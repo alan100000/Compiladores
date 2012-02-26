@@ -1,5 +1,5 @@
 
-grammar SimpleCalc;
+grammar SimpleDroid;
  
 tokens {
     PLUS    = '+' ;
@@ -38,8 +38,18 @@ factor  : NUMBER ;
  * LEXER RULES
  *------------------------------------------------------------------*/
  
+INT  : (DIGITO)+ ;
+DECIMAL : (DIGITO)+'.'(DIGITO)+ ;
+SEMICOLON : ';' ;
+OPEXP : '+'|'-' ;
+OPTERMINO: '*'|'/'|'%' ;
+LLAVEIZQ : '{' ;
+LLAVEDER : '}' ;
+PARIZQ : ')';
+PARDER : '('; 
 NUMBER  : (DIGIT)+ ;
  
 WHITESPACE : ( '\t' | ' ' | '\r' | '\n'| '\u000C' )+    { $channel = HIDDEN; } ;
  
+fragment DIGITO  : '0'..'9' ;
 fragment DIGIT  : '0'..'9' ;
