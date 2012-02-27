@@ -1,0 +1,28 @@
+int alfina, be = 3;
+decimal beta = 22.11;
+string palabras = "\nFIN DEL PROGRAMA!";
+
+function nothing hola_mundo(){
+	if(aviso){
+		write("\nHELLO WORLD!");
+	}
+	else{
+		write("\nNO MSG FOR YOU!");
+	}
+}
+
+function int suma_b(int aux){
+	aux = aux + 1;
+	return aux;
+}
+
+function execute(){
+	boolean deseo;
+	while(b < 4){
+		b = invoke suma_b(b);
+	}
+	write("QUIERES VER ALGO? ESCRIBE true O ESCRIBE false: ");
+	read(boolean, deseo);
+	invoke hola_mundo(deseo);
+	write(palabras);
+}

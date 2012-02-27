@@ -1,5 +1,5 @@
 
-grammar simpleDroid;
+grammar SimpleDroid;
 
 
 /*------------------------------------------------------------------
@@ -9,8 +9,8 @@ grammar simpleDroid;
 tokens {
 	LLAVEIZQ = '{' ;
 	LLAVEDER = '}' ;
-	PARIZQ = ')';
-	PARDER = '('; 
+	PARIZQ = '(';
+	PARDER = ')'; 
 	CORIZQ = '['; 
 	CORDER = ']';
 	COMA = ',';
@@ -49,13 +49,13 @@ tokens {
  
 @members {
     public static void main(String[] args) throws Exception {
-        SimpleCalcLexer lex = new SimpleCalcLexer(new ANTLRFileStream(args[0]));
+        SimpleDroidLexer lex = new SimpleDroidLexer(new ANTLRFileStream(args[0]));
         CommonTokenStream tokens = new CommonTokenStream(lex);
  
-        SimpleCalcParser parser = new SimpleCalcParser(tokens);
+        SimpleDroidParser parser = new SimpleDroidParser(tokens);
  
         try {
-            parser.expr();
+            parser.programa();
         } catch (RecognitionException e)  {
             e.printStackTrace();
         }
@@ -69,6 +69,8 @@ CTE_DECIMAL : (DIGITO)+'.'(DIGITO)+ ;
 CTE_ENTERA : (DIGITO)+ ;
 CTE_CHAR: (LOWERCASE | UPPERCASE ) ;
 ID: LOWERCASE (LOWERCASE | UPPERCASE | DIGITO | '_')* ;
+
+
 WHITESPACE : ( '\t' | ' ' | '\r' | '\n'| '\u000C' )+    { $channel = HIDDEN; } ;
 CTE_STRING : '\"' (.)* '\"' ;
 
@@ -193,10 +195,10 @@ varcte : ID varctePrima
 varctePrima : CORIZQ CTE_ENTERA CORDER
 	| ;
 
-ciclo : while
-	| for ;
+ciclo : xwhile
+	| xfor ;
 
-while : WHILE PARDER expresion PARIZQ LLAVEIZQ bloque LLAVEDER ;
+xwhile : WHILE PARIZQ expresion PARDER LLAVEIZQ bloque LLAVEDER ;
 
 retorno : RETURN varcte SEMICOLON ;
 
@@ -215,6 +217,6 @@ condicionPrima : ELSE LLAVEIZQ bloque LLAVEDER
 
 lectura : READ PARIZQ ID PARDER SEMICOLON ;
 
-for : FOR PARIZQ asignacion SEMICOLON expresion SEMICOLON asignacion PARDER LLAVEIZQ bloque LLAVEDER ;
+xfor : FOR PARIZQ asignacion SEMICOLON expresion SEMICOLON asignacion PARDER LLAVEIZQ bloque LLAVEDER ;
 
 
