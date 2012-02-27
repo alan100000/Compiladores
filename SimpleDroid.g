@@ -65,10 +65,12 @@ tokens {
 
 
 CTE_BOOLEAN : 'true' | 'false' ;
+ID: (LOWERCASE) (LOWERCASE | UPPERCASE | DIGITO | '_')* ;
 CTE_DECIMAL : (DIGITO)+'.'(DIGITO)+ ;
 CTE_ENTERA : (DIGITO)+ ;
-CTE_CHAR: (LOWERCASE | UPPERCASE ) ;
-ID: LOWERCASE (LOWERCASE | UPPERCASE | DIGITO | '_')* ;
+CTE_CHAR: ('\'')(LOWERCASE | UPPERCASE )('\'') ;
+
+
 
 
 WHITESPACE : ( '\t' | ' ' | '\r' | '\n'| '\u000C' )+    { $channel = HIDDEN; } ;
@@ -136,41 +138,40 @@ asignacion : ID asignacionPrima IGUAL expresion SEMICOLON ;
 asignacionPrima : CORIZQ CTE_ENTERA CORDER
 	| ;
 
-expresion : expresionPrima exp expresionBiPrima ;
+expresion : expresionPrima exp comparador ;
 
 expresionPrima : NOT
 	| ;
 
-expresionBiPrima : logico
+comparador : comparadorPrima logico ;
+
+comparadorPrima : comparadorBiPrima comparadorTriPrima exp 
 	| ;
 
-logico : comparador logicoPrima ;
+comparadorBiPrima : LT
+	| GT ;
+
+comparadorTriPrima : IGUAL
+	| ;
+
+logico : logicoPrima expresion 
+	| ;
 
 logicoPrima : AND
-	| OR
-	| ;
-
-comparador : exp comparadorPrima ;
-
-comparadorPrima : LT comparadorBiPrima
-	| GT comparadorBiPrima
-	| ;
-
-comparadorBiPrima : IGUAL
-	| ;
+	| OR ;
 
 exp : termino expPrima ;
 
 expPrima
-options {backtrack=true;}: MAS
-	| MENOS
+options {backtrack=true;}: MAS exp
+	| MENOS exp
 	| ;
 
 termino : factor terminoPrima ;
 
-terminoPrima : POR
-	| ENTRE
-	| MOD
+terminoPrima : POR termino
+	| ENTRE termino
+	| MOD termino
 	| ;
 
 factor : PARIZQ expresion PARDER
@@ -190,7 +191,7 @@ varcte : ID varctePrima
 	| CTE_STRING
 	| CTE_CHAR
 	| CTE_BOOLEAN
-	| invocacion ;
+	| invocacionDos ;
 
 varctePrima : CORIZQ CTE_ENTERA CORDER
 	| ;
@@ -203,6 +204,8 @@ xwhile : WHILE PARIZQ expresion PARDER LLAVEIZQ bloque LLAVEDER ;
 retorno : RETURN varcte SEMICOLON ;
 
 invocacion : INVOKE ID PARIZQ paramsDos PARDER SEMICOLON ;
+
+invocacionDos : INVOKE ID PARIZQ paramsDos PARDER ;
 
 paramsDos : expresion paramsDosPrima 
 	| ;

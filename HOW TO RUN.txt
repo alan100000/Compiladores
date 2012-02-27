@@ -1,0 +1,4 @@
+java org.antlr.Tool SimpleDroid.g
+javac *.java
+java SimpleDroidParser text.droid
+
