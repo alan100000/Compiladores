@@ -1,0 +1,4 @@
+#!/bin/bash
+
+java org.antlr.Tool SimpleDroid.g
+javac *.java
