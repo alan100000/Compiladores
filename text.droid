@@ -4,6 +4,7 @@ decimal beta = 22.11;
 string palabras = "\nFIN DEL PROGRAMA!";
 
 function nothing hola_mundo(){
+	int pedro;
 	if(aviso){
 		write("\nHELLO WORLD!");
 	}
@@ -12,7 +13,13 @@ function nothing hola_mundo(){
 	}
 }
 
+function decimal mauricio(decimal paco, decimal poco, decimal elnegroklever){
+	string mauri = "el mauricio come chile";
+	write(mauri);
+}
+
 function int suma_b(int aux){
+	decimal maximiliano = 77.88889;
 	aux = aux + 1;
 	return aux;
 }

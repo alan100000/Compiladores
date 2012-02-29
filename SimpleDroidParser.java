@@ -1,4 +1,4 @@
-// $ANTLR 3.3 Nov 30, 2010 12:50:56 SimpleDroid.g 2012-02-28 20:20:18
+// $ANTLR 3.3 Nov 30, 2010 12:50:56 SimpleDroid.g 2012-02-29 13:32:51
 
     import java.util.Stack;
     import java.util.ArrayList;
@@ -90,7 +90,7 @@ public class SimpleDroidParser extends Parser {
         public static void main(String[] args) throws Exception {
             SimpleDroidLexer lex = new SimpleDroidLexer(new ANTLRFileStream(args[0])); //se crea el lexer
             CommonTokenStream tokens = new CommonTokenStream(lex); //se crean las tokens
-    	Procs aux = new Procs("main"); //BORRAME
+    	Procs aux = new Procs("global"); //BORRAME
     	listaProcs.add(aux); //BORRAME
 
             SimpleDroidParser parser = new SimpleDroidParser(tokens); //se crea el parser
@@ -102,18 +102,25 @@ public class SimpleDroidParser extends Parser {
             }
         }
 
+        public void nuevoProc(String nombre){ //agrega un nuevo Proc a la lista de procs
+    	Procs aux = new Procs(nombre);
+    	listaProcs.add(aux);
+    	procIndice++;
+        }
+
+
         public void insertaVariable(String tipo){ //falta checar cubo y checar si es global
     	String borrarLuego = identificadores.pop().toString(); //BORRAME
     	//listaProcs.get(procIndice).agregaVar(identificadores.pop().toString(), tipo);
     	listaProcs.get(procIndice).agregaVar(borrarLuego, tipo); //BORRAME
-    	System.out.println("Se deposito al proc["+procIndice+"]: "+borrarLuego+", "+tipo); //BORRAME
+    	System.out.println("Se deposito al proc["+procIndice+"][\""+listaProcs.get(procIndice).getNombre()+"\"]: "+borrarLuego+", "+tipo); //BORRAME
     	if(!identificadores.empty()){
     		if(identificadores.peek().toString().equals(",")){
     			identificadores.pop();
     			borrarLuego = identificadores.pop().toString(); //BORRAME
     			//listaProcs.get(procIndice).agregaVar(identificadores.pop().toString(), tipo);
     			listaProcs.get(procIndice).agregaVar(borrarLuego, tipo); //BORRAME
-    			System.out.println("Se deposito al proc["+procIndice+"]: "+borrarLuego+", "+tipo); //BORRAME
+    			System.out.println("Se deposito al proc["+procIndice+"][\""+listaProcs.get(procIndice).getNombre()+"\"]: "+borrarLuego+", "+tipo); //BORRAME
     		} 
     	}
         }
@@ -121,11 +128,11 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "programa"
-    // SimpleDroid.g:116:1: programa : vars funciones main ;
+    // SimpleDroid.g:123:1: programa : vars funciones main ;
     public final void programa() throws RecognitionException {
         try {
-            // SimpleDroid.g:116:10: ( vars funciones main )
-            // SimpleDroid.g:116:12: vars funciones main
+            // SimpleDroid.g:123:10: ( vars funciones main )
+            // SimpleDroid.g:123:12: vars funciones main
             {
             pushFollow(FOLLOW_vars_in_programa527);
             vars();
@@ -161,11 +168,11 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "main"
-    // SimpleDroid.g:118:1: main : FUNCTION EXECUTE PARIZQ PARDER LLAVEIZQ vars bloque LLAVEDER ;
+    // SimpleDroid.g:125:1: main : FUNCTION EXECUTE PARIZQ PARDER LLAVEIZQ vars bloque LLAVEDER ;
     public final void main() throws RecognitionException {
         try {
-            // SimpleDroid.g:118:6: ( FUNCTION EXECUTE PARIZQ PARDER LLAVEIZQ vars bloque LLAVEDER )
-            // SimpleDroid.g:118:8: FUNCTION EXECUTE PARIZQ PARDER LLAVEIZQ vars bloque LLAVEDER
+            // SimpleDroid.g:125:6: ( FUNCTION EXECUTE PARIZQ PARDER LLAVEIZQ vars bloque LLAVEDER )
+            // SimpleDroid.g:125:8: FUNCTION EXECUTE PARIZQ PARDER LLAVEIZQ vars bloque LLAVEDER
             {
             match(input,FUNCTION,FOLLOW_FUNCTION_in_main541); if (state.failed) return ;
             match(input,EXECUTE,FOLLOW_EXECUTE_in_main543); if (state.failed) return ;
@@ -183,6 +190,9 @@ public class SimpleDroidParser extends Parser {
             state._fsp--;
             if (state.failed) return ;
             match(input,LLAVEDER,FOLLOW_LLAVEDER_in_main555); if (state.failed) return ;
+            if ( state.backtracking==0 ) {
+               nuevoProc("main"); 
+            }
 
             }
 
@@ -199,13 +209,13 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "vars"
-    // SimpleDroid.g:120:1: vars : ( varsPrima tipo varsBiPrima SEMICOLON vars | );
+    // SimpleDroid.g:127:1: vars : ( varsPrima tipo varsBiPrima SEMICOLON vars | );
     public final void vars() throws RecognitionException {
         SimpleDroidParser.tipo_return tipo1 = null;
 
 
         try {
-            // SimpleDroid.g:120:6: ( varsPrima tipo varsBiPrima SEMICOLON vars | )
+            // SimpleDroid.g:127:6: ( varsPrima tipo varsBiPrima SEMICOLON vars | )
             int alt1=2;
             int LA1_0 = input.LA(1);
 
@@ -224,25 +234,25 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt1) {
                 case 1 :
-                    // SimpleDroid.g:120:8: varsPrima tipo varsBiPrima SEMICOLON vars
+                    // SimpleDroid.g:127:8: varsPrima tipo varsBiPrima SEMICOLON vars
                     {
-                    pushFollow(FOLLOW_varsPrima_in_vars564);
+                    pushFollow(FOLLOW_varsPrima_in_vars568);
                     varsPrima();
 
                     state._fsp--;
                     if (state.failed) return ;
-                    pushFollow(FOLLOW_tipo_in_vars566);
+                    pushFollow(FOLLOW_tipo_in_vars570);
                     tipo1=tipo();
 
                     state._fsp--;
                     if (state.failed) return ;
-                    pushFollow(FOLLOW_varsBiPrima_in_vars568);
+                    pushFollow(FOLLOW_varsBiPrima_in_vars572);
                     varsBiPrima();
 
                     state._fsp--;
                     if (state.failed) return ;
-                    match(input,SEMICOLON,FOLLOW_SEMICOLON_in_vars570); if (state.failed) return ;
-                    pushFollow(FOLLOW_vars_in_vars572);
+                    match(input,SEMICOLON,FOLLOW_SEMICOLON_in_vars574); if (state.failed) return ;
+                    pushFollow(FOLLOW_vars_in_vars576);
                     vars();
 
                     state._fsp--;
@@ -254,7 +264,7 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:121:4: 
+                    // SimpleDroid.g:128:4: 
                     {
                     }
                     break;
@@ -273,10 +283,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "varsPrima"
-    // SimpleDroid.g:123:1: varsPrima : ( GLOBAL | );
+    // SimpleDroid.g:130:1: varsPrima : ( GLOBAL | );
     public final void varsPrima() throws RecognitionException {
         try {
-            // SimpleDroid.g:123:11: ( GLOBAL | )
+            // SimpleDroid.g:130:11: ( GLOBAL | )
             int alt2=2;
             int LA2_0 = input.LA(1);
 
@@ -295,14 +305,14 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt2) {
                 case 1 :
-                    // SimpleDroid.g:123:13: GLOBAL
+                    // SimpleDroid.g:130:13: GLOBAL
                     {
-                    match(input,GLOBAL,FOLLOW_GLOBAL_in_varsPrima586); if (state.failed) return ;
+                    match(input,GLOBAL,FOLLOW_GLOBAL_in_varsPrima590); if (state.failed) return ;
 
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:124:4: 
+                    // SimpleDroid.g:131:4: 
                     {
                     }
                     break;
@@ -321,21 +331,21 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "varsBiPrima"
-    // SimpleDroid.g:126:1: varsBiPrima : ID varsTriPrima varsCuatriPrima ;
+    // SimpleDroid.g:133:1: varsBiPrima : ID varsTriPrima varsCuatriPrima ;
     public final void varsBiPrima() throws RecognitionException {
         Token ID2=null;
 
         try {
-            // SimpleDroid.g:126:13: ( ID varsTriPrima varsCuatriPrima )
-            // SimpleDroid.g:126:15: ID varsTriPrima varsCuatriPrima
+            // SimpleDroid.g:133:13: ( ID varsTriPrima varsCuatriPrima )
+            // SimpleDroid.g:133:15: ID varsTriPrima varsCuatriPrima
             {
-            ID2=(Token)match(input,ID,FOLLOW_ID_in_varsBiPrima598); if (state.failed) return ;
-            pushFollow(FOLLOW_varsTriPrima_in_varsBiPrima600);
+            ID2=(Token)match(input,ID,FOLLOW_ID_in_varsBiPrima602); if (state.failed) return ;
+            pushFollow(FOLLOW_varsTriPrima_in_varsBiPrima604);
             varsTriPrima();
 
             state._fsp--;
             if (state.failed) return ;
-            pushFollow(FOLLOW_varsCuatriPrima_in_varsBiPrima602);
+            pushFollow(FOLLOW_varsCuatriPrima_in_varsBiPrima606);
             varsCuatriPrima();
 
             state._fsp--;
@@ -359,10 +369,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "varsTriPrima"
-    // SimpleDroid.g:128:1: varsTriPrima : ( IGUAL expresion | CORIZQ CTE_ENTERA CORDER | );
+    // SimpleDroid.g:135:1: varsTriPrima : ( IGUAL expresion | CORIZQ CTE_ENTERA CORDER | );
     public final void varsTriPrima() throws RecognitionException {
         try {
-            // SimpleDroid.g:128:14: ( IGUAL expresion | CORIZQ CTE_ENTERA CORDER | )
+            // SimpleDroid.g:135:14: ( IGUAL expresion | CORIZQ CTE_ENTERA CORDER | )
             int alt3=3;
             switch ( input.LA(1) ) {
             case IGUAL:
@@ -391,10 +401,10 @@ public class SimpleDroidParser extends Parser {
 
             switch (alt3) {
                 case 1 :
-                    // SimpleDroid.g:128:16: IGUAL expresion
+                    // SimpleDroid.g:135:16: IGUAL expresion
                     {
-                    match(input,IGUAL,FOLLOW_IGUAL_in_varsTriPrima612); if (state.failed) return ;
-                    pushFollow(FOLLOW_expresion_in_varsTriPrima614);
+                    match(input,IGUAL,FOLLOW_IGUAL_in_varsTriPrima616); if (state.failed) return ;
+                    pushFollow(FOLLOW_expresion_in_varsTriPrima618);
                     expresion();
 
                     state._fsp--;
@@ -403,16 +413,16 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:129:4: CORIZQ CTE_ENTERA CORDER
+                    // SimpleDroid.g:136:4: CORIZQ CTE_ENTERA CORDER
                     {
-                    match(input,CORIZQ,FOLLOW_CORIZQ_in_varsTriPrima619); if (state.failed) return ;
-                    match(input,CTE_ENTERA,FOLLOW_CTE_ENTERA_in_varsTriPrima621); if (state.failed) return ;
-                    match(input,CORDER,FOLLOW_CORDER_in_varsTriPrima623); if (state.failed) return ;
+                    match(input,CORIZQ,FOLLOW_CORIZQ_in_varsTriPrima623); if (state.failed) return ;
+                    match(input,CTE_ENTERA,FOLLOW_CTE_ENTERA_in_varsTriPrima625); if (state.failed) return ;
+                    match(input,CORDER,FOLLOW_CORDER_in_varsTriPrima627); if (state.failed) return ;
 
                     }
                     break;
                 case 3 :
-                    // SimpleDroid.g:130:4: 
+                    // SimpleDroid.g:137:4: 
                     {
                     }
                     break;
@@ -431,12 +441,12 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "varsCuatriPrima"
-    // SimpleDroid.g:132:1: varsCuatriPrima : ( COMA varsBiPrima | );
+    // SimpleDroid.g:139:1: varsCuatriPrima : ( COMA varsBiPrima | );
     public final void varsCuatriPrima() throws RecognitionException {
         Token COMA3=null;
 
         try {
-            // SimpleDroid.g:132:17: ( COMA varsBiPrima | )
+            // SimpleDroid.g:139:17: ( COMA varsBiPrima | )
             int alt4=2;
             int LA4_0 = input.LA(1);
 
@@ -455,10 +465,10 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt4) {
                 case 1 :
-                    // SimpleDroid.g:132:19: COMA varsBiPrima
+                    // SimpleDroid.g:139:19: COMA varsBiPrima
                     {
-                    COMA3=(Token)match(input,COMA,FOLLOW_COMA_in_varsCuatriPrima635); if (state.failed) return ;
-                    pushFollow(FOLLOW_varsBiPrima_in_varsCuatriPrima637);
+                    COMA3=(Token)match(input,COMA,FOLLOW_COMA_in_varsCuatriPrima639); if (state.failed) return ;
+                    pushFollow(FOLLOW_varsBiPrima_in_varsCuatriPrima641);
                     varsBiPrima();
 
                     state._fsp--;
@@ -471,7 +481,7 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:134:4: 
+                    // SimpleDroid.g:141:4: 
                     {
                     }
                     break;
@@ -490,10 +500,12 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "funciones"
-    // SimpleDroid.g:136:1: funciones : ( FUNCTION funcionesPrima ID PARIZQ params PARDER LLAVEIZQ vars bloque LLAVEDER funciones | );
+    // SimpleDroid.g:143:1: funciones : ( FUNCTION funcionesPrima ID PARIZQ params PARDER LLAVEIZQ vars bloque LLAVEDER funciones | );
     public final void funciones() throws RecognitionException {
+        Token ID4=null;
+
         try {
-            // SimpleDroid.g:136:11: ( FUNCTION funcionesPrima ID PARIZQ params PARDER LLAVEIZQ vars bloque LLAVEDER funciones | )
+            // SimpleDroid.g:143:11: ( FUNCTION funcionesPrima ID PARIZQ params PARDER LLAVEIZQ vars bloque LLAVEDER funciones | )
             int alt5=2;
             int LA5_0 = input.LA(1);
 
@@ -523,44 +535,47 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt5) {
                 case 1 :
-                    // SimpleDroid.g:136:13: FUNCTION funcionesPrima ID PARIZQ params PARDER LLAVEIZQ vars bloque LLAVEDER funciones
+                    // SimpleDroid.g:143:13: FUNCTION funcionesPrima ID PARIZQ params PARDER LLAVEIZQ vars bloque LLAVEDER funciones
                     {
-                    match(input,FUNCTION,FOLLOW_FUNCTION_in_funciones651); if (state.failed) return ;
-                    pushFollow(FOLLOW_funcionesPrima_in_funciones653);
+                    match(input,FUNCTION,FOLLOW_FUNCTION_in_funciones655); if (state.failed) return ;
+                    pushFollow(FOLLOW_funcionesPrima_in_funciones657);
                     funcionesPrima();
 
                     state._fsp--;
                     if (state.failed) return ;
-                    match(input,ID,FOLLOW_ID_in_funciones655); if (state.failed) return ;
-                    match(input,PARIZQ,FOLLOW_PARIZQ_in_funciones657); if (state.failed) return ;
-                    pushFollow(FOLLOW_params_in_funciones659);
+                    ID4=(Token)match(input,ID,FOLLOW_ID_in_funciones659); if (state.failed) return ;
+                    match(input,PARIZQ,FOLLOW_PARIZQ_in_funciones661); if (state.failed) return ;
+                    pushFollow(FOLLOW_params_in_funciones663);
                     params();
 
                     state._fsp--;
                     if (state.failed) return ;
-                    match(input,PARDER,FOLLOW_PARDER_in_funciones661); if (state.failed) return ;
-                    match(input,LLAVEIZQ,FOLLOW_LLAVEIZQ_in_funciones663); if (state.failed) return ;
-                    pushFollow(FOLLOW_vars_in_funciones665);
+                    match(input,PARDER,FOLLOW_PARDER_in_funciones665); if (state.failed) return ;
+                    match(input,LLAVEIZQ,FOLLOW_LLAVEIZQ_in_funciones667); if (state.failed) return ;
+                    pushFollow(FOLLOW_vars_in_funciones669);
                     vars();
 
                     state._fsp--;
                     if (state.failed) return ;
-                    pushFollow(FOLLOW_bloque_in_funciones667);
+                    pushFollow(FOLLOW_bloque_in_funciones671);
                     bloque();
 
                     state._fsp--;
                     if (state.failed) return ;
-                    match(input,LLAVEDER,FOLLOW_LLAVEDER_in_funciones669); if (state.failed) return ;
-                    pushFollow(FOLLOW_funciones_in_funciones671);
+                    match(input,LLAVEDER,FOLLOW_LLAVEDER_in_funciones673); if (state.failed) return ;
+                    pushFollow(FOLLOW_funciones_in_funciones675);
                     funciones();
 
                     state._fsp--;
                     if (state.failed) return ;
+                    if ( state.backtracking==0 ) {
+                       nuevoProc((ID4!=null?ID4.getText():null)); 
+                    }
 
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:137:4: 
+                    // SimpleDroid.g:144:4: 
                     {
                     }
                     break;
@@ -579,10 +594,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "funcionesPrima"
-    // SimpleDroid.g:139:1: funcionesPrima : ( tipo | NOTHING );
+    // SimpleDroid.g:146:1: funcionesPrima : ( tipo | NOTHING );
     public final void funcionesPrima() throws RecognitionException {
         try {
-            // SimpleDroid.g:139:16: ( tipo | NOTHING )
+            // SimpleDroid.g:146:16: ( tipo | NOTHING )
             int alt6=2;
             int LA6_0 = input.LA(1);
 
@@ -601,9 +616,9 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt6) {
                 case 1 :
-                    // SimpleDroid.g:139:18: tipo
+                    // SimpleDroid.g:146:18: tipo
                     {
-                    pushFollow(FOLLOW_tipo_in_funcionesPrima683);
+                    pushFollow(FOLLOW_tipo_in_funcionesPrima689);
                     tipo();
 
                     state._fsp--;
@@ -612,9 +627,9 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:140:4: NOTHING
+                    // SimpleDroid.g:147:4: NOTHING
                     {
-                    match(input,NOTHING,FOLLOW_NOTHING_in_funcionesPrima688); if (state.failed) return ;
+                    match(input,NOTHING,FOLLOW_NOTHING_in_funcionesPrima694); if (state.failed) return ;
 
                     }
                     break;
@@ -635,13 +650,13 @@ public class SimpleDroidParser extends Parser {
     };
 
     // $ANTLR start "tipo"
-    // SimpleDroid.g:142:1: tipo : ( INT | DECIMAL | STRING | CHAR | BOOLEAN );
+    // SimpleDroid.g:149:1: tipo : ( INT | DECIMAL | STRING | CHAR | BOOLEAN );
     public final SimpleDroidParser.tipo_return tipo() throws RecognitionException {
         SimpleDroidParser.tipo_return retval = new SimpleDroidParser.tipo_return();
         retval.start = input.LT(1);
 
         try {
-            // SimpleDroid.g:142:6: ( INT | DECIMAL | STRING | CHAR | BOOLEAN )
+            // SimpleDroid.g:149:6: ( INT | DECIMAL | STRING | CHAR | BOOLEAN )
             // SimpleDroid.g:
             {
             if ( (input.LA(1)>=INT && input.LA(1)<=BOOLEAN) ) {
@@ -672,10 +687,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "params"
-    // SimpleDroid.g:148:1: params : ( tipo ID paramsPrima | );
+    // SimpleDroid.g:155:1: params : ( tipo ID paramsPrima | );
     public final void params() throws RecognitionException {
         try {
-            // SimpleDroid.g:148:8: ( tipo ID paramsPrima | )
+            // SimpleDroid.g:155:8: ( tipo ID paramsPrima | )
             int alt7=2;
             int LA7_0 = input.LA(1);
 
@@ -694,15 +709,15 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt7) {
                 case 1 :
-                    // SimpleDroid.g:148:10: tipo ID paramsPrima
+                    // SimpleDroid.g:155:10: tipo ID paramsPrima
                     {
-                    pushFollow(FOLLOW_tipo_in_params726);
+                    pushFollow(FOLLOW_tipo_in_params732);
                     tipo();
 
                     state._fsp--;
                     if (state.failed) return ;
-                    match(input,ID,FOLLOW_ID_in_params728); if (state.failed) return ;
-                    pushFollow(FOLLOW_paramsPrima_in_params730);
+                    match(input,ID,FOLLOW_ID_in_params734); if (state.failed) return ;
+                    pushFollow(FOLLOW_paramsPrima_in_params736);
                     paramsPrima();
 
                     state._fsp--;
@@ -711,7 +726,7 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:149:4: 
+                    // SimpleDroid.g:156:4: 
                     {
                     }
                     break;
@@ -730,10 +745,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "paramsPrima"
-    // SimpleDroid.g:151:1: paramsPrima : ( COMA tipo ID paramsPrima | );
+    // SimpleDroid.g:158:1: paramsPrima : ( COMA tipo ID paramsPrima | );
     public final void paramsPrima() throws RecognitionException {
         try {
-            // SimpleDroid.g:151:13: ( COMA tipo ID paramsPrima | )
+            // SimpleDroid.g:158:13: ( COMA tipo ID paramsPrima | )
             int alt8=2;
             int LA8_0 = input.LA(1);
 
@@ -752,16 +767,16 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt8) {
                 case 1 :
-                    // SimpleDroid.g:151:15: COMA tipo ID paramsPrima
+                    // SimpleDroid.g:158:15: COMA tipo ID paramsPrima
                     {
-                    match(input,COMA,FOLLOW_COMA_in_paramsPrima742); if (state.failed) return ;
-                    pushFollow(FOLLOW_tipo_in_paramsPrima744);
+                    match(input,COMA,FOLLOW_COMA_in_paramsPrima748); if (state.failed) return ;
+                    pushFollow(FOLLOW_tipo_in_paramsPrima750);
                     tipo();
 
                     state._fsp--;
                     if (state.failed) return ;
-                    match(input,ID,FOLLOW_ID_in_paramsPrima746); if (state.failed) return ;
-                    pushFollow(FOLLOW_paramsPrima_in_paramsPrima748);
+                    match(input,ID,FOLLOW_ID_in_paramsPrima752); if (state.failed) return ;
+                    pushFollow(FOLLOW_paramsPrima_in_paramsPrima754);
                     paramsPrima();
 
                     state._fsp--;
@@ -770,7 +785,7 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:152:4: 
+                    // SimpleDroid.g:159:4: 
                     {
                     }
                     break;
@@ -789,10 +804,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "bloque"
-    // SimpleDroid.g:154:1: bloque : ( estatuto bloque | );
+    // SimpleDroid.g:161:1: bloque : ( estatuto bloque | );
     public final void bloque() throws RecognitionException {
         try {
-            // SimpleDroid.g:154:8: ( estatuto bloque | )
+            // SimpleDroid.g:161:8: ( estatuto bloque | )
             int alt9=2;
             int LA9_0 = input.LA(1);
 
@@ -811,14 +826,14 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt9) {
                 case 1 :
-                    // SimpleDroid.g:154:10: estatuto bloque
+                    // SimpleDroid.g:161:10: estatuto bloque
                     {
-                    pushFollow(FOLLOW_estatuto_in_bloque760);
+                    pushFollow(FOLLOW_estatuto_in_bloque766);
                     estatuto();
 
                     state._fsp--;
                     if (state.failed) return ;
-                    pushFollow(FOLLOW_bloque_in_bloque762);
+                    pushFollow(FOLLOW_bloque_in_bloque768);
                     bloque();
 
                     state._fsp--;
@@ -827,7 +842,7 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:155:4: 
+                    // SimpleDroid.g:162:4: 
                     {
                     }
                     break;
@@ -846,10 +861,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "estatuto"
-    // SimpleDroid.g:157:1: estatuto : ( asignacion | condicion | ciclo | escritura | lectura | retorno | invocacion );
+    // SimpleDroid.g:164:1: estatuto : ( asignacion | condicion | ciclo | escritura | lectura | retorno | invocacion );
     public final void estatuto() throws RecognitionException {
         try {
-            // SimpleDroid.g:157:10: ( asignacion | condicion | ciclo | escritura | lectura | retorno | invocacion )
+            // SimpleDroid.g:164:10: ( asignacion | condicion | ciclo | escritura | lectura | retorno | invocacion )
             int alt10=7;
             switch ( input.LA(1) ) {
             case ID:
@@ -898,9 +913,9 @@ public class SimpleDroidParser extends Parser {
 
             switch (alt10) {
                 case 1 :
-                    // SimpleDroid.g:157:12: asignacion
+                    // SimpleDroid.g:164:12: asignacion
                     {
-                    pushFollow(FOLLOW_asignacion_in_estatuto774);
+                    pushFollow(FOLLOW_asignacion_in_estatuto780);
                     asignacion();
 
                     state._fsp--;
@@ -909,9 +924,9 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:158:4: condicion
+                    // SimpleDroid.g:165:4: condicion
                     {
-                    pushFollow(FOLLOW_condicion_in_estatuto779);
+                    pushFollow(FOLLOW_condicion_in_estatuto785);
                     condicion();
 
                     state._fsp--;
@@ -920,9 +935,9 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // SimpleDroid.g:159:4: ciclo
+                    // SimpleDroid.g:166:4: ciclo
                     {
-                    pushFollow(FOLLOW_ciclo_in_estatuto784);
+                    pushFollow(FOLLOW_ciclo_in_estatuto790);
                     ciclo();
 
                     state._fsp--;
@@ -931,9 +946,9 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // SimpleDroid.g:160:4: escritura
+                    // SimpleDroid.g:167:4: escritura
                     {
-                    pushFollow(FOLLOW_escritura_in_estatuto789);
+                    pushFollow(FOLLOW_escritura_in_estatuto795);
                     escritura();
 
                     state._fsp--;
@@ -942,9 +957,9 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // SimpleDroid.g:161:4: lectura
+                    // SimpleDroid.g:168:4: lectura
                     {
-                    pushFollow(FOLLOW_lectura_in_estatuto794);
+                    pushFollow(FOLLOW_lectura_in_estatuto800);
                     lectura();
 
                     state._fsp--;
@@ -953,9 +968,9 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 6 :
-                    // SimpleDroid.g:162:4: retorno
+                    // SimpleDroid.g:169:4: retorno
                     {
-                    pushFollow(FOLLOW_retorno_in_estatuto799);
+                    pushFollow(FOLLOW_retorno_in_estatuto805);
                     retorno();
 
                     state._fsp--;
@@ -964,9 +979,9 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 7 :
-                    // SimpleDroid.g:163:4: invocacion
+                    // SimpleDroid.g:170:4: invocacion
                     {
-                    pushFollow(FOLLOW_invocacion_in_estatuto804);
+                    pushFollow(FOLLOW_invocacion_in_estatuto810);
                     invocacion();
 
                     state._fsp--;
@@ -989,25 +1004,25 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "asignacion"
-    // SimpleDroid.g:165:1: asignacion : ID asignacionPrima IGUAL expresion SEMICOLON ;
+    // SimpleDroid.g:172:1: asignacion : ID asignacionPrima IGUAL expresion SEMICOLON ;
     public final void asignacion() throws RecognitionException {
         try {
-            // SimpleDroid.g:165:12: ( ID asignacionPrima IGUAL expresion SEMICOLON )
-            // SimpleDroid.g:165:14: ID asignacionPrima IGUAL expresion SEMICOLON
+            // SimpleDroid.g:172:12: ( ID asignacionPrima IGUAL expresion SEMICOLON )
+            // SimpleDroid.g:172:14: ID asignacionPrima IGUAL expresion SEMICOLON
             {
-            match(input,ID,FOLLOW_ID_in_asignacion813); if (state.failed) return ;
-            pushFollow(FOLLOW_asignacionPrima_in_asignacion815);
+            match(input,ID,FOLLOW_ID_in_asignacion819); if (state.failed) return ;
+            pushFollow(FOLLOW_asignacionPrima_in_asignacion821);
             asignacionPrima();
 
             state._fsp--;
             if (state.failed) return ;
-            match(input,IGUAL,FOLLOW_IGUAL_in_asignacion817); if (state.failed) return ;
-            pushFollow(FOLLOW_expresion_in_asignacion819);
+            match(input,IGUAL,FOLLOW_IGUAL_in_asignacion823); if (state.failed) return ;
+            pushFollow(FOLLOW_expresion_in_asignacion825);
             expresion();
 
             state._fsp--;
             if (state.failed) return ;
-            match(input,SEMICOLON,FOLLOW_SEMICOLON_in_asignacion821); if (state.failed) return ;
+            match(input,SEMICOLON,FOLLOW_SEMICOLON_in_asignacion827); if (state.failed) return ;
 
             }
 
@@ -1024,10 +1039,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "asignacionPrima"
-    // SimpleDroid.g:167:1: asignacionPrima : ( CORIZQ CTE_ENTERA CORDER | );
+    // SimpleDroid.g:174:1: asignacionPrima : ( CORIZQ CTE_ENTERA CORDER | );
     public final void asignacionPrima() throws RecognitionException {
         try {
-            // SimpleDroid.g:167:17: ( CORIZQ CTE_ENTERA CORDER | )
+            // SimpleDroid.g:174:17: ( CORIZQ CTE_ENTERA CORDER | )
             int alt11=2;
             int LA11_0 = input.LA(1);
 
@@ -1046,16 +1061,16 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt11) {
                 case 1 :
-                    // SimpleDroid.g:167:19: CORIZQ CTE_ENTERA CORDER
+                    // SimpleDroid.g:174:19: CORIZQ CTE_ENTERA CORDER
                     {
-                    match(input,CORIZQ,FOLLOW_CORIZQ_in_asignacionPrima830); if (state.failed) return ;
-                    match(input,CTE_ENTERA,FOLLOW_CTE_ENTERA_in_asignacionPrima832); if (state.failed) return ;
-                    match(input,CORDER,FOLLOW_CORDER_in_asignacionPrima834); if (state.failed) return ;
+                    match(input,CORIZQ,FOLLOW_CORIZQ_in_asignacionPrima836); if (state.failed) return ;
+                    match(input,CTE_ENTERA,FOLLOW_CTE_ENTERA_in_asignacionPrima838); if (state.failed) return ;
+                    match(input,CORDER,FOLLOW_CORDER_in_asignacionPrima840); if (state.failed) return ;
 
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:168:4: 
+                    // SimpleDroid.g:175:4: 
                     {
                     }
                     break;
@@ -1074,23 +1089,23 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "expresion"
-    // SimpleDroid.g:170:1: expresion : expresionPrima exp comparador ;
+    // SimpleDroid.g:177:1: expresion : expresionPrima exp comparador ;
     public final void expresion() throws RecognitionException {
         try {
-            // SimpleDroid.g:170:11: ( expresionPrima exp comparador )
-            // SimpleDroid.g:170:13: expresionPrima exp comparador
+            // SimpleDroid.g:177:11: ( expresionPrima exp comparador )
+            // SimpleDroid.g:177:13: expresionPrima exp comparador
             {
-            pushFollow(FOLLOW_expresionPrima_in_expresion846);
+            pushFollow(FOLLOW_expresionPrima_in_expresion852);
             expresionPrima();
 
             state._fsp--;
             if (state.failed) return ;
-            pushFollow(FOLLOW_exp_in_expresion848);
+            pushFollow(FOLLOW_exp_in_expresion854);
             exp();
 
             state._fsp--;
             if (state.failed) return ;
-            pushFollow(FOLLOW_comparador_in_expresion850);
+            pushFollow(FOLLOW_comparador_in_expresion856);
             comparador();
 
             state._fsp--;
@@ -1111,10 +1126,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "expresionPrima"
-    // SimpleDroid.g:172:1: expresionPrima : ( NOT | );
+    // SimpleDroid.g:179:1: expresionPrima : ( NOT | );
     public final void expresionPrima() throws RecognitionException {
         try {
-            // SimpleDroid.g:172:16: ( NOT | )
+            // SimpleDroid.g:179:16: ( NOT | )
             int alt12=2;
             int LA12_0 = input.LA(1);
 
@@ -1133,14 +1148,14 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt12) {
                 case 1 :
-                    // SimpleDroid.g:172:18: NOT
+                    // SimpleDroid.g:179:18: NOT
                     {
-                    match(input,NOT,FOLLOW_NOT_in_expresionPrima859); if (state.failed) return ;
+                    match(input,NOT,FOLLOW_NOT_in_expresionPrima865); if (state.failed) return ;
 
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:173:4: 
+                    // SimpleDroid.g:180:4: 
                     {
                     }
                     break;
@@ -1159,18 +1174,18 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "comparador"
-    // SimpleDroid.g:175:1: comparador : comparadorPrima logico ;
+    // SimpleDroid.g:182:1: comparador : comparadorPrima logico ;
     public final void comparador() throws RecognitionException {
         try {
-            // SimpleDroid.g:175:12: ( comparadorPrima logico )
-            // SimpleDroid.g:175:14: comparadorPrima logico
+            // SimpleDroid.g:182:12: ( comparadorPrima logico )
+            // SimpleDroid.g:182:14: comparadorPrima logico
             {
-            pushFollow(FOLLOW_comparadorPrima_in_comparador871);
+            pushFollow(FOLLOW_comparadorPrima_in_comparador877);
             comparadorPrima();
 
             state._fsp--;
             if (state.failed) return ;
-            pushFollow(FOLLOW_logico_in_comparador873);
+            pushFollow(FOLLOW_logico_in_comparador879);
             logico();
 
             state._fsp--;
@@ -1191,10 +1206,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "comparadorPrima"
-    // SimpleDroid.g:177:1: comparadorPrima : ( comparadorBiPrima comparadorTriPrima exp | );
+    // SimpleDroid.g:184:1: comparadorPrima : ( comparadorBiPrima comparadorTriPrima exp | );
     public final void comparadorPrima() throws RecognitionException {
         try {
-            // SimpleDroid.g:177:17: ( comparadorBiPrima comparadorTriPrima exp | )
+            // SimpleDroid.g:184:17: ( comparadorBiPrima comparadorTriPrima exp | )
             int alt13=2;
             int LA13_0 = input.LA(1);
 
@@ -1213,19 +1228,19 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt13) {
                 case 1 :
-                    // SimpleDroid.g:177:19: comparadorBiPrima comparadorTriPrima exp
+                    // SimpleDroid.g:184:19: comparadorBiPrima comparadorTriPrima exp
                     {
-                    pushFollow(FOLLOW_comparadorBiPrima_in_comparadorPrima882);
+                    pushFollow(FOLLOW_comparadorBiPrima_in_comparadorPrima888);
                     comparadorBiPrima();
 
                     state._fsp--;
                     if (state.failed) return ;
-                    pushFollow(FOLLOW_comparadorTriPrima_in_comparadorPrima884);
+                    pushFollow(FOLLOW_comparadorTriPrima_in_comparadorPrima890);
                     comparadorTriPrima();
 
                     state._fsp--;
                     if (state.failed) return ;
-                    pushFollow(FOLLOW_exp_in_comparadorPrima886);
+                    pushFollow(FOLLOW_exp_in_comparadorPrima892);
                     exp();
 
                     state._fsp--;
@@ -1234,7 +1249,7 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:178:4: 
+                    // SimpleDroid.g:185:4: 
                     {
                     }
                     break;
@@ -1253,10 +1268,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "comparadorBiPrima"
-    // SimpleDroid.g:180:1: comparadorBiPrima : ( LT | GT | IGUAL IGUAL | NE IGUAL );
+    // SimpleDroid.g:187:1: comparadorBiPrima : ( LT | GT | IGUAL IGUAL | NE IGUAL );
     public final void comparadorBiPrima() throws RecognitionException {
         try {
-            // SimpleDroid.g:180:19: ( LT | GT | IGUAL IGUAL | NE IGUAL )
+            // SimpleDroid.g:187:19: ( LT | GT | IGUAL IGUAL | NE IGUAL )
             int alt14=4;
             switch ( input.LA(1) ) {
             case LT:
@@ -1289,32 +1304,32 @@ public class SimpleDroidParser extends Parser {
 
             switch (alt14) {
                 case 1 :
-                    // SimpleDroid.g:180:21: LT
+                    // SimpleDroid.g:187:21: LT
                     {
-                    match(input,LT,FOLLOW_LT_in_comparadorBiPrima899); if (state.failed) return ;
+                    match(input,LT,FOLLOW_LT_in_comparadorBiPrima905); if (state.failed) return ;
 
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:181:4: GT
+                    // SimpleDroid.g:188:4: GT
                     {
-                    match(input,GT,FOLLOW_GT_in_comparadorBiPrima904); if (state.failed) return ;
+                    match(input,GT,FOLLOW_GT_in_comparadorBiPrima910); if (state.failed) return ;
 
                     }
                     break;
                 case 3 :
-                    // SimpleDroid.g:182:4: IGUAL IGUAL
+                    // SimpleDroid.g:189:4: IGUAL IGUAL
                     {
-                    match(input,IGUAL,FOLLOW_IGUAL_in_comparadorBiPrima910); if (state.failed) return ;
-                    match(input,IGUAL,FOLLOW_IGUAL_in_comparadorBiPrima912); if (state.failed) return ;
+                    match(input,IGUAL,FOLLOW_IGUAL_in_comparadorBiPrima916); if (state.failed) return ;
+                    match(input,IGUAL,FOLLOW_IGUAL_in_comparadorBiPrima918); if (state.failed) return ;
 
                     }
                     break;
                 case 4 :
-                    // SimpleDroid.g:183:4: NE IGUAL
+                    // SimpleDroid.g:190:4: NE IGUAL
                     {
-                    match(input,NE,FOLLOW_NE_in_comparadorBiPrima917); if (state.failed) return ;
-                    match(input,IGUAL,FOLLOW_IGUAL_in_comparadorBiPrima919); if (state.failed) return ;
+                    match(input,NE,FOLLOW_NE_in_comparadorBiPrima923); if (state.failed) return ;
+                    match(input,IGUAL,FOLLOW_IGUAL_in_comparadorBiPrima925); if (state.failed) return ;
 
                     }
                     break;
@@ -1333,10 +1348,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "comparadorTriPrima"
-    // SimpleDroid.g:185:1: comparadorTriPrima : ( IGUAL | );
+    // SimpleDroid.g:192:1: comparadorTriPrima : ( IGUAL | );
     public final void comparadorTriPrima() throws RecognitionException {
         try {
-            // SimpleDroid.g:185:20: ( IGUAL | )
+            // SimpleDroid.g:192:20: ( IGUAL | )
             int alt15=2;
             int LA15_0 = input.LA(1);
 
@@ -1355,14 +1370,14 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt15) {
                 case 1 :
-                    // SimpleDroid.g:185:22: IGUAL
+                    // SimpleDroid.g:192:22: IGUAL
                     {
-                    match(input,IGUAL,FOLLOW_IGUAL_in_comparadorTriPrima927); if (state.failed) return ;
+                    match(input,IGUAL,FOLLOW_IGUAL_in_comparadorTriPrima933); if (state.failed) return ;
 
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:186:4: 
+                    // SimpleDroid.g:193:4: 
                     {
                     }
                     break;
@@ -1381,10 +1396,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "logico"
-    // SimpleDroid.g:188:1: logico : ( logicoPrima expresion | );
+    // SimpleDroid.g:195:1: logico : ( logicoPrima expresion | );
     public final void logico() throws RecognitionException {
         try {
-            // SimpleDroid.g:188:8: ( logicoPrima expresion | )
+            // SimpleDroid.g:195:8: ( logicoPrima expresion | )
             int alt16=2;
             int LA16_0 = input.LA(1);
 
@@ -1403,14 +1418,14 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt16) {
                 case 1 :
-                    // SimpleDroid.g:188:10: logicoPrima expresion
+                    // SimpleDroid.g:195:10: logicoPrima expresion
                     {
-                    pushFollow(FOLLOW_logicoPrima_in_logico939);
+                    pushFollow(FOLLOW_logicoPrima_in_logico945);
                     logicoPrima();
 
                     state._fsp--;
                     if (state.failed) return ;
-                    pushFollow(FOLLOW_expresion_in_logico941);
+                    pushFollow(FOLLOW_expresion_in_logico947);
                     expresion();
 
                     state._fsp--;
@@ -1419,7 +1434,7 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:189:4: 
+                    // SimpleDroid.g:196:4: 
                     {
                     }
                     break;
@@ -1438,10 +1453,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "logicoPrima"
-    // SimpleDroid.g:191:1: logicoPrima : ( AND | OR );
+    // SimpleDroid.g:198:1: logicoPrima : ( AND | OR );
     public final void logicoPrima() throws RecognitionException {
         try {
-            // SimpleDroid.g:191:13: ( AND | OR )
+            // SimpleDroid.g:198:13: ( AND | OR )
             // SimpleDroid.g:
             {
             if ( (input.LA(1)>=AND && input.LA(1)<=OR) ) {
@@ -1470,18 +1485,18 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "exp"
-    // SimpleDroid.g:194:1: exp : termino expPrima ;
+    // SimpleDroid.g:201:1: exp : termino expPrima ;
     public final void exp() throws RecognitionException {
         try {
-            // SimpleDroid.g:194:5: ( termino expPrima )
-            // SimpleDroid.g:194:7: termino expPrima
+            // SimpleDroid.g:201:5: ( termino expPrima )
+            // SimpleDroid.g:201:7: termino expPrima
             {
-            pushFollow(FOLLOW_termino_in_exp968);
+            pushFollow(FOLLOW_termino_in_exp974);
             termino();
 
             state._fsp--;
             if (state.failed) return ;
-            pushFollow(FOLLOW_expPrima_in_exp970);
+            pushFollow(FOLLOW_expPrima_in_exp976);
             expPrima();
 
             state._fsp--;
@@ -1502,18 +1517,18 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "expPrima"
-    // SimpleDroid.g:196:1: expPrima options {backtrack=true; } : ( MAS exp | MENOS exp | );
+    // SimpleDroid.g:203:1: expPrima options {backtrack=true; } : ( MAS exp | MENOS exp | );
     public final void expPrima() throws RecognitionException {
         try {
-            // SimpleDroid.g:197:26: ( MAS exp | MENOS exp | )
+            // SimpleDroid.g:204:26: ( MAS exp | MENOS exp | )
             int alt17=3;
             alt17 = dfa17.predict(input);
             switch (alt17) {
                 case 1 :
-                    // SimpleDroid.g:197:28: MAS exp
+                    // SimpleDroid.g:204:28: MAS exp
                     {
-                    match(input,MAS,FOLLOW_MAS_in_expPrima985); if (state.failed) return ;
-                    pushFollow(FOLLOW_exp_in_expPrima987);
+                    match(input,MAS,FOLLOW_MAS_in_expPrima991); if (state.failed) return ;
+                    pushFollow(FOLLOW_exp_in_expPrima993);
                     exp();
 
                     state._fsp--;
@@ -1522,10 +1537,10 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:198:4: MENOS exp
+                    // SimpleDroid.g:205:4: MENOS exp
                     {
-                    match(input,MENOS,FOLLOW_MENOS_in_expPrima992); if (state.failed) return ;
-                    pushFollow(FOLLOW_exp_in_expPrima994);
+                    match(input,MENOS,FOLLOW_MENOS_in_expPrima998); if (state.failed) return ;
+                    pushFollow(FOLLOW_exp_in_expPrima1000);
                     exp();
 
                     state._fsp--;
@@ -1534,7 +1549,7 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // SimpleDroid.g:199:4: 
+                    // SimpleDroid.g:206:4: 
                     {
                     }
                     break;
@@ -1553,18 +1568,18 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "termino"
-    // SimpleDroid.g:201:1: termino : factor terminoPrima ;
+    // SimpleDroid.g:208:1: termino : factor terminoPrima ;
     public final void termino() throws RecognitionException {
         try {
-            // SimpleDroid.g:201:9: ( factor terminoPrima )
-            // SimpleDroid.g:201:11: factor terminoPrima
+            // SimpleDroid.g:208:9: ( factor terminoPrima )
+            // SimpleDroid.g:208:11: factor terminoPrima
             {
-            pushFollow(FOLLOW_factor_in_termino1006);
+            pushFollow(FOLLOW_factor_in_termino1012);
             factor();
 
             state._fsp--;
             if (state.failed) return ;
-            pushFollow(FOLLOW_terminoPrima_in_termino1008);
+            pushFollow(FOLLOW_terminoPrima_in_termino1014);
             terminoPrima();
 
             state._fsp--;
@@ -1585,10 +1600,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "terminoPrima"
-    // SimpleDroid.g:203:1: terminoPrima : ( POR termino | ENTRE termino | MOD termino | );
+    // SimpleDroid.g:210:1: terminoPrima : ( POR termino | ENTRE termino | MOD termino | );
     public final void terminoPrima() throws RecognitionException {
         try {
-            // SimpleDroid.g:203:14: ( POR termino | ENTRE termino | MOD termino | )
+            // SimpleDroid.g:210:14: ( POR termino | ENTRE termino | MOD termino | )
             int alt18=4;
             switch ( input.LA(1) ) {
             case POR:
@@ -1632,10 +1647,10 @@ public class SimpleDroidParser extends Parser {
 
             switch (alt18) {
                 case 1 :
-                    // SimpleDroid.g:203:16: POR termino
+                    // SimpleDroid.g:210:16: POR termino
                     {
-                    match(input,POR,FOLLOW_POR_in_terminoPrima1017); if (state.failed) return ;
-                    pushFollow(FOLLOW_termino_in_terminoPrima1019);
+                    match(input,POR,FOLLOW_POR_in_terminoPrima1023); if (state.failed) return ;
+                    pushFollow(FOLLOW_termino_in_terminoPrima1025);
                     termino();
 
                     state._fsp--;
@@ -1644,10 +1659,10 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:204:4: ENTRE termino
+                    // SimpleDroid.g:211:4: ENTRE termino
                     {
-                    match(input,ENTRE,FOLLOW_ENTRE_in_terminoPrima1024); if (state.failed) return ;
-                    pushFollow(FOLLOW_termino_in_terminoPrima1026);
+                    match(input,ENTRE,FOLLOW_ENTRE_in_terminoPrima1030); if (state.failed) return ;
+                    pushFollow(FOLLOW_termino_in_terminoPrima1032);
                     termino();
 
                     state._fsp--;
@@ -1656,10 +1671,10 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // SimpleDroid.g:205:4: MOD termino
+                    // SimpleDroid.g:212:4: MOD termino
                     {
-                    match(input,MOD,FOLLOW_MOD_in_terminoPrima1031); if (state.failed) return ;
-                    pushFollow(FOLLOW_termino_in_terminoPrima1033);
+                    match(input,MOD,FOLLOW_MOD_in_terminoPrima1037); if (state.failed) return ;
+                    pushFollow(FOLLOW_termino_in_terminoPrima1039);
                     termino();
 
                     state._fsp--;
@@ -1668,7 +1683,7 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // SimpleDroid.g:206:4: 
+                    // SimpleDroid.g:213:4: 
                     {
                     }
                     break;
@@ -1687,10 +1702,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "factor"
-    // SimpleDroid.g:208:1: factor : ( PARIZQ expresion PARDER | factorPrima varcte );
+    // SimpleDroid.g:215:1: factor : ( PARIZQ expresion PARDER | factorPrima varcte );
     public final void factor() throws RecognitionException {
         try {
-            // SimpleDroid.g:208:8: ( PARIZQ expresion PARDER | factorPrima varcte )
+            // SimpleDroid.g:215:8: ( PARIZQ expresion PARDER | factorPrima varcte )
             int alt19=2;
             int LA19_0 = input.LA(1);
 
@@ -1709,27 +1724,27 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt19) {
                 case 1 :
-                    // SimpleDroid.g:208:10: PARIZQ expresion PARDER
+                    // SimpleDroid.g:215:10: PARIZQ expresion PARDER
                     {
-                    match(input,PARIZQ,FOLLOW_PARIZQ_in_factor1045); if (state.failed) return ;
-                    pushFollow(FOLLOW_expresion_in_factor1047);
+                    match(input,PARIZQ,FOLLOW_PARIZQ_in_factor1051); if (state.failed) return ;
+                    pushFollow(FOLLOW_expresion_in_factor1053);
                     expresion();
 
                     state._fsp--;
                     if (state.failed) return ;
-                    match(input,PARDER,FOLLOW_PARDER_in_factor1049); if (state.failed) return ;
+                    match(input,PARDER,FOLLOW_PARDER_in_factor1055); if (state.failed) return ;
 
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:209:4: factorPrima varcte
+                    // SimpleDroid.g:216:4: factorPrima varcte
                     {
-                    pushFollow(FOLLOW_factorPrima_in_factor1054);
+                    pushFollow(FOLLOW_factorPrima_in_factor1060);
                     factorPrima();
 
                     state._fsp--;
                     if (state.failed) return ;
-                    pushFollow(FOLLOW_varcte_in_factor1056);
+                    pushFollow(FOLLOW_varcte_in_factor1062);
                     varcte();
 
                     state._fsp--;
@@ -1752,10 +1767,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "factorPrima"
-    // SimpleDroid.g:211:1: factorPrima : ( MENOS | );
+    // SimpleDroid.g:218:1: factorPrima : ( MENOS | );
     public final void factorPrima() throws RecognitionException {
         try {
-            // SimpleDroid.g:211:13: ( MENOS | )
+            // SimpleDroid.g:218:13: ( MENOS | )
             int alt20=2;
             int LA20_0 = input.LA(1);
 
@@ -1774,14 +1789,14 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt20) {
                 case 1 :
-                    // SimpleDroid.g:211:15: MENOS
+                    // SimpleDroid.g:218:15: MENOS
                     {
-                    match(input,MENOS,FOLLOW_MENOS_in_factorPrima1065); if (state.failed) return ;
+                    match(input,MENOS,FOLLOW_MENOS_in_factorPrima1071); if (state.failed) return ;
 
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:212:4: 
+                    // SimpleDroid.g:219:4: 
                     {
                     }
                     break;
@@ -1800,26 +1815,26 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "escritura"
-    // SimpleDroid.g:214:1: escritura : WRITE PARIZQ expresion escrituraPrima PARDER SEMICOLON ;
+    // SimpleDroid.g:221:1: escritura : WRITE PARIZQ expresion escrituraPrima PARDER SEMICOLON ;
     public final void escritura() throws RecognitionException {
         try {
-            // SimpleDroid.g:214:11: ( WRITE PARIZQ expresion escrituraPrima PARDER SEMICOLON )
-            // SimpleDroid.g:214:13: WRITE PARIZQ expresion escrituraPrima PARDER SEMICOLON
+            // SimpleDroid.g:221:11: ( WRITE PARIZQ expresion escrituraPrima PARDER SEMICOLON )
+            // SimpleDroid.g:221:13: WRITE PARIZQ expresion escrituraPrima PARDER SEMICOLON
             {
-            match(input,WRITE,FOLLOW_WRITE_in_escritura1077); if (state.failed) return ;
-            match(input,PARIZQ,FOLLOW_PARIZQ_in_escritura1079); if (state.failed) return ;
-            pushFollow(FOLLOW_expresion_in_escritura1081);
+            match(input,WRITE,FOLLOW_WRITE_in_escritura1083); if (state.failed) return ;
+            match(input,PARIZQ,FOLLOW_PARIZQ_in_escritura1085); if (state.failed) return ;
+            pushFollow(FOLLOW_expresion_in_escritura1087);
             expresion();
 
             state._fsp--;
             if (state.failed) return ;
-            pushFollow(FOLLOW_escrituraPrima_in_escritura1083);
+            pushFollow(FOLLOW_escrituraPrima_in_escritura1089);
             escrituraPrima();
 
             state._fsp--;
             if (state.failed) return ;
-            match(input,PARDER,FOLLOW_PARDER_in_escritura1085); if (state.failed) return ;
-            match(input,SEMICOLON,FOLLOW_SEMICOLON_in_escritura1087); if (state.failed) return ;
+            match(input,PARDER,FOLLOW_PARDER_in_escritura1091); if (state.failed) return ;
+            match(input,SEMICOLON,FOLLOW_SEMICOLON_in_escritura1093); if (state.failed) return ;
 
             }
 
@@ -1836,10 +1851,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "escrituraPrima"
-    // SimpleDroid.g:216:1: escrituraPrima : ( MAS expresion escrituraPrima | );
+    // SimpleDroid.g:223:1: escrituraPrima : ( MAS expresion escrituraPrima | );
     public final void escrituraPrima() throws RecognitionException {
         try {
-            // SimpleDroid.g:216:16: ( MAS expresion escrituraPrima | )
+            // SimpleDroid.g:223:16: ( MAS expresion escrituraPrima | )
             int alt21=2;
             int LA21_0 = input.LA(1);
 
@@ -1858,15 +1873,15 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt21) {
                 case 1 :
-                    // SimpleDroid.g:216:18: MAS expresion escrituraPrima
+                    // SimpleDroid.g:223:18: MAS expresion escrituraPrima
                     {
-                    match(input,MAS,FOLLOW_MAS_in_escrituraPrima1096); if (state.failed) return ;
-                    pushFollow(FOLLOW_expresion_in_escrituraPrima1098);
+                    match(input,MAS,FOLLOW_MAS_in_escrituraPrima1102); if (state.failed) return ;
+                    pushFollow(FOLLOW_expresion_in_escrituraPrima1104);
                     expresion();
 
                     state._fsp--;
                     if (state.failed) return ;
-                    pushFollow(FOLLOW_escrituraPrima_in_escrituraPrima1100);
+                    pushFollow(FOLLOW_escrituraPrima_in_escrituraPrima1106);
                     escrituraPrima();
 
                     state._fsp--;
@@ -1875,7 +1890,7 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:217:4: 
+                    // SimpleDroid.g:224:4: 
                     {
                     }
                     break;
@@ -1894,10 +1909,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "varcte"
-    // SimpleDroid.g:219:1: varcte : ( ID varctePrima | CTE_ENTERA | CTE_DECIMAL | CTE_STRING | CTE_CHAR | CTE_BOOLEAN | invocacionDos );
+    // SimpleDroid.g:226:1: varcte : ( ID varctePrima | CTE_ENTERA | CTE_DECIMAL | CTE_STRING | CTE_CHAR | CTE_BOOLEAN | invocacionDos );
     public final void varcte() throws RecognitionException {
         try {
-            // SimpleDroid.g:219:8: ( ID varctePrima | CTE_ENTERA | CTE_DECIMAL | CTE_STRING | CTE_CHAR | CTE_BOOLEAN | invocacionDos )
+            // SimpleDroid.g:226:8: ( ID varctePrima | CTE_ENTERA | CTE_DECIMAL | CTE_STRING | CTE_CHAR | CTE_BOOLEAN | invocacionDos )
             int alt22=7;
             switch ( input.LA(1) ) {
             case ID:
@@ -1945,10 +1960,10 @@ public class SimpleDroidParser extends Parser {
 
             switch (alt22) {
                 case 1 :
-                    // SimpleDroid.g:219:10: ID varctePrima
+                    // SimpleDroid.g:226:10: ID varctePrima
                     {
-                    match(input,ID,FOLLOW_ID_in_varcte1112); if (state.failed) return ;
-                    pushFollow(FOLLOW_varctePrima_in_varcte1114);
+                    match(input,ID,FOLLOW_ID_in_varcte1118); if (state.failed) return ;
+                    pushFollow(FOLLOW_varctePrima_in_varcte1120);
                     varctePrima();
 
                     state._fsp--;
@@ -1957,44 +1972,44 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:220:4: CTE_ENTERA
+                    // SimpleDroid.g:227:4: CTE_ENTERA
                     {
-                    match(input,CTE_ENTERA,FOLLOW_CTE_ENTERA_in_varcte1119); if (state.failed) return ;
+                    match(input,CTE_ENTERA,FOLLOW_CTE_ENTERA_in_varcte1125); if (state.failed) return ;
 
                     }
                     break;
                 case 3 :
-                    // SimpleDroid.g:221:4: CTE_DECIMAL
+                    // SimpleDroid.g:228:4: CTE_DECIMAL
                     {
-                    match(input,CTE_DECIMAL,FOLLOW_CTE_DECIMAL_in_varcte1124); if (state.failed) return ;
+                    match(input,CTE_DECIMAL,FOLLOW_CTE_DECIMAL_in_varcte1130); if (state.failed) return ;
 
                     }
                     break;
                 case 4 :
-                    // SimpleDroid.g:222:4: CTE_STRING
+                    // SimpleDroid.g:229:4: CTE_STRING
                     {
-                    match(input,CTE_STRING,FOLLOW_CTE_STRING_in_varcte1129); if (state.failed) return ;
+                    match(input,CTE_STRING,FOLLOW_CTE_STRING_in_varcte1135); if (state.failed) return ;
 
                     }
                     break;
                 case 5 :
-                    // SimpleDroid.g:223:4: CTE_CHAR
+                    // SimpleDroid.g:230:4: CTE_CHAR
                     {
-                    match(input,CTE_CHAR,FOLLOW_CTE_CHAR_in_varcte1134); if (state.failed) return ;
+                    match(input,CTE_CHAR,FOLLOW_CTE_CHAR_in_varcte1140); if (state.failed) return ;
 
                     }
                     break;
                 case 6 :
-                    // SimpleDroid.g:224:4: CTE_BOOLEAN
+                    // SimpleDroid.g:231:4: CTE_BOOLEAN
                     {
-                    match(input,CTE_BOOLEAN,FOLLOW_CTE_BOOLEAN_in_varcte1139); if (state.failed) return ;
+                    match(input,CTE_BOOLEAN,FOLLOW_CTE_BOOLEAN_in_varcte1145); if (state.failed) return ;
 
                     }
                     break;
                 case 7 :
-                    // SimpleDroid.g:225:4: invocacionDos
+                    // SimpleDroid.g:232:4: invocacionDos
                     {
-                    pushFollow(FOLLOW_invocacionDos_in_varcte1144);
+                    pushFollow(FOLLOW_invocacionDos_in_varcte1150);
                     invocacionDos();
 
                     state._fsp--;
@@ -2017,10 +2032,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "varctePrima"
-    // SimpleDroid.g:227:1: varctePrima : ( CORIZQ CTE_ENTERA CORDER | );
+    // SimpleDroid.g:234:1: varctePrima : ( CORIZQ CTE_ENTERA CORDER | );
     public final void varctePrima() throws RecognitionException {
         try {
-            // SimpleDroid.g:227:13: ( CORIZQ CTE_ENTERA CORDER | )
+            // SimpleDroid.g:234:13: ( CORIZQ CTE_ENTERA CORDER | )
             int alt23=2;
             int LA23_0 = input.LA(1);
 
@@ -2039,16 +2054,16 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt23) {
                 case 1 :
-                    // SimpleDroid.g:227:15: CORIZQ CTE_ENTERA CORDER
+                    // SimpleDroid.g:234:15: CORIZQ CTE_ENTERA CORDER
                     {
-                    match(input,CORIZQ,FOLLOW_CORIZQ_in_varctePrima1153); if (state.failed) return ;
-                    match(input,CTE_ENTERA,FOLLOW_CTE_ENTERA_in_varctePrima1155); if (state.failed) return ;
-                    match(input,CORDER,FOLLOW_CORDER_in_varctePrima1157); if (state.failed) return ;
+                    match(input,CORIZQ,FOLLOW_CORIZQ_in_varctePrima1159); if (state.failed) return ;
+                    match(input,CTE_ENTERA,FOLLOW_CTE_ENTERA_in_varctePrima1161); if (state.failed) return ;
+                    match(input,CORDER,FOLLOW_CORDER_in_varctePrima1163); if (state.failed) return ;
 
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:228:4: 
+                    // SimpleDroid.g:235:4: 
                     {
                     }
                     break;
@@ -2067,10 +2082,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "ciclo"
-    // SimpleDroid.g:230:1: ciclo : ( xwhile | xfor );
+    // SimpleDroid.g:237:1: ciclo : ( xwhile | xfor );
     public final void ciclo() throws RecognitionException {
         try {
-            // SimpleDroid.g:230:7: ( xwhile | xfor )
+            // SimpleDroid.g:237:7: ( xwhile | xfor )
             int alt24=2;
             int LA24_0 = input.LA(1);
 
@@ -2089,9 +2104,9 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt24) {
                 case 1 :
-                    // SimpleDroid.g:230:9: xwhile
+                    // SimpleDroid.g:237:9: xwhile
                     {
-                    pushFollow(FOLLOW_xwhile_in_ciclo1169);
+                    pushFollow(FOLLOW_xwhile_in_ciclo1175);
                     xwhile();
 
                     state._fsp--;
@@ -2100,9 +2115,9 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:231:4: xfor
+                    // SimpleDroid.g:238:4: xfor
                     {
-                    pushFollow(FOLLOW_xfor_in_ciclo1174);
+                    pushFollow(FOLLOW_xfor_in_ciclo1180);
                     xfor();
 
                     state._fsp--;
@@ -2125,27 +2140,27 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "xwhile"
-    // SimpleDroid.g:233:1: xwhile : WHILE PARIZQ expresion PARDER LLAVEIZQ bloque LLAVEDER ;
+    // SimpleDroid.g:240:1: xwhile : WHILE PARIZQ expresion PARDER LLAVEIZQ bloque LLAVEDER ;
     public final void xwhile() throws RecognitionException {
         try {
-            // SimpleDroid.g:233:8: ( WHILE PARIZQ expresion PARDER LLAVEIZQ bloque LLAVEDER )
-            // SimpleDroid.g:233:10: WHILE PARIZQ expresion PARDER LLAVEIZQ bloque LLAVEDER
+            // SimpleDroid.g:240:8: ( WHILE PARIZQ expresion PARDER LLAVEIZQ bloque LLAVEDER )
+            // SimpleDroid.g:240:10: WHILE PARIZQ expresion PARDER LLAVEIZQ bloque LLAVEDER
             {
-            match(input,WHILE,FOLLOW_WHILE_in_xwhile1183); if (state.failed) return ;
-            match(input,PARIZQ,FOLLOW_PARIZQ_in_xwhile1185); if (state.failed) return ;
-            pushFollow(FOLLOW_expresion_in_xwhile1187);
+            match(input,WHILE,FOLLOW_WHILE_in_xwhile1189); if (state.failed) return ;
+            match(input,PARIZQ,FOLLOW_PARIZQ_in_xwhile1191); if (state.failed) return ;
+            pushFollow(FOLLOW_expresion_in_xwhile1193);
             expresion();
 
             state._fsp--;
             if (state.failed) return ;
-            match(input,PARDER,FOLLOW_PARDER_in_xwhile1189); if (state.failed) return ;
-            match(input,LLAVEIZQ,FOLLOW_LLAVEIZQ_in_xwhile1191); if (state.failed) return ;
-            pushFollow(FOLLOW_bloque_in_xwhile1193);
+            match(input,PARDER,FOLLOW_PARDER_in_xwhile1195); if (state.failed) return ;
+            match(input,LLAVEIZQ,FOLLOW_LLAVEIZQ_in_xwhile1197); if (state.failed) return ;
+            pushFollow(FOLLOW_bloque_in_xwhile1199);
             bloque();
 
             state._fsp--;
             if (state.failed) return ;
-            match(input,LLAVEDER,FOLLOW_LLAVEDER_in_xwhile1195); if (state.failed) return ;
+            match(input,LLAVEDER,FOLLOW_LLAVEDER_in_xwhile1201); if (state.failed) return ;
 
             }
 
@@ -2162,19 +2177,19 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "retorno"
-    // SimpleDroid.g:235:1: retorno : RETURN varcte SEMICOLON ;
+    // SimpleDroid.g:242:1: retorno : RETURN varcte SEMICOLON ;
     public final void retorno() throws RecognitionException {
         try {
-            // SimpleDroid.g:235:9: ( RETURN varcte SEMICOLON )
-            // SimpleDroid.g:235:11: RETURN varcte SEMICOLON
+            // SimpleDroid.g:242:9: ( RETURN varcte SEMICOLON )
+            // SimpleDroid.g:242:11: RETURN varcte SEMICOLON
             {
-            match(input,RETURN,FOLLOW_RETURN_in_retorno1204); if (state.failed) return ;
-            pushFollow(FOLLOW_varcte_in_retorno1206);
+            match(input,RETURN,FOLLOW_RETURN_in_retorno1210); if (state.failed) return ;
+            pushFollow(FOLLOW_varcte_in_retorno1212);
             varcte();
 
             state._fsp--;
             if (state.failed) return ;
-            match(input,SEMICOLON,FOLLOW_SEMICOLON_in_retorno1208); if (state.failed) return ;
+            match(input,SEMICOLON,FOLLOW_SEMICOLON_in_retorno1214); if (state.failed) return ;
 
             }
 
@@ -2191,22 +2206,22 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "invocacion"
-    // SimpleDroid.g:237:1: invocacion : INVOKE ID PARIZQ paramsDos PARDER SEMICOLON ;
+    // SimpleDroid.g:244:1: invocacion : INVOKE ID PARIZQ paramsDos PARDER SEMICOLON ;
     public final void invocacion() throws RecognitionException {
         try {
-            // SimpleDroid.g:237:12: ( INVOKE ID PARIZQ paramsDos PARDER SEMICOLON )
-            // SimpleDroid.g:237:14: INVOKE ID PARIZQ paramsDos PARDER SEMICOLON
+            // SimpleDroid.g:244:12: ( INVOKE ID PARIZQ paramsDos PARDER SEMICOLON )
+            // SimpleDroid.g:244:14: INVOKE ID PARIZQ paramsDos PARDER SEMICOLON
             {
-            match(input,INVOKE,FOLLOW_INVOKE_in_invocacion1217); if (state.failed) return ;
-            match(input,ID,FOLLOW_ID_in_invocacion1219); if (state.failed) return ;
-            match(input,PARIZQ,FOLLOW_PARIZQ_in_invocacion1221); if (state.failed) return ;
-            pushFollow(FOLLOW_paramsDos_in_invocacion1223);
+            match(input,INVOKE,FOLLOW_INVOKE_in_invocacion1223); if (state.failed) return ;
+            match(input,ID,FOLLOW_ID_in_invocacion1225); if (state.failed) return ;
+            match(input,PARIZQ,FOLLOW_PARIZQ_in_invocacion1227); if (state.failed) return ;
+            pushFollow(FOLLOW_paramsDos_in_invocacion1229);
             paramsDos();
 
             state._fsp--;
             if (state.failed) return ;
-            match(input,PARDER,FOLLOW_PARDER_in_invocacion1225); if (state.failed) return ;
-            match(input,SEMICOLON,FOLLOW_SEMICOLON_in_invocacion1227); if (state.failed) return ;
+            match(input,PARDER,FOLLOW_PARDER_in_invocacion1231); if (state.failed) return ;
+            match(input,SEMICOLON,FOLLOW_SEMICOLON_in_invocacion1233); if (state.failed) return ;
 
             }
 
@@ -2223,21 +2238,21 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "invocacionDos"
-    // SimpleDroid.g:239:1: invocacionDos : INVOKE ID PARIZQ paramsDos PARDER ;
+    // SimpleDroid.g:246:1: invocacionDos : INVOKE ID PARIZQ paramsDos PARDER ;
     public final void invocacionDos() throws RecognitionException {
         try {
-            // SimpleDroid.g:239:15: ( INVOKE ID PARIZQ paramsDos PARDER )
-            // SimpleDroid.g:239:17: INVOKE ID PARIZQ paramsDos PARDER
+            // SimpleDroid.g:246:15: ( INVOKE ID PARIZQ paramsDos PARDER )
+            // SimpleDroid.g:246:17: INVOKE ID PARIZQ paramsDos PARDER
             {
-            match(input,INVOKE,FOLLOW_INVOKE_in_invocacionDos1236); if (state.failed) return ;
-            match(input,ID,FOLLOW_ID_in_invocacionDos1238); if (state.failed) return ;
-            match(input,PARIZQ,FOLLOW_PARIZQ_in_invocacionDos1240); if (state.failed) return ;
-            pushFollow(FOLLOW_paramsDos_in_invocacionDos1242);
+            match(input,INVOKE,FOLLOW_INVOKE_in_invocacionDos1242); if (state.failed) return ;
+            match(input,ID,FOLLOW_ID_in_invocacionDos1244); if (state.failed) return ;
+            match(input,PARIZQ,FOLLOW_PARIZQ_in_invocacionDos1246); if (state.failed) return ;
+            pushFollow(FOLLOW_paramsDos_in_invocacionDos1248);
             paramsDos();
 
             state._fsp--;
             if (state.failed) return ;
-            match(input,PARDER,FOLLOW_PARDER_in_invocacionDos1244); if (state.failed) return ;
+            match(input,PARDER,FOLLOW_PARDER_in_invocacionDos1250); if (state.failed) return ;
 
             }
 
@@ -2254,10 +2269,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "paramsDos"
-    // SimpleDroid.g:241:1: paramsDos : ( expresion paramsDosPrima | );
+    // SimpleDroid.g:248:1: paramsDos : ( expresion paramsDosPrima | );
     public final void paramsDos() throws RecognitionException {
         try {
-            // SimpleDroid.g:241:11: ( expresion paramsDosPrima | )
+            // SimpleDroid.g:248:11: ( expresion paramsDosPrima | )
             int alt25=2;
             int LA25_0 = input.LA(1);
 
@@ -2276,14 +2291,14 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt25) {
                 case 1 :
-                    // SimpleDroid.g:241:13: expresion paramsDosPrima
+                    // SimpleDroid.g:248:13: expresion paramsDosPrima
                     {
-                    pushFollow(FOLLOW_expresion_in_paramsDos1253);
+                    pushFollow(FOLLOW_expresion_in_paramsDos1259);
                     expresion();
 
                     state._fsp--;
                     if (state.failed) return ;
-                    pushFollow(FOLLOW_paramsDosPrima_in_paramsDos1255);
+                    pushFollow(FOLLOW_paramsDosPrima_in_paramsDos1261);
                     paramsDosPrima();
 
                     state._fsp--;
@@ -2292,7 +2307,7 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:242:4: 
+                    // SimpleDroid.g:249:4: 
                     {
                     }
                     break;
@@ -2311,10 +2326,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "paramsDosPrima"
-    // SimpleDroid.g:244:1: paramsDosPrima : ( COMA expresion paramsDosPrima | );
+    // SimpleDroid.g:251:1: paramsDosPrima : ( COMA expresion paramsDosPrima | );
     public final void paramsDosPrima() throws RecognitionException {
         try {
-            // SimpleDroid.g:244:16: ( COMA expresion paramsDosPrima | )
+            // SimpleDroid.g:251:16: ( COMA expresion paramsDosPrima | )
             int alt26=2;
             int LA26_0 = input.LA(1);
 
@@ -2333,15 +2348,15 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt26) {
                 case 1 :
-                    // SimpleDroid.g:244:18: COMA expresion paramsDosPrima
+                    // SimpleDroid.g:251:18: COMA expresion paramsDosPrima
                     {
-                    match(input,COMA,FOLLOW_COMA_in_paramsDosPrima1268); if (state.failed) return ;
-                    pushFollow(FOLLOW_expresion_in_paramsDosPrima1270);
+                    match(input,COMA,FOLLOW_COMA_in_paramsDosPrima1274); if (state.failed) return ;
+                    pushFollow(FOLLOW_expresion_in_paramsDosPrima1276);
                     expresion();
 
                     state._fsp--;
                     if (state.failed) return ;
-                    pushFollow(FOLLOW_paramsDosPrima_in_paramsDosPrima1272);
+                    pushFollow(FOLLOW_paramsDosPrima_in_paramsDosPrima1278);
                     paramsDosPrima();
 
                     state._fsp--;
@@ -2350,7 +2365,7 @@ public class SimpleDroidParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:245:4: 
+                    // SimpleDroid.g:252:4: 
                     {
                     }
                     break;
@@ -2369,28 +2384,28 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "condicion"
-    // SimpleDroid.g:247:1: condicion : IF PARIZQ expresion PARDER LLAVEIZQ bloque LLAVEDER condicionPrima ;
+    // SimpleDroid.g:254:1: condicion : IF PARIZQ expresion PARDER LLAVEIZQ bloque LLAVEDER condicionPrima ;
     public final void condicion() throws RecognitionException {
         try {
-            // SimpleDroid.g:247:11: ( IF PARIZQ expresion PARDER LLAVEIZQ bloque LLAVEDER condicionPrima )
-            // SimpleDroid.g:247:13: IF PARIZQ expresion PARDER LLAVEIZQ bloque LLAVEDER condicionPrima
+            // SimpleDroid.g:254:11: ( IF PARIZQ expresion PARDER LLAVEIZQ bloque LLAVEDER condicionPrima )
+            // SimpleDroid.g:254:13: IF PARIZQ expresion PARDER LLAVEIZQ bloque LLAVEDER condicionPrima
             {
-            match(input,IF,FOLLOW_IF_in_condicion1284); if (state.failed) return ;
-            match(input,PARIZQ,FOLLOW_PARIZQ_in_condicion1286); if (state.failed) return ;
-            pushFollow(FOLLOW_expresion_in_condicion1288);
+            match(input,IF,FOLLOW_IF_in_condicion1290); if (state.failed) return ;
+            match(input,PARIZQ,FOLLOW_PARIZQ_in_condicion1292); if (state.failed) return ;
+            pushFollow(FOLLOW_expresion_in_condicion1294);
             expresion();
 
             state._fsp--;
             if (state.failed) return ;
-            match(input,PARDER,FOLLOW_PARDER_in_condicion1290); if (state.failed) return ;
-            match(input,LLAVEIZQ,FOLLOW_LLAVEIZQ_in_condicion1292); if (state.failed) return ;
-            pushFollow(FOLLOW_bloque_in_condicion1294);
+            match(input,PARDER,FOLLOW_PARDER_in_condicion1296); if (state.failed) return ;
+            match(input,LLAVEIZQ,FOLLOW_LLAVEIZQ_in_condicion1298); if (state.failed) return ;
+            pushFollow(FOLLOW_bloque_in_condicion1300);
             bloque();
 
             state._fsp--;
             if (state.failed) return ;
-            match(input,LLAVEDER,FOLLOW_LLAVEDER_in_condicion1296); if (state.failed) return ;
-            pushFollow(FOLLOW_condicionPrima_in_condicion1298);
+            match(input,LLAVEDER,FOLLOW_LLAVEDER_in_condicion1302); if (state.failed) return ;
+            pushFollow(FOLLOW_condicionPrima_in_condicion1304);
             condicionPrima();
 
             state._fsp--;
@@ -2411,10 +2426,10 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "condicionPrima"
-    // SimpleDroid.g:249:1: condicionPrima : ( ELSE LLAVEIZQ bloque LLAVEDER | );
+    // SimpleDroid.g:256:1: condicionPrima : ( ELSE LLAVEIZQ bloque LLAVEDER | );
     public final void condicionPrima() throws RecognitionException {
         try {
-            // SimpleDroid.g:249:16: ( ELSE LLAVEIZQ bloque LLAVEDER | )
+            // SimpleDroid.g:256:16: ( ELSE LLAVEIZQ bloque LLAVEDER | )
             int alt27=2;
             int LA27_0 = input.LA(1);
 
@@ -2433,21 +2448,21 @@ public class SimpleDroidParser extends Parser {
             }
             switch (alt27) {
                 case 1 :
-                    // SimpleDroid.g:249:18: ELSE LLAVEIZQ bloque LLAVEDER
+                    // SimpleDroid.g:256:18: ELSE LLAVEIZQ bloque LLAVEDER
                     {
-                    match(input,ELSE,FOLLOW_ELSE_in_condicionPrima1307); if (state.failed) return ;
-                    match(input,LLAVEIZQ,FOLLOW_LLAVEIZQ_in_condicionPrima1309); if (state.failed) return ;
-                    pushFollow(FOLLOW_bloque_in_condicionPrima1311);
+                    match(input,ELSE,FOLLOW_ELSE_in_condicionPrima1313); if (state.failed) return ;
+                    match(input,LLAVEIZQ,FOLLOW_LLAVEIZQ_in_condicionPrima1315); if (state.failed) return ;
+                    pushFollow(FOLLOW_bloque_in_condicionPrima1317);
                     bloque();
 
                     state._fsp--;
                     if (state.failed) return ;
-                    match(input,LLAVEDER,FOLLOW_LLAVEDER_in_condicionPrima1313); if (state.failed) return ;
+                    match(input,LLAVEDER,FOLLOW_LLAVEDER_in_condicionPrima1319); if (state.failed) return ;
 
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:250:4: 
+                    // SimpleDroid.g:257:4: 
                     {
                     }
                     break;
@@ -2466,17 +2481,17 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "lectura"
-    // SimpleDroid.g:252:1: lectura : READ PARIZQ ID PARDER SEMICOLON ;
+    // SimpleDroid.g:259:1: lectura : READ PARIZQ ID PARDER SEMICOLON ;
     public final void lectura() throws RecognitionException {
         try {
-            // SimpleDroid.g:252:9: ( READ PARIZQ ID PARDER SEMICOLON )
-            // SimpleDroid.g:252:11: READ PARIZQ ID PARDER SEMICOLON
+            // SimpleDroid.g:259:9: ( READ PARIZQ ID PARDER SEMICOLON )
+            // SimpleDroid.g:259:11: READ PARIZQ ID PARDER SEMICOLON
             {
-            match(input,READ,FOLLOW_READ_in_lectura1325); if (state.failed) return ;
-            match(input,PARIZQ,FOLLOW_PARIZQ_in_lectura1327); if (state.failed) return ;
-            match(input,ID,FOLLOW_ID_in_lectura1329); if (state.failed) return ;
-            match(input,PARDER,FOLLOW_PARDER_in_lectura1331); if (state.failed) return ;
-            match(input,SEMICOLON,FOLLOW_SEMICOLON_in_lectura1333); if (state.failed) return ;
+            match(input,READ,FOLLOW_READ_in_lectura1331); if (state.failed) return ;
+            match(input,PARIZQ,FOLLOW_PARIZQ_in_lectura1333); if (state.failed) return ;
+            match(input,ID,FOLLOW_ID_in_lectura1335); if (state.failed) return ;
+            match(input,PARDER,FOLLOW_PARDER_in_lectura1337); if (state.failed) return ;
+            match(input,SEMICOLON,FOLLOW_SEMICOLON_in_lectura1339); if (state.failed) return ;
 
             }
 
@@ -2493,39 +2508,39 @@ public class SimpleDroidParser extends Parser {
 
 
     // $ANTLR start "xfor"
-    // SimpleDroid.g:254:1: xfor : FOR PARIZQ asignacion SEMICOLON expresion SEMICOLON asignacion PARDER LLAVEIZQ bloque LLAVEDER ;
+    // SimpleDroid.g:261:1: xfor : FOR PARIZQ asignacion SEMICOLON expresion SEMICOLON asignacion PARDER LLAVEIZQ bloque LLAVEDER ;
     public final void xfor() throws RecognitionException {
         try {
-            // SimpleDroid.g:254:6: ( FOR PARIZQ asignacion SEMICOLON expresion SEMICOLON asignacion PARDER LLAVEIZQ bloque LLAVEDER )
-            // SimpleDroid.g:254:8: FOR PARIZQ asignacion SEMICOLON expresion SEMICOLON asignacion PARDER LLAVEIZQ bloque LLAVEDER
+            // SimpleDroid.g:261:6: ( FOR PARIZQ asignacion SEMICOLON expresion SEMICOLON asignacion PARDER LLAVEIZQ bloque LLAVEDER )
+            // SimpleDroid.g:261:8: FOR PARIZQ asignacion SEMICOLON expresion SEMICOLON asignacion PARDER LLAVEIZQ bloque LLAVEDER
             {
-            match(input,FOR,FOLLOW_FOR_in_xfor1342); if (state.failed) return ;
-            match(input,PARIZQ,FOLLOW_PARIZQ_in_xfor1344); if (state.failed) return ;
-            pushFollow(FOLLOW_asignacion_in_xfor1346);
+            match(input,FOR,FOLLOW_FOR_in_xfor1348); if (state.failed) return ;
+            match(input,PARIZQ,FOLLOW_PARIZQ_in_xfor1350); if (state.failed) return ;
+            pushFollow(FOLLOW_asignacion_in_xfor1352);
             asignacion();
 
             state._fsp--;
             if (state.failed) return ;
-            match(input,SEMICOLON,FOLLOW_SEMICOLON_in_xfor1348); if (state.failed) return ;
-            pushFollow(FOLLOW_expresion_in_xfor1350);
+            match(input,SEMICOLON,FOLLOW_SEMICOLON_in_xfor1354); if (state.failed) return ;
+            pushFollow(FOLLOW_expresion_in_xfor1356);
             expresion();
 
             state._fsp--;
             if (state.failed) return ;
-            match(input,SEMICOLON,FOLLOW_SEMICOLON_in_xfor1352); if (state.failed) return ;
-            pushFollow(FOLLOW_asignacion_in_xfor1354);
+            match(input,SEMICOLON,FOLLOW_SEMICOLON_in_xfor1358); if (state.failed) return ;
+            pushFollow(FOLLOW_asignacion_in_xfor1360);
             asignacion();
 
             state._fsp--;
             if (state.failed) return ;
-            match(input,PARDER,FOLLOW_PARDER_in_xfor1356); if (state.failed) return ;
-            match(input,LLAVEIZQ,FOLLOW_LLAVEIZQ_in_xfor1358); if (state.failed) return ;
-            pushFollow(FOLLOW_bloque_in_xfor1360);
+            match(input,PARDER,FOLLOW_PARDER_in_xfor1362); if (state.failed) return ;
+            match(input,LLAVEIZQ,FOLLOW_LLAVEIZQ_in_xfor1364); if (state.failed) return ;
+            pushFollow(FOLLOW_bloque_in_xfor1366);
             bloque();
 
             state._fsp--;
             if (state.failed) return ;
-            match(input,LLAVEDER,FOLLOW_LLAVEDER_in_xfor1362); if (state.failed) return ;
+            match(input,LLAVEDER,FOLLOW_LLAVEDER_in_xfor1368); if (state.failed) return ;
 
             }
 
@@ -2542,11 +2557,11 @@ public class SimpleDroidParser extends Parser {
 
     // $ANTLR start synpred1_SimpleDroid
     public final void synpred1_SimpleDroid_fragment() throws RecognitionException {   
-        // SimpleDroid.g:197:28: ( MAS exp )
-        // SimpleDroid.g:197:28: MAS exp
+        // SimpleDroid.g:204:28: ( MAS exp )
+        // SimpleDroid.g:204:28: MAS exp
         {
-        match(input,MAS,FOLLOW_MAS_in_synpred1_SimpleDroid985); if (state.failed) return ;
-        pushFollow(FOLLOW_exp_in_synpred1_SimpleDroid987);
+        match(input,MAS,FOLLOW_MAS_in_synpred1_SimpleDroid991); if (state.failed) return ;
+        pushFollow(FOLLOW_exp_in_synpred1_SimpleDroid993);
         exp();
 
         state._fsp--;
@@ -2633,7 +2648,7 @@ public class SimpleDroidParser extends Parser {
             this.transition = DFA17_transition;
         }
         public String getDescription() {
-            return "196:1: expPrima options {backtrack=true; } : ( MAS exp | MENOS exp | );";
+            return "203:1: expPrima options {backtrack=true; } : ( MAS exp | MENOS exp | );";
         }
         public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
             TokenStream input = (TokenStream)_input;
@@ -2675,176 +2690,176 @@ public class SimpleDroidParser extends Parser {
     public static final BitSet FOLLOW_vars_in_main551 = new BitSet(new long[]{0x0000405E81000020L});
     public static final BitSet FOLLOW_bloque_in_main553 = new BitSet(new long[]{0x0000000000000020L});
     public static final BitSet FOLLOW_LLAVEDER_in_main555 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_varsPrima_in_vars564 = new BitSet(new long[]{0x000000007C400000L});
-    public static final BitSet FOLLOW_tipo_in_vars566 = new BitSet(new long[]{0x0000400000000000L});
-    public static final BitSet FOLLOW_varsBiPrima_in_vars568 = new BitSet(new long[]{0x0000000000000800L});
-    public static final BitSet FOLLOW_SEMICOLON_in_vars570 = new BitSet(new long[]{0x000000007C400000L});
-    public static final BitSet FOLLOW_vars_in_vars572 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_GLOBAL_in_varsPrima586 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_varsBiPrima598 = new BitSet(new long[]{0x0000000000001500L});
-    public static final BitSet FOLLOW_varsTriPrima_in_varsBiPrima600 = new BitSet(new long[]{0x0000000000000400L});
-    public static final BitSet FOLLOW_varsCuatriPrima_in_varsBiPrima602 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IGUAL_in_varsTriPrima612 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_expresion_in_varsTriPrima614 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CORIZQ_in_varsTriPrima619 = new BitSet(new long[]{0x0001000000000000L});
-    public static final BitSet FOLLOW_CTE_ENTERA_in_varsTriPrima621 = new BitSet(new long[]{0x0000000000000200L});
-    public static final BitSet FOLLOW_CORDER_in_varsTriPrima623 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_COMA_in_varsCuatriPrima635 = new BitSet(new long[]{0x0000400000000000L});
-    public static final BitSet FOLLOW_varsBiPrima_in_varsCuatriPrima637 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_FUNCTION_in_funciones651 = new BitSet(new long[]{0x000000007E400000L});
-    public static final BitSet FOLLOW_funcionesPrima_in_funciones653 = new BitSet(new long[]{0x0000400000000000L});
-    public static final BitSet FOLLOW_ID_in_funciones655 = new BitSet(new long[]{0x0000000000000040L});
-    public static final BitSet FOLLOW_PARIZQ_in_funciones657 = new BitSet(new long[]{0x000000007C400080L});
-    public static final BitSet FOLLOW_params_in_funciones659 = new BitSet(new long[]{0x0000000000000080L});
-    public static final BitSet FOLLOW_PARDER_in_funciones661 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_LLAVEIZQ_in_funciones663 = new BitSet(new long[]{0x0000405EFD400020L});
-    public static final BitSet FOLLOW_vars_in_funciones665 = new BitSet(new long[]{0x0000405E81000020L});
-    public static final BitSet FOLLOW_bloque_in_funciones667 = new BitSet(new long[]{0x0000000000000020L});
-    public static final BitSet FOLLOW_LLAVEDER_in_funciones669 = new BitSet(new long[]{0x0000000000800000L});
-    public static final BitSet FOLLOW_funciones_in_funciones671 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_tipo_in_funcionesPrima683 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NOTHING_in_funcionesPrima688 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_varsPrima_in_vars568 = new BitSet(new long[]{0x000000007C400000L});
+    public static final BitSet FOLLOW_tipo_in_vars570 = new BitSet(new long[]{0x0000400000000000L});
+    public static final BitSet FOLLOW_varsBiPrima_in_vars572 = new BitSet(new long[]{0x0000000000000800L});
+    public static final BitSet FOLLOW_SEMICOLON_in_vars574 = new BitSet(new long[]{0x000000007C400000L});
+    public static final BitSet FOLLOW_vars_in_vars576 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_GLOBAL_in_varsPrima590 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ID_in_varsBiPrima602 = new BitSet(new long[]{0x0000000000001500L});
+    public static final BitSet FOLLOW_varsTriPrima_in_varsBiPrima604 = new BitSet(new long[]{0x0000000000000400L});
+    public static final BitSet FOLLOW_varsCuatriPrima_in_varsBiPrima606 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IGUAL_in_varsTriPrima616 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_expresion_in_varsTriPrima618 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CORIZQ_in_varsTriPrima623 = new BitSet(new long[]{0x0001000000000000L});
+    public static final BitSet FOLLOW_CTE_ENTERA_in_varsTriPrima625 = new BitSet(new long[]{0x0000000000000200L});
+    public static final BitSet FOLLOW_CORDER_in_varsTriPrima627 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_COMA_in_varsCuatriPrima639 = new BitSet(new long[]{0x0000400000000000L});
+    public static final BitSet FOLLOW_varsBiPrima_in_varsCuatriPrima641 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_FUNCTION_in_funciones655 = new BitSet(new long[]{0x000000007E400000L});
+    public static final BitSet FOLLOW_funcionesPrima_in_funciones657 = new BitSet(new long[]{0x0000400000000000L});
+    public static final BitSet FOLLOW_ID_in_funciones659 = new BitSet(new long[]{0x0000000000000040L});
+    public static final BitSet FOLLOW_PARIZQ_in_funciones661 = new BitSet(new long[]{0x000000007C400080L});
+    public static final BitSet FOLLOW_params_in_funciones663 = new BitSet(new long[]{0x0000000000000080L});
+    public static final BitSet FOLLOW_PARDER_in_funciones665 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_LLAVEIZQ_in_funciones667 = new BitSet(new long[]{0x0000405EFD400020L});
+    public static final BitSet FOLLOW_vars_in_funciones669 = new BitSet(new long[]{0x0000405E81000020L});
+    public static final BitSet FOLLOW_bloque_in_funciones671 = new BitSet(new long[]{0x0000000000000020L});
+    public static final BitSet FOLLOW_LLAVEDER_in_funciones673 = new BitSet(new long[]{0x0000000000800000L});
+    public static final BitSet FOLLOW_funciones_in_funciones675 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_tipo_in_funcionesPrima689 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NOTHING_in_funcionesPrima694 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_tipo0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_tipo_in_params726 = new BitSet(new long[]{0x0000400000000000L});
-    public static final BitSet FOLLOW_ID_in_params728 = new BitSet(new long[]{0x0000000000000400L});
-    public static final BitSet FOLLOW_paramsPrima_in_params730 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_COMA_in_paramsPrima742 = new BitSet(new long[]{0x000000007C400000L});
-    public static final BitSet FOLLOW_tipo_in_paramsPrima744 = new BitSet(new long[]{0x0000400000000000L});
-    public static final BitSet FOLLOW_ID_in_paramsPrima746 = new BitSet(new long[]{0x0000000000000400L});
-    public static final BitSet FOLLOW_paramsPrima_in_paramsPrima748 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_estatuto_in_bloque760 = new BitSet(new long[]{0x0000405E81000000L});
-    public static final BitSet FOLLOW_bloque_in_bloque762 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_asignacion_in_estatuto774 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_condicion_in_estatuto779 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ciclo_in_estatuto784 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_escritura_in_estatuto789 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_lectura_in_estatuto794 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_retorno_in_estatuto799 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_invocacion_in_estatuto804 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_asignacion813 = new BitSet(new long[]{0x0000000000001100L});
-    public static final BitSet FOLLOW_asignacionPrima_in_asignacion815 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_IGUAL_in_asignacion817 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_expresion_in_asignacion819 = new BitSet(new long[]{0x0000000000000800L});
-    public static final BitSet FOLLOW_SEMICOLON_in_asignacion821 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CORIZQ_in_asignacionPrima830 = new BitSet(new long[]{0x0001000000000000L});
-    public static final BitSet FOLLOW_CTE_ENTERA_in_asignacionPrima832 = new BitSet(new long[]{0x0000000000000200L});
-    public static final BitSet FOLLOW_CORDER_in_asignacionPrima834 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expresionPrima_in_expresion846 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_exp_in_expresion848 = new BitSet(new long[]{0x00000300001C1000L});
-    public static final BitSet FOLLOW_comparador_in_expresion850 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NOT_in_expresionPrima859 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_comparadorPrima_in_comparador871 = new BitSet(new long[]{0x0000030000000000L});
-    public static final BitSet FOLLOW_logico_in_comparador873 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_comparadorBiPrima_in_comparadorPrima882 = new BitSet(new long[]{0x000BC48001005040L});
-    public static final BitSet FOLLOW_comparadorTriPrima_in_comparadorPrima884 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_exp_in_comparadorPrima886 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LT_in_comparadorBiPrima899 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_GT_in_comparadorBiPrima904 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IGUAL_in_comparadorBiPrima910 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_IGUAL_in_comparadorBiPrima912 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NE_in_comparadorBiPrima917 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_IGUAL_in_comparadorBiPrima919 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IGUAL_in_comparadorTriPrima927 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_logicoPrima_in_logico939 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_expresion_in_logico941 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_tipo_in_params732 = new BitSet(new long[]{0x0000400000000000L});
+    public static final BitSet FOLLOW_ID_in_params734 = new BitSet(new long[]{0x0000000000000400L});
+    public static final BitSet FOLLOW_paramsPrima_in_params736 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_COMA_in_paramsPrima748 = new BitSet(new long[]{0x000000007C400000L});
+    public static final BitSet FOLLOW_tipo_in_paramsPrima750 = new BitSet(new long[]{0x0000400000000000L});
+    public static final BitSet FOLLOW_ID_in_paramsPrima752 = new BitSet(new long[]{0x0000000000000400L});
+    public static final BitSet FOLLOW_paramsPrima_in_paramsPrima754 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_estatuto_in_bloque766 = new BitSet(new long[]{0x0000405E81000000L});
+    public static final BitSet FOLLOW_bloque_in_bloque768 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_asignacion_in_estatuto780 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_condicion_in_estatuto785 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ciclo_in_estatuto790 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_escritura_in_estatuto795 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_lectura_in_estatuto800 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_retorno_in_estatuto805 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_invocacion_in_estatuto810 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ID_in_asignacion819 = new BitSet(new long[]{0x0000000000001100L});
+    public static final BitSet FOLLOW_asignacionPrima_in_asignacion821 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_IGUAL_in_asignacion823 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_expresion_in_asignacion825 = new BitSet(new long[]{0x0000000000000800L});
+    public static final BitSet FOLLOW_SEMICOLON_in_asignacion827 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CORIZQ_in_asignacionPrima836 = new BitSet(new long[]{0x0001000000000000L});
+    public static final BitSet FOLLOW_CTE_ENTERA_in_asignacionPrima838 = new BitSet(new long[]{0x0000000000000200L});
+    public static final BitSet FOLLOW_CORDER_in_asignacionPrima840 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expresionPrima_in_expresion852 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_exp_in_expresion854 = new BitSet(new long[]{0x00000300001C1000L});
+    public static final BitSet FOLLOW_comparador_in_expresion856 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NOT_in_expresionPrima865 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_comparadorPrima_in_comparador877 = new BitSet(new long[]{0x0000030000000000L});
+    public static final BitSet FOLLOW_logico_in_comparador879 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_comparadorBiPrima_in_comparadorPrima888 = new BitSet(new long[]{0x000BC48001005040L});
+    public static final BitSet FOLLOW_comparadorTriPrima_in_comparadorPrima890 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_exp_in_comparadorPrima892 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LT_in_comparadorBiPrima905 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_GT_in_comparadorBiPrima910 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IGUAL_in_comparadorBiPrima916 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_IGUAL_in_comparadorBiPrima918 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NE_in_comparadorBiPrima923 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_IGUAL_in_comparadorBiPrima925 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IGUAL_in_comparadorTriPrima933 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_logicoPrima_in_logico945 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_expresion_in_logico947 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_logicoPrima0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_termino_in_exp968 = new BitSet(new long[]{0x0000000000006000L});
-    public static final BitSet FOLLOW_expPrima_in_exp970 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_MAS_in_expPrima985 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_exp_in_expPrima987 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_MENOS_in_expPrima992 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_exp_in_expPrima994 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_factor_in_termino1006 = new BitSet(new long[]{0x0000000000038000L});
-    public static final BitSet FOLLOW_terminoPrima_in_termino1008 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_POR_in_terminoPrima1017 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_termino_in_terminoPrima1019 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ENTRE_in_terminoPrima1024 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_termino_in_terminoPrima1026 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_MOD_in_terminoPrima1031 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_termino_in_terminoPrima1033 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_PARIZQ_in_factor1045 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_expresion_in_factor1047 = new BitSet(new long[]{0x0000000000000080L});
-    public static final BitSet FOLLOW_PARDER_in_factor1049 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_factorPrima_in_factor1054 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_varcte_in_factor1056 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_MENOS_in_factorPrima1065 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_WRITE_in_escritura1077 = new BitSet(new long[]{0x0000000000000040L});
-    public static final BitSet FOLLOW_PARIZQ_in_escritura1079 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_expresion_in_escritura1081 = new BitSet(new long[]{0x0000000000002080L});
-    public static final BitSet FOLLOW_escrituraPrima_in_escritura1083 = new BitSet(new long[]{0x0000000000000080L});
-    public static final BitSet FOLLOW_PARDER_in_escritura1085 = new BitSet(new long[]{0x0000000000000800L});
-    public static final BitSet FOLLOW_SEMICOLON_in_escritura1087 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_MAS_in_escrituraPrima1096 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_expresion_in_escrituraPrima1098 = new BitSet(new long[]{0x0000000000002000L});
-    public static final BitSet FOLLOW_escrituraPrima_in_escrituraPrima1100 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_varcte1112 = new BitSet(new long[]{0x0000000000000100L});
-    public static final BitSet FOLLOW_varctePrima_in_varcte1114 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CTE_ENTERA_in_varcte1119 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CTE_DECIMAL_in_varcte1124 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CTE_STRING_in_varcte1129 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CTE_CHAR_in_varcte1134 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CTE_BOOLEAN_in_varcte1139 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_invocacionDos_in_varcte1144 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_CORIZQ_in_varctePrima1153 = new BitSet(new long[]{0x0001000000000000L});
-    public static final BitSet FOLLOW_CTE_ENTERA_in_varctePrima1155 = new BitSet(new long[]{0x0000000000000200L});
-    public static final BitSet FOLLOW_CORDER_in_varctePrima1157 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_xwhile_in_ciclo1169 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_xfor_in_ciclo1174 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_WHILE_in_xwhile1183 = new BitSet(new long[]{0x0000000000000040L});
-    public static final BitSet FOLLOW_PARIZQ_in_xwhile1185 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_expresion_in_xwhile1187 = new BitSet(new long[]{0x0000000000000080L});
-    public static final BitSet FOLLOW_PARDER_in_xwhile1189 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_LLAVEIZQ_in_xwhile1191 = new BitSet(new long[]{0x0000405E81000020L});
-    public static final BitSet FOLLOW_bloque_in_xwhile1193 = new BitSet(new long[]{0x0000000000000020L});
-    public static final BitSet FOLLOW_LLAVEDER_in_xwhile1195 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_RETURN_in_retorno1204 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_varcte_in_retorno1206 = new BitSet(new long[]{0x0000000000000800L});
-    public static final BitSet FOLLOW_SEMICOLON_in_retorno1208 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_INVOKE_in_invocacion1217 = new BitSet(new long[]{0x0000400000000000L});
-    public static final BitSet FOLLOW_ID_in_invocacion1219 = new BitSet(new long[]{0x0000000000000040L});
-    public static final BitSet FOLLOW_PARIZQ_in_invocacion1221 = new BitSet(new long[]{0x000BC480010040C0L});
-    public static final BitSet FOLLOW_paramsDos_in_invocacion1223 = new BitSet(new long[]{0x0000000000000080L});
-    public static final BitSet FOLLOW_PARDER_in_invocacion1225 = new BitSet(new long[]{0x0000000000000800L});
-    public static final BitSet FOLLOW_SEMICOLON_in_invocacion1227 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_INVOKE_in_invocacionDos1236 = new BitSet(new long[]{0x0000400000000000L});
-    public static final BitSet FOLLOW_ID_in_invocacionDos1238 = new BitSet(new long[]{0x0000000000000040L});
-    public static final BitSet FOLLOW_PARIZQ_in_invocacionDos1240 = new BitSet(new long[]{0x000BC480010040C0L});
-    public static final BitSet FOLLOW_paramsDos_in_invocacionDos1242 = new BitSet(new long[]{0x0000000000000080L});
-    public static final BitSet FOLLOW_PARDER_in_invocacionDos1244 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expresion_in_paramsDos1253 = new BitSet(new long[]{0x0000000000000400L});
-    public static final BitSet FOLLOW_paramsDosPrima_in_paramsDos1255 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_COMA_in_paramsDosPrima1268 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_expresion_in_paramsDosPrima1270 = new BitSet(new long[]{0x0000000000000400L});
-    public static final BitSet FOLLOW_paramsDosPrima_in_paramsDosPrima1272 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IF_in_condicion1284 = new BitSet(new long[]{0x0000000000000040L});
-    public static final BitSet FOLLOW_PARIZQ_in_condicion1286 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_expresion_in_condicion1288 = new BitSet(new long[]{0x0000000000000080L});
-    public static final BitSet FOLLOW_PARDER_in_condicion1290 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_LLAVEIZQ_in_condicion1292 = new BitSet(new long[]{0x0000405E81000020L});
-    public static final BitSet FOLLOW_bloque_in_condicion1294 = new BitSet(new long[]{0x0000000000000020L});
-    public static final BitSet FOLLOW_LLAVEDER_in_condicion1296 = new BitSet(new long[]{0x0000000100000000L});
-    public static final BitSet FOLLOW_condicionPrima_in_condicion1298 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ELSE_in_condicionPrima1307 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_LLAVEIZQ_in_condicionPrima1309 = new BitSet(new long[]{0x0000405E81000020L});
-    public static final BitSet FOLLOW_bloque_in_condicionPrima1311 = new BitSet(new long[]{0x0000000000000020L});
-    public static final BitSet FOLLOW_LLAVEDER_in_condicionPrima1313 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_READ_in_lectura1325 = new BitSet(new long[]{0x0000000000000040L});
-    public static final BitSet FOLLOW_PARIZQ_in_lectura1327 = new BitSet(new long[]{0x0000400000000000L});
-    public static final BitSet FOLLOW_ID_in_lectura1329 = new BitSet(new long[]{0x0000000000000080L});
-    public static final BitSet FOLLOW_PARDER_in_lectura1331 = new BitSet(new long[]{0x0000000000000800L});
-    public static final BitSet FOLLOW_SEMICOLON_in_lectura1333 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_FOR_in_xfor1342 = new BitSet(new long[]{0x0000000000000040L});
-    public static final BitSet FOLLOW_PARIZQ_in_xfor1344 = new BitSet(new long[]{0x0000400000000000L});
-    public static final BitSet FOLLOW_asignacion_in_xfor1346 = new BitSet(new long[]{0x0000000000000800L});
-    public static final BitSet FOLLOW_SEMICOLON_in_xfor1348 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_expresion_in_xfor1350 = new BitSet(new long[]{0x0000000000000800L});
-    public static final BitSet FOLLOW_SEMICOLON_in_xfor1352 = new BitSet(new long[]{0x0000400000000000L});
-    public static final BitSet FOLLOW_asignacion_in_xfor1354 = new BitSet(new long[]{0x0000000000000080L});
-    public static final BitSet FOLLOW_PARDER_in_xfor1356 = new BitSet(new long[]{0x0000000000000010L});
-    public static final BitSet FOLLOW_LLAVEIZQ_in_xfor1358 = new BitSet(new long[]{0x0000405E81000020L});
-    public static final BitSet FOLLOW_bloque_in_xfor1360 = new BitSet(new long[]{0x0000000000000020L});
-    public static final BitSet FOLLOW_LLAVEDER_in_xfor1362 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_MAS_in_synpred1_SimpleDroid985 = new BitSet(new long[]{0x000BC48001004040L});
-    public static final BitSet FOLLOW_exp_in_synpred1_SimpleDroid987 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_termino_in_exp974 = new BitSet(new long[]{0x0000000000006000L});
+    public static final BitSet FOLLOW_expPrima_in_exp976 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_MAS_in_expPrima991 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_exp_in_expPrima993 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_MENOS_in_expPrima998 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_exp_in_expPrima1000 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_factor_in_termino1012 = new BitSet(new long[]{0x0000000000038000L});
+    public static final BitSet FOLLOW_terminoPrima_in_termino1014 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_POR_in_terminoPrima1023 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_termino_in_terminoPrima1025 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ENTRE_in_terminoPrima1030 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_termino_in_terminoPrima1032 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_MOD_in_terminoPrima1037 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_termino_in_terminoPrima1039 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_PARIZQ_in_factor1051 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_expresion_in_factor1053 = new BitSet(new long[]{0x0000000000000080L});
+    public static final BitSet FOLLOW_PARDER_in_factor1055 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_factorPrima_in_factor1060 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_varcte_in_factor1062 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_MENOS_in_factorPrima1071 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_WRITE_in_escritura1083 = new BitSet(new long[]{0x0000000000000040L});
+    public static final BitSet FOLLOW_PARIZQ_in_escritura1085 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_expresion_in_escritura1087 = new BitSet(new long[]{0x0000000000002080L});
+    public static final BitSet FOLLOW_escrituraPrima_in_escritura1089 = new BitSet(new long[]{0x0000000000000080L});
+    public static final BitSet FOLLOW_PARDER_in_escritura1091 = new BitSet(new long[]{0x0000000000000800L});
+    public static final BitSet FOLLOW_SEMICOLON_in_escritura1093 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_MAS_in_escrituraPrima1102 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_expresion_in_escrituraPrima1104 = new BitSet(new long[]{0x0000000000002000L});
+    public static final BitSet FOLLOW_escrituraPrima_in_escrituraPrima1106 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ID_in_varcte1118 = new BitSet(new long[]{0x0000000000000100L});
+    public static final BitSet FOLLOW_varctePrima_in_varcte1120 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CTE_ENTERA_in_varcte1125 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CTE_DECIMAL_in_varcte1130 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CTE_STRING_in_varcte1135 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CTE_CHAR_in_varcte1140 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CTE_BOOLEAN_in_varcte1145 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_invocacionDos_in_varcte1150 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_CORIZQ_in_varctePrima1159 = new BitSet(new long[]{0x0001000000000000L});
+    public static final BitSet FOLLOW_CTE_ENTERA_in_varctePrima1161 = new BitSet(new long[]{0x0000000000000200L});
+    public static final BitSet FOLLOW_CORDER_in_varctePrima1163 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_xwhile_in_ciclo1175 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_xfor_in_ciclo1180 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_WHILE_in_xwhile1189 = new BitSet(new long[]{0x0000000000000040L});
+    public static final BitSet FOLLOW_PARIZQ_in_xwhile1191 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_expresion_in_xwhile1193 = new BitSet(new long[]{0x0000000000000080L});
+    public static final BitSet FOLLOW_PARDER_in_xwhile1195 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_LLAVEIZQ_in_xwhile1197 = new BitSet(new long[]{0x0000405E81000020L});
+    public static final BitSet FOLLOW_bloque_in_xwhile1199 = new BitSet(new long[]{0x0000000000000020L});
+    public static final BitSet FOLLOW_LLAVEDER_in_xwhile1201 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_RETURN_in_retorno1210 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_varcte_in_retorno1212 = new BitSet(new long[]{0x0000000000000800L});
+    public static final BitSet FOLLOW_SEMICOLON_in_retorno1214 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_INVOKE_in_invocacion1223 = new BitSet(new long[]{0x0000400000000000L});
+    public static final BitSet FOLLOW_ID_in_invocacion1225 = new BitSet(new long[]{0x0000000000000040L});
+    public static final BitSet FOLLOW_PARIZQ_in_invocacion1227 = new BitSet(new long[]{0x000BC480010040C0L});
+    public static final BitSet FOLLOW_paramsDos_in_invocacion1229 = new BitSet(new long[]{0x0000000000000080L});
+    public static final BitSet FOLLOW_PARDER_in_invocacion1231 = new BitSet(new long[]{0x0000000000000800L});
+    public static final BitSet FOLLOW_SEMICOLON_in_invocacion1233 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_INVOKE_in_invocacionDos1242 = new BitSet(new long[]{0x0000400000000000L});
+    public static final BitSet FOLLOW_ID_in_invocacionDos1244 = new BitSet(new long[]{0x0000000000000040L});
+    public static final BitSet FOLLOW_PARIZQ_in_invocacionDos1246 = new BitSet(new long[]{0x000BC480010040C0L});
+    public static final BitSet FOLLOW_paramsDos_in_invocacionDos1248 = new BitSet(new long[]{0x0000000000000080L});
+    public static final BitSet FOLLOW_PARDER_in_invocacionDos1250 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expresion_in_paramsDos1259 = new BitSet(new long[]{0x0000000000000400L});
+    public static final BitSet FOLLOW_paramsDosPrima_in_paramsDos1261 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_COMA_in_paramsDosPrima1274 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_expresion_in_paramsDosPrima1276 = new BitSet(new long[]{0x0000000000000400L});
+    public static final BitSet FOLLOW_paramsDosPrima_in_paramsDosPrima1278 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IF_in_condicion1290 = new BitSet(new long[]{0x0000000000000040L});
+    public static final BitSet FOLLOW_PARIZQ_in_condicion1292 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_expresion_in_condicion1294 = new BitSet(new long[]{0x0000000000000080L});
+    public static final BitSet FOLLOW_PARDER_in_condicion1296 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_LLAVEIZQ_in_condicion1298 = new BitSet(new long[]{0x0000405E81000020L});
+    public static final BitSet FOLLOW_bloque_in_condicion1300 = new BitSet(new long[]{0x0000000000000020L});
+    public static final BitSet FOLLOW_LLAVEDER_in_condicion1302 = new BitSet(new long[]{0x0000000100000000L});
+    public static final BitSet FOLLOW_condicionPrima_in_condicion1304 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ELSE_in_condicionPrima1313 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_LLAVEIZQ_in_condicionPrima1315 = new BitSet(new long[]{0x0000405E81000020L});
+    public static final BitSet FOLLOW_bloque_in_condicionPrima1317 = new BitSet(new long[]{0x0000000000000020L});
+    public static final BitSet FOLLOW_LLAVEDER_in_condicionPrima1319 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_READ_in_lectura1331 = new BitSet(new long[]{0x0000000000000040L});
+    public static final BitSet FOLLOW_PARIZQ_in_lectura1333 = new BitSet(new long[]{0x0000400000000000L});
+    public static final BitSet FOLLOW_ID_in_lectura1335 = new BitSet(new long[]{0x0000000000000080L});
+    public static final BitSet FOLLOW_PARDER_in_lectura1337 = new BitSet(new long[]{0x0000000000000800L});
+    public static final BitSet FOLLOW_SEMICOLON_in_lectura1339 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_FOR_in_xfor1348 = new BitSet(new long[]{0x0000000000000040L});
+    public static final BitSet FOLLOW_PARIZQ_in_xfor1350 = new BitSet(new long[]{0x0000400000000000L});
+    public static final BitSet FOLLOW_asignacion_in_xfor1352 = new BitSet(new long[]{0x0000000000000800L});
+    public static final BitSet FOLLOW_SEMICOLON_in_xfor1354 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_expresion_in_xfor1356 = new BitSet(new long[]{0x0000000000000800L});
+    public static final BitSet FOLLOW_SEMICOLON_in_xfor1358 = new BitSet(new long[]{0x0000400000000000L});
+    public static final BitSet FOLLOW_asignacion_in_xfor1360 = new BitSet(new long[]{0x0000000000000080L});
+    public static final BitSet FOLLOW_PARDER_in_xfor1362 = new BitSet(new long[]{0x0000000000000010L});
+    public static final BitSet FOLLOW_LLAVEIZQ_in_xfor1364 = new BitSet(new long[]{0x0000405E81000020L});
+    public static final BitSet FOLLOW_bloque_in_xfor1366 = new BitSet(new long[]{0x0000000000000020L});
+    public static final BitSet FOLLOW_LLAVEDER_in_xfor1368 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_MAS_in_synpred1_SimpleDroid991 = new BitSet(new long[]{0x000BC48001004040L});
+    public static final BitSet FOLLOW_exp_in_synpred1_SimpleDroid993 = new BitSet(new long[]{0x0000000000000002L});
 
 }

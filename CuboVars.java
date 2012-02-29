@@ -1,4 +1,4 @@
-public class CuboVars{
+/*public class CuboVars{
     String[][][] cubo
     public CuboVars(){
         cubo = new String[13][5][5];
@@ -86,4 +86,4 @@ public class CuboVars{
                    {"","","","",""},
                    {"","","","",""}};
     }
-}
+}*/

@@ -61,7 +61,7 @@ tokens {
     public static void main(String[] args) throws Exception {
         SimpleDroidLexer lex = new SimpleDroidLexer(new ANTLRFileStream(args[0])); //se crea el lexer
         CommonTokenStream tokens = new CommonTokenStream(lex); //se crean las tokens
-	Procs aux = new Procs("main"); //BORRAME
+	Procs aux = new Procs("global"); //BORRAME
 	listaProcs.add(aux); //BORRAME
 
         SimpleDroidParser parser = new SimpleDroidParser(tokens); //se crea el parser
@@ -73,18 +73,25 @@ tokens {
         }
     }
 
+    public void nuevoProc(String nombre){ //agrega un nuevo Proc a la lista de procs
+	Procs aux = new Procs(nombre);
+	listaProcs.add(aux);
+	procIndice++;
+    }
+
+
     public void insertaVariable(String tipo){ //falta checar cubo y checar si es global
 	String borrarLuego = identificadores.pop().toString(); //BORRAME
 	//listaProcs.get(procIndice).agregaVar(identificadores.pop().toString(), tipo);
 	listaProcs.get(procIndice).agregaVar(borrarLuego, tipo); //BORRAME
-	System.out.println("Se deposito al proc["+procIndice+"]: "+borrarLuego+", "+tipo); //BORRAME
+	System.out.println("Se deposito al proc["+procIndice+"][\""+listaProcs.get(procIndice).getNombre()+"\"]: "+borrarLuego+", "+tipo); //BORRAME
 	if(!identificadores.empty()){
 		if(identificadores.peek().toString().equals(",")){
 			identificadores.pop();
 			borrarLuego = identificadores.pop().toString(); //BORRAME
 			//listaProcs.get(procIndice).agregaVar(identificadores.pop().toString(), tipo);
 			listaProcs.get(procIndice).agregaVar(borrarLuego, tipo); //BORRAME
-			System.out.println("Se deposito al proc["+procIndice+"]: "+borrarLuego+", "+tipo); //BORRAME
+			System.out.println("Se deposito al proc["+procIndice+"][\""+listaProcs.get(procIndice).getNombre()+"\"]: "+borrarLuego+", "+tipo); //BORRAME
 		} 
 	}
     }
@@ -115,7 +122,7 @@ fragment UPPERCASE : 'A'..'Z' ;
 
 programa : vars funciones main {System.out.println("La compilacion ha sido exitosa. Bienvenido al futuro.");};
 
-main : FUNCTION EXECUTE PARIZQ PARDER LLAVEIZQ vars bloque LLAVEDER ;
+main : FUNCTION EXECUTE PARIZQ PARDER LLAVEIZQ vars bloque LLAVEDER { nuevoProc("main"); } ;  
 
 vars : varsPrima tipo varsBiPrima SEMICOLON vars { insertaVariable($tipo.text); }
 	| ;
@@ -133,7 +140,7 @@ varsCuatriPrima : COMA varsBiPrima { System.out.println($COMA.text + "");
 					identificadores.push($COMA.text); }
 	| ;
 
-funciones : FUNCTION funcionesPrima ID PARIZQ params PARDER LLAVEIZQ vars bloque LLAVEDER funciones
+funciones : FUNCTION funcionesPrima ID PARIZQ params PARDER LLAVEIZQ vars bloque LLAVEDER funciones { nuevoProc($ID.text); }
 	| ;
 
 funcionesPrima : tipo

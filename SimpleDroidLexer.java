@@ -1,4 +1,4 @@
-// $ANTLR 3.3 Nov 30, 2010 12:50:56 SimpleDroid.g 2012-02-28 20:20:19
+// $ANTLR 3.3 Nov 30, 2010 12:50:56 SimpleDroid.g 2012-02-29 13:32:52
 
 import org.antlr.runtime.*;
 import java.util.Stack;
@@ -855,7 +855,7 @@ public class SimpleDroidLexer extends Lexer {
         try {
             int _type = CTE_BOOLEAN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // SimpleDroid.g:95:13: ( 'true' | 'false' )
+            // SimpleDroid.g:102:13: ( 'true' | 'false' )
             int alt1=2;
             int LA1_0 = input.LA(1);
 
@@ -873,7 +873,7 @@ public class SimpleDroidLexer extends Lexer {
             }
             switch (alt1) {
                 case 1 :
-                    // SimpleDroid.g:95:15: 'true'
+                    // SimpleDroid.g:102:15: 'true'
                     {
                     match("true"); 
 
@@ -881,7 +881,7 @@ public class SimpleDroidLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // SimpleDroid.g:95:24: 'false'
+                    // SimpleDroid.g:102:24: 'false'
                     {
                     match("false"); 
 
@@ -903,17 +903,17 @@ public class SimpleDroidLexer extends Lexer {
         try {
             int _type = ID;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // SimpleDroid.g:96:3: ( ( LOWERCASE ) ( LOWERCASE | UPPERCASE | DIGITO | '_' )* )
-            // SimpleDroid.g:96:5: ( LOWERCASE ) ( LOWERCASE | UPPERCASE | DIGITO | '_' )*
+            // SimpleDroid.g:103:3: ( ( LOWERCASE ) ( LOWERCASE | UPPERCASE | DIGITO | '_' )* )
+            // SimpleDroid.g:103:5: ( LOWERCASE ) ( LOWERCASE | UPPERCASE | DIGITO | '_' )*
             {
-            // SimpleDroid.g:96:5: ( LOWERCASE )
-            // SimpleDroid.g:96:6: LOWERCASE
+            // SimpleDroid.g:103:5: ( LOWERCASE )
+            // SimpleDroid.g:103:6: LOWERCASE
             {
             mLOWERCASE(); 
 
             }
 
-            // SimpleDroid.g:96:17: ( LOWERCASE | UPPERCASE | DIGITO | '_' )*
+            // SimpleDroid.g:103:17: ( LOWERCASE | UPPERCASE | DIGITO | '_' )*
             loop2:
             do {
                 int alt2=2;
@@ -962,10 +962,10 @@ public class SimpleDroidLexer extends Lexer {
         try {
             int _type = CTE_DECIMAL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // SimpleDroid.g:97:13: ( ( DIGITO )+ '.' ( DIGITO )+ )
-            // SimpleDroid.g:97:15: ( DIGITO )+ '.' ( DIGITO )+
+            // SimpleDroid.g:104:13: ( ( DIGITO )+ '.' ( DIGITO )+ )
+            // SimpleDroid.g:104:15: ( DIGITO )+ '.' ( DIGITO )+
             {
-            // SimpleDroid.g:97:15: ( DIGITO )+
+            // SimpleDroid.g:104:15: ( DIGITO )+
             int cnt3=0;
             loop3:
             do {
@@ -979,7 +979,7 @@ public class SimpleDroidLexer extends Lexer {
 
                 switch (alt3) {
             	case 1 :
-            	    // SimpleDroid.g:97:16: DIGITO
+            	    // SimpleDroid.g:104:16: DIGITO
             	    {
             	    mDIGITO(); 
 
@@ -996,7 +996,7 @@ public class SimpleDroidLexer extends Lexer {
             } while (true);
 
             match('.'); 
-            // SimpleDroid.g:97:27: ( DIGITO )+
+            // SimpleDroid.g:104:27: ( DIGITO )+
             int cnt4=0;
             loop4:
             do {
@@ -1010,7 +1010,7 @@ public class SimpleDroidLexer extends Lexer {
 
                 switch (alt4) {
             	case 1 :
-            	    // SimpleDroid.g:97:28: DIGITO
+            	    // SimpleDroid.g:104:28: DIGITO
             	    {
             	    mDIGITO(); 
 
@@ -1042,10 +1042,10 @@ public class SimpleDroidLexer extends Lexer {
         try {
             int _type = CTE_ENTERA;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // SimpleDroid.g:98:12: ( ( DIGITO )+ )
-            // SimpleDroid.g:98:14: ( DIGITO )+
+            // SimpleDroid.g:105:12: ( ( DIGITO )+ )
+            // SimpleDroid.g:105:14: ( DIGITO )+
             {
-            // SimpleDroid.g:98:14: ( DIGITO )+
+            // SimpleDroid.g:105:14: ( DIGITO )+
             int cnt5=0;
             loop5:
             do {
@@ -1059,7 +1059,7 @@ public class SimpleDroidLexer extends Lexer {
 
                 switch (alt5) {
             	case 1 :
-            	    // SimpleDroid.g:98:15: DIGITO
+            	    // SimpleDroid.g:105:15: DIGITO
             	    {
             	    mDIGITO(); 
 
@@ -1091,11 +1091,11 @@ public class SimpleDroidLexer extends Lexer {
         try {
             int _type = CTE_CHAR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // SimpleDroid.g:99:9: ( ( '\\'' ) ( LOWERCASE | UPPERCASE ) ( '\\'' ) )
-            // SimpleDroid.g:99:11: ( '\\'' ) ( LOWERCASE | UPPERCASE ) ( '\\'' )
+            // SimpleDroid.g:106:9: ( ( '\\'' ) ( LOWERCASE | UPPERCASE ) ( '\\'' ) )
+            // SimpleDroid.g:106:11: ( '\\'' ) ( LOWERCASE | UPPERCASE ) ( '\\'' )
             {
-            // SimpleDroid.g:99:11: ( '\\'' )
-            // SimpleDroid.g:99:12: '\\''
+            // SimpleDroid.g:106:11: ( '\\'' )
+            // SimpleDroid.g:106:12: '\\''
             {
             match('\''); 
 
@@ -1110,8 +1110,8 @@ public class SimpleDroidLexer extends Lexer {
                 recover(mse);
                 throw mse;}
 
-            // SimpleDroid.g:99:41: ( '\\'' )
-            // SimpleDroid.g:99:42: '\\''
+            // SimpleDroid.g:106:41: ( '\\'' )
+            // SimpleDroid.g:106:42: '\\''
             {
             match('\''); 
 
@@ -1133,10 +1133,10 @@ public class SimpleDroidLexer extends Lexer {
         try {
             int _type = WHITESPACE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // SimpleDroid.g:104:12: ( ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+ )
-            // SimpleDroid.g:104:14: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
+            // SimpleDroid.g:111:12: ( ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+ )
+            // SimpleDroid.g:111:14: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
             {
-            // SimpleDroid.g:104:14: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
+            // SimpleDroid.g:111:14: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
             int cnt6=0;
             loop6:
             do {
@@ -1191,11 +1191,11 @@ public class SimpleDroidLexer extends Lexer {
         try {
             int _type = CTE_STRING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // SimpleDroid.g:105:12: ( '\\\"' ( . )* '\\\"' )
-            // SimpleDroid.g:105:14: '\\\"' ( . )* '\\\"'
+            // SimpleDroid.g:112:12: ( '\\\"' ( . )* '\\\"' )
+            // SimpleDroid.g:112:14: '\\\"' ( . )* '\\\"'
             {
             match('\"'); 
-            // SimpleDroid.g:105:19: ( . )*
+            // SimpleDroid.g:112:19: ( . )*
             loop7:
             do {
                 int alt7=2;
@@ -1211,7 +1211,7 @@ public class SimpleDroidLexer extends Lexer {
 
                 switch (alt7) {
             	case 1 :
-            	    // SimpleDroid.g:105:20: .
+            	    // SimpleDroid.g:112:20: .
             	    {
             	    matchAny(); 
 
@@ -1238,8 +1238,8 @@ public class SimpleDroidLexer extends Lexer {
     // $ANTLR start "DIGITO"
     public final void mDIGITO() throws RecognitionException {
         try {
-            // SimpleDroid.g:108:18: ( '0' .. '9' )
-            // SimpleDroid.g:108:20: '0' .. '9'
+            // SimpleDroid.g:115:18: ( '0' .. '9' )
+            // SimpleDroid.g:115:20: '0' .. '9'
             {
             matchRange('0','9'); 
 
@@ -1254,8 +1254,8 @@ public class SimpleDroidLexer extends Lexer {
     // $ANTLR start "LOWERCASE"
     public final void mLOWERCASE() throws RecognitionException {
         try {
-            // SimpleDroid.g:109:20: ( 'a' .. 'z' )
-            // SimpleDroid.g:109:22: 'a' .. 'z'
+            // SimpleDroid.g:116:20: ( 'a' .. 'z' )
+            // SimpleDroid.g:116:22: 'a' .. 'z'
             {
             matchRange('a','z'); 
 
@@ -1270,8 +1270,8 @@ public class SimpleDroidLexer extends Lexer {
     // $ANTLR start "UPPERCASE"
     public final void mUPPERCASE() throws RecognitionException {
         try {
-            // SimpleDroid.g:110:20: ( 'A' .. 'Z' )
-            // SimpleDroid.g:110:22: 'A' .. 'Z'
+            // SimpleDroid.g:117:20: ( 'A' .. 'Z' )
+            // SimpleDroid.g:117:22: 'A' .. 'Z'
             {
             matchRange('A','Z'); 
 
