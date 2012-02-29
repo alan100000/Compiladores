@@ -85,7 +85,7 @@ fragment UPPERCASE : 'A'..'Z' ;
  * ANALISIS DE SINTAXIS
  *------------------------------------------------------------------*/
 
-programa : vars funciones main ;
+programa : vars funciones main {System.out.println("Terminado");};
 
 main : FUNCTION EXECUTE PARIZQ PARDER LLAVEIZQ vars bloque LLAVEDER ;
 
