@@ -1,4 +1,3 @@
-
 grammar SimpleDroid;
 
 
@@ -23,6 +22,7 @@ tokens {
 	MOD = '%';
 	GT = '>';
 	LT = '<';
+	NE = '!';
 	EXECUTE = 'execute' ;
 	GLOBAL = 'global' ;
 	FUNCTION = 'function';
@@ -46,19 +46,47 @@ tokens {
 	AND = 'and';
 	OR = 'or';
 }
- 
+@header {
+    import java.util.Stack;
+    import java.util.ArrayList;
+    import java.util.List;
+}
+
 @members {
+    static Stack identificadores = new Stack();
+    static int procIndice = 0; // Indice del arreglo de procs
+    static List<Procs> listaProcs = new ArrayList<Procs>(); //se inicializa la tabla de scopes
+    
+
     public static void main(String[] args) throws Exception {
-        SimpleDroidLexer lex = new SimpleDroidLexer(new ANTLRFileStream(args[0]));
-        CommonTokenStream tokens = new CommonTokenStream(lex);
- 
-        SimpleDroidParser parser = new SimpleDroidParser(tokens);
+        SimpleDroidLexer lex = new SimpleDroidLexer(new ANTLRFileStream(args[0])); //se crea el lexer
+        CommonTokenStream tokens = new CommonTokenStream(lex); //se crean las tokens
+	Procs aux = new Procs("main"); //BORRAME
+	listaProcs.add(aux); //BORRAME
+
+        SimpleDroidParser parser = new SimpleDroidParser(tokens); //se crea el parser
  
         try {
-            parser.programa();
+            parser.programa(); //se inicia el parser en la regla <programa>
         } catch (RecognitionException e)  {
             e.printStackTrace();
         }
+    }
+
+    public void insertaVariable(String tipo){ //falta checar cubo y checar si es global
+	String borrarLuego = identificadores.pop().toString(); //BORRAME
+	//listaProcs.get(procIndice).agregaVar(identificadores.pop().toString(), tipo);
+	listaProcs.get(procIndice).agregaVar(borrarLuego, tipo); //BORRAME
+	System.out.println("Se deposito al proc["+procIndice+"]: "+borrarLuego+", "+tipo); //BORRAME
+	if(!identificadores.empty()){
+		if(identificadores.peek().toString().equals(",")){
+			identificadores.pop();
+			borrarLuego = identificadores.pop().toString(); //BORRAME
+			//listaProcs.get(procIndice).agregaVar(identificadores.pop().toString(), tipo);
+			listaProcs.get(procIndice).agregaVar(borrarLuego, tipo); //BORRAME
+			System.out.println("Se deposito al proc["+procIndice+"]: "+borrarLuego+", "+tipo); //BORRAME
+		} 
+	}
     }
 }
 
@@ -85,23 +113,24 @@ fragment UPPERCASE : 'A'..'Z' ;
  * ANALISIS DE SINTAXIS
  *------------------------------------------------------------------*/
 
-programa : vars funciones main {System.out.println("Terminado");};
+programa : vars funciones main {System.out.println("La compilacion ha sido exitosa. Bienvenido al futuro.");};
 
 main : FUNCTION EXECUTE PARIZQ PARDER LLAVEIZQ vars bloque LLAVEDER ;
 
-vars : varsPrima tipo varsBiPrima SEMICOLON vars
+vars : varsPrima tipo varsBiPrima SEMICOLON vars { insertaVariable($tipo.text); }
 	| ;
 
 varsPrima : GLOBAL
 	| ;
 
-varsBiPrima : ID varsTriPrima varsCuatriPrima ;
+varsBiPrima : ID varsTriPrima varsCuatriPrima { identificadores.push($ID.text); };
 
 varsTriPrima : IGUAL expresion
 	| CORIZQ CTE_ENTERA CORDER
 	| ;
 
-varsCuatriPrima : COMA varsBiPrima
+varsCuatriPrima : COMA varsBiPrima { System.out.println($COMA.text + ""); 
+					identificadores.push($COMA.text); }
 	| ;
 
 funciones : FUNCTION funcionesPrima ID PARIZQ params PARDER LLAVEIZQ vars bloque LLAVEDER funciones
@@ -149,7 +178,9 @@ comparadorPrima : comparadorBiPrima comparadorTriPrima exp
 	| ;
 
 comparadorBiPrima : LT
-	| GT ;
+	| GT 
+	| IGUAL IGUAL
+	| NE IGUAL;
 
 comparadorTriPrima : IGUAL
 	| ;
