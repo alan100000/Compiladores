@@ -55,6 +55,7 @@ tokens {
 @members {
     static Stack identificadores = new Stack();
     static int procIndice = 0; // Indice del arreglo de procs
+    static boolean globalVar = false; // En caso de ser una variable global
     static List<Procs> listaProcs = new ArrayList<Procs>(); //se inicializa la tabla de scopes
     
 
@@ -81,19 +82,26 @@ tokens {
 
 
     public void insertaVariable(String tipo){ //falta checar cubo y checar si es global
+	int i = 0;	
+	if(globalVar) //si es variable global el indice del scope es 0, el que representa las variables globales
+		i = 0;
+	else
+		i = procIndice;
+
 	String borrarLuego = identificadores.pop().toString(); //BORRAME
 	//listaProcs.get(procIndice).agregaVar(identificadores.pop().toString(), tipo);
-	listaProcs.get(procIndice).agregaVar(borrarLuego, tipo); //BORRAME
-	System.out.println("Se deposito al proc["+procIndice+"][\""+listaProcs.get(procIndice).getNombre()+"\"]: "+borrarLuego+", "+tipo); //BORRAME
+	listaProcs.get(i).agregaVar(borrarLuego, tipo); //BORRAME
+	System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo); //BORRAME
 	if(!identificadores.empty()){
 		if(identificadores.peek().toString().equals(",")){
 			identificadores.pop();
 			borrarLuego = identificadores.pop().toString(); //BORRAME
-			//listaProcs.get(procIndice).agregaVar(identificadores.pop().toString(), tipo);
-			listaProcs.get(procIndice).agregaVar(borrarLuego, tipo); //BORRAME
-			System.out.println("Se deposito al proc["+procIndice+"][\""+listaProcs.get(procIndice).getNombre()+"\"]: "+borrarLuego+", "+tipo); //BORRAME
+			//listaProcs.get(i).agregaVar(identificadores.pop().toString(), tipo);
+			listaProcs.get(i).agregaVar(borrarLuego, tipo); //BORRAME
+			System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo); //BORRAME
 		} 
 	}
+	globalVar = false;
     }
 }
 
@@ -122,12 +130,14 @@ fragment UPPERCASE : 'A'..'Z' ;
 
 programa : vars funciones main {System.out.println("La compilacion ha sido exitosa. Bienvenido al futuro.");};
 
-main : FUNCTION EXECUTE PARIZQ PARDER LLAVEIZQ vars bloque LLAVEDER { nuevoProc("main"); } ;  
+main : FUNCTION funcionExec PARIZQ PARDER LLAVEIZQ vars bloque LLAVEDER;  
+
+funcionExec: EXECUTE { nuevoProc("main"); };
 
 vars : varsPrima tipo varsBiPrima SEMICOLON vars { insertaVariable($tipo.text); }
 	| ;
 
-varsPrima : GLOBAL
+varsPrima : GLOBAL {globalVar = true; }
 	| ;
 
 varsBiPrima : ID varsTriPrima varsCuatriPrima { identificadores.push($ID.text); };
@@ -136,12 +146,13 @@ varsTriPrima : IGUAL expresion
 	| CORIZQ CTE_ENTERA CORDER
 	| ;
 
-varsCuatriPrima : COMA varsBiPrima { System.out.println($COMA.text + ""); 
-					identificadores.push($COMA.text); }
+varsCuatriPrima : COMA varsBiPrima { identificadores.push($COMA.text); }
 	| ;
 
-funciones : FUNCTION funcionesPrima ID PARIZQ params PARDER LLAVEIZQ vars bloque LLAVEDER funciones { nuevoProc($ID.text); }
+funciones : FUNCTION funcionesPrima funcionId PARIZQ params PARDER LLAVEIZQ vars bloque LLAVEDER funciones 
 	| ;
+
+funcionId: ID { nuevoProc($ID.text); };
 
 funcionesPrima : tipo
 	| NOTHING ;
@@ -152,11 +163,14 @@ tipo : INT
 	| CHAR
 	| BOOLEAN ;
 
-params : tipo ID paramsPrima
+params : paramsId paramsPrima
 	| ;
 
-paramsPrima : COMA tipo ID paramsPrima
+paramsPrima : COMA paramsId paramsPrima
 	| ;
+
+paramsId : tipo ID { identificadores.push($ID.text);
+			insertaVariable($tipo.text); };
 
 bloque : estatuto bloque
 	| ;

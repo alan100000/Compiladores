@@ -20,6 +20,7 @@ function decimal mauricio(decimal paco, decimal poco, decimal elnegroklever){
 
 function int suma_b(int aux){
 	decimal maximiliano = 77.88889;
+	global int truenaDroid = 3;
 	aux = aux + 1;
 	return aux;
 }
