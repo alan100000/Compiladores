@@ -1,89 +1,86 @@
-/*public class CuboVars{
-    String[][][] cubo
+public class CuboVars{
+    String[][][] cubo;
     public CuboVars(){
-        cubo = new String[13][5][5];
-        cubo[0] = {{"int","decimal","error","error","error"}, //suma
-                      {"decimal","decimal","error","error","error"},
-                      {"error","error","string","string","error"},
-                      {"error","error","string","string","error"},
-                      {"error","error","error","error","error"}};
+        cubo =  new String[][][] 
+                 {{{"int","decimal","error","error","error"}, //suma
+                   {"decimal","decimal","error","error","error"},
+                   {"error","error","string","string","error"},
+                   {"error","error","string","string","error"},
+                   {"error","error","error","error","error"}},
+                
+                  {{"int","decimal","error","error","error"}, //resta
+                   {"decimal","decimal","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"}},
 
-        cubo[1] = {{"","","","",""}, //resta
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""}};
+                  {{"int","decimal","error","error","error"}, //multiplicacion
+                   {"decimal","decimal","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"}},
 
-        cubo[2] = {{"","","","",""}, //multiplicacion
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""}};
+                  {{"decimal","decimal","error","error","error"}, //division
+                   {"decimal","decimal","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"}},
 
-        cubo[3] = {{"","","","",""}, //division
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""}};
+                  {{"int"  ,"error","error","error","error"}, //mod
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"}},
 
-        cubo[4] = {{"","","","",""}, //mod
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""}};
+                  {{"boolean","boolean","error","error","error"}, //>
+                   {"boolean","boolean","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"}},
 
-        cubo[5] = {{"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""}};
+                  {{"boolean","boolean","error","error","error"}, //<
+                   {"boolean","boolean","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"}},
 
-        cubo[6] = {{"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""}};
+                  {{"boolean","boolean","error","error","error"}, //>=
+                   {"boolean","boolean","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"}},
 
-        cubo[7] = {{"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""}};
+                  {{"boolean","boolean","error","error","error"}, //<=
+                   {"boolean","boolean","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"}},
 
-        cubo[8] = {{"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""}};
+                  {{"boolean","boolean","error","error","error"}, //==
+                   {"boolean","boolean","error","error","error"},
+                   {"error","error","boolean","boolean","error"},
+                   {"error","error","boolean","boolean","error"},
+                   {"error","error","error","error","boolean"}},
 
-        cubo[9] = {{"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""}};
+                  {{"boolean","boolean","error","error","error"}, //!=
+                   {"boolean","boolean","error","error","error"},
+                   {"error","error","boolean","boolean","error"},
+                   {"error","error","boolean","boolean","error"},
+                   {"error","error","error","error","boolean"}},
 
-        cubo[10] = {{"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""}};
+                  {{"error","error","error","error","error"}, //AND
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","boolean"}},
 
-        cubo[11] = {{"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""}};
-
-        cubo[12] = {{"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""}};
-
-        cubo[13] = {{"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""},
-                   {"","","","",""}};
+                  {{"error","error","error","error","error"}, //OR
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","error"},
+                   {"error","error","error","error","boolean"}}};
     }
-}*/
+    public String verificaCubo(int i, int j, int k){
+        return this.cubo[i][j][k];
+    }
+}
