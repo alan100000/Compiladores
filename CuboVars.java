@@ -1,6 +1,26 @@
 public class CuboVars{
     String[][][] cubo;
+	String[] operandos;
+	String[] operadores;
     public CuboVars(){
+		operadores =new String[] 
+			{"+"
+			,"-"
+			,"*"
+			,"/"
+			,"%"
+			,">"
+			,"<"
+			,">="
+			,"<="
+			,"=="
+			,"!="
+			,"AND"
+			,"OR"};
+
+		operandos = new String[] 
+			{"int","decimal","string","char","boolean"};
+
         cubo =  new String[][][] 
                  {{{"int","decimal","error","error","error"}, //suma
                    {"decimal","decimal","error","error","error"},
