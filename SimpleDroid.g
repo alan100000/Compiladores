@@ -54,9 +54,11 @@ tokens {
 
 @members {
     static Stack identificadores = new Stack();
+    static Stack scopes = new Stack();
     static int procIndice = 0; // Indice del arreglo de procs
-    static boolean globalVar = false; // En caso de ser una variable global
     static List<Procs> listaProcs = new ArrayList<Procs>(); //se inicializa la tabla de scopes
+    static int numLinea = 0; //numero de Linea
+    
     
 
     public static void main(String[] args) throws Exception {
@@ -80,15 +82,23 @@ tokens {
 	procIndice++;
     }
 
-
-    public void insertaVariable(String tipo){ //falta checar cubo y checar si es global
-	int i = 0;	
+    public boolean insertaVariable(String tipo){ //falta checar cubo y checar si es global
+	int i = 0;
+	boolean globalVar;
+	if(!scopes.empty())
+		globalVar = Boolean.parseBoolean(scopes.pop().toString());
+	else
+		globalVar = true;
 	if(globalVar) //si es variable global el indice del scope es 0, el que representa las variables globales
 		i = 0;
 	else
 		i = procIndice;
 
 	String borrarLuego = identificadores.pop().toString(); //BORRAME
+	if(varRepetida(borrarLuego, globalVar)){
+		System.out.println("Variable repetida: "+borrarLuego+", en la linea "+numLinea);
+		return false;
+	}
 	//listaProcs.get(procIndice).agregaVar(identificadores.pop().toString(), tipo);
 	listaProcs.get(i).agregaVar(borrarLuego, tipo); //BORRAME
 	System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo); //BORRAME
@@ -101,7 +111,34 @@ tokens {
 			System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo); //BORRAME
 		} 
 	}
-	globalVar = false;
+	return true;
+    }
+
+    public boolean varDeclarada(String id){
+	TablaVars var = listaProcs.get(procIndice).buscaVar(id);
+
+	if(var != null)
+		return true;	
+	else{
+		var = listaProcs.get(0).buscaVar(id);
+		if(var != null)
+			return true;
+	}
+	System.out.println("Variable no declarada: "+id+", en la linea"+numLinea);
+	return false;
+    }
+
+    public boolean varRepetida(String id, boolean globalVar){
+	TablaVars var;
+	if(globalVar)
+		var = listaProcs.get(0).buscaVar(id);
+	else
+		var = listaProcs.get(procIndice).buscaVar(id);
+	
+	if(var != null)
+		return true;
+	else
+		return false;
     }
 }
 
@@ -134,13 +171,15 @@ main : FUNCTION funcionExec PARIZQ PARDER LLAVEIZQ vars bloque LLAVEDER;
 
 funcionExec: EXECUTE { nuevoProc("main"); };
 
-vars : varsPrima tipo varsBiPrima SEMICOLON vars { insertaVariable($tipo.text); }
+vars : varsPrima tipo varsBiPrima SEMICOLON vars {numLinea = $SEMICOLON.getLine();} { insertaVariable($tipo.text) ;}
 	| ;
 
-varsPrima : GLOBAL {globalVar = true; }
-	| ;
+varsPrima : GLOBAL {scopes.push(true); }
+	| {scopes.push(false); } ;
 
-varsBiPrima : ID varsTriPrima varsCuatriPrima { identificadores.push($ID.text); };
+varsBiPrima : varsId varsTriPrima varsCuatriPrima;
+
+varsId: ID { identificadores.push($ID.text); };
 
 varsTriPrima : IGUAL expresion
 	| CORIZQ CTE_ENTERA CORDER
@@ -169,7 +208,8 @@ params : paramsId paramsPrima
 paramsPrima : COMA paramsId paramsPrima
 	| ;
 
-paramsId : tipo ID { identificadores.push($ID.text);
+paramsId : tipo ID { 	scopes.push(false);
+			identificadores.push($ID.text);
 			insertaVariable($tipo.text); };
 
 bloque : estatuto bloque
@@ -183,7 +223,9 @@ estatuto : asignacion
 	| retorno
 	| invocacion ;
 
-asignacion : ID asignacionPrima IGUAL expresion SEMICOLON ;
+asignacion : asignacionId asignacionPrima IGUAL expresion SEMICOLON ;
+
+asignacionId: ID {numLinea = $ID.getLine();}{ varDeclarada($ID.text); } ;
 
 asignacionPrima : CORIZQ CTE_ENTERA CORDER
 	| ;
@@ -237,7 +279,7 @@ escritura : WRITE PARIZQ expresion escrituraPrima PARDER SEMICOLON ;
 escrituraPrima : MAS expresion escrituraPrima
 	| ;
 
-varcte : ID varctePrima
+varcte : ID varctePrima {numLinea = $ID.getLine();}{ varDeclarada($ID.text); }
 	| CTE_ENTERA
 	| CTE_DECIMAL
 	| CTE_STRING
