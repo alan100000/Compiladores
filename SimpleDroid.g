@@ -41,10 +41,10 @@ tokens {
 	WRITE = 'write';
 	NULL = 'null';
 	RETURN = 'return';
-	NOT = 'not';
+	NOT = 'NOT';
 	
-	AND = 'and';
-	OR = 'or';
+	AND = 'AND';
+	OR = 'OR';
 }
 @header {
     import java.util.Stack;

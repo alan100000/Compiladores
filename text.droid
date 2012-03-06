@@ -24,6 +24,9 @@ function int suma_b(int aux){
 	decimal maximiliano = 77.88889;
 	int hola = 2;
 	global int truenaDroid = 3;
+	if( ( (3+5) > 6 ) OR true ){
+		write("ok");
+	}
 	write("hey");
 	aux = aux + 1;
 	aux = 1 + aux;
