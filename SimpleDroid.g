@@ -58,6 +58,7 @@ tokens {
     static int procIndice = 0; // Indice del arreglo de procs
     static List<Procs> listaProcs = new ArrayList<Procs>(); //se inicializa la tabla de scopes
     static int numLinea = 0; //numero de Linea
+    static CuboVars cuboVars = new CuboVars();
     
     
 
