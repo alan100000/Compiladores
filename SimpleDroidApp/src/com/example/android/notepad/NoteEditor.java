@@ -97,7 +97,12 @@ public class NoteEditor extends Activity {
 
             for (int i = 0; i < count; i++) {
                 int baseline = getLineBounds(i, r);
-                canvas.drawText(""+i,r.left - 1, baseline,paint); //LINE NUMBER
+                if(i<9)
+                	canvas.drawText(""+(i+1),r.left - 11, baseline,paint); //LINE NUMBER
+                else if(i<99)
+                	canvas.drawText(""+(i+1),r.left - 16, baseline,paint); //LINE NUMBER
+                else
+                	canvas.drawText(""+(i+1),r.left - 22, baseline,paint); //LINE NUMBER
                 canvas.drawLine(r.left, baseline + 1, r.right, baseline + 1, paint);
             }
 
