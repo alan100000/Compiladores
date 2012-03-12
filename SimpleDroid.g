@@ -59,15 +59,16 @@ tokens {
     static List<Procs> listaProcs = new ArrayList<Procs>(); //se inicializa la tabla de scopes
     static int numLinea = 0; //numero de Linea
     static CuboVars cuboVars = new CuboVars();
+    public static String salida;
     
+    public String getSalida(){
+	return salida;
+    }
     
 
     public static void main(String[] args) throws Exception {
         SimpleDroidLexer lex = new SimpleDroidLexer(new ANTLRFileStream(args[0])); //se crea el lexer
-        CommonTokenStream tokens = new CommonTokenStream(lex); //se crean las tokens
-	Procs aux = new Procs("global"); //BORRAME
-	listaProcs.add(aux); //BORRAME
-
+        CommonTokenStream tokens = new CommonTokenStream(lex); //se crean las tokens	
         SimpleDroidParser parser = new SimpleDroidParser(tokens); //se crea el parser
  
         try {
@@ -98,11 +99,13 @@ tokens {
 	String borrarLuego = identificadores.pop().toString(); //BORRAME
 	if(varRepetida(borrarLuego, globalVar)){
 		System.out.println("Variable repetida: "+borrarLuego+", en la linea "+numLinea);
+		salida += "Variable repetida: "+borrarLuego+", en la linea "+numLinea+"\n";
 		return false;
 	}
 	//listaProcs.get(procIndice).agregaVar(identificadores.pop().toString(), tipo);
 	listaProcs.get(i).agregaVar(borrarLuego, tipo); //BORRAME
 	System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo); //BORRAME
+	salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+"\n";
 	if(!identificadores.empty()){
 		if(identificadores.peek().toString().equals(",")){
 			identificadores.pop();
@@ -110,6 +113,7 @@ tokens {
 			//listaProcs.get(i).agregaVar(identificadores.pop().toString(), tipo);
 			listaProcs.get(i).agregaVar(borrarLuego, tipo); //BORRAME
 			System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo); //BORRAME
+			salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+"\n";
 		} 
 	}
 	return true;
@@ -126,6 +130,7 @@ tokens {
 			return true;
 	}
 	System.out.println("Variable no declarada: "+id+", en la linea"+numLinea);
+	salida += "Variable no declarada: "+id+", en la linea"+numLinea+"\n";
 	return false;
     }
 
@@ -166,7 +171,12 @@ fragment UPPERCASE : 'A'..'Z' ;
  * ANALISIS DE SINTAXIS
  *------------------------------------------------------------------*/
 
-programa : vars funciones main {System.out.println("La compilacion ha sido exitosa. Bienvenido al futuro.");};
+programa : inicializacion vars funciones main {	System.out.println("La compilacion ha sido exitosa. Bienvenido al futuro.");
+						salida += "La compilacion ha sido exitosa. Bienvenido al futuro.";};
+
+inicializacion : {Procs aux = new Procs("global");
+		  listaProcs.add(aux);
+		   };
 
 main : FUNCTION funcionExec PARIZQ PARDER LLAVEIZQ vars bloque LLAVEDER;  
 
