@@ -39,4 +39,7 @@
     <string name="error_title">Error</string>
     <string name="error_message">Error loading note</string>
     <string name="nothing_to_save">There is nothing to save</string>
+    <string name="menu_compile">Compile</string>
+    <string name="title_compiler_output">Compiler Output</string>
+    <string name="compiler">Compile</string>
 </resources>

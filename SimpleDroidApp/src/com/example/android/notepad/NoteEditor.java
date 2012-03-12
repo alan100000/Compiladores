@@ -16,6 +16,8 @@
 
 package com.example.android.notepad;
 
+import org.antlr.runtime.*;
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ContentValues;
@@ -45,7 +47,7 @@ import com.example.android.notepad.NotePad.NoteColumns;
  */
 public class NoteEditor extends Activity {
     private static final String TAG = "NoteEditor";
-
+    public static String compiler;
     /**
      * Standard projection for the interesting columns of a normal note.
      */
@@ -279,6 +281,8 @@ public class NoteEditor extends Activity {
         // Handle all of the possible menu actions.
         switch (item.getItemId()) {
         case R.id.menu_save:
+        	compiler = "";
+        	compiler = mText.getText().toString();
             saveNote();
             finish();
             break;
@@ -286,6 +290,23 @@ public class NoteEditor extends Activity {
             deleteNote();
             finish();
             break;
+       // case R.id.menu_compile:
+        	/*INICIA PROCESO ANTLR*/
+         //   TextView out = (TextView)findViewById(R.id.output_text);
+/*
+            String source = mText.getText().toString();
+            SimpleDroidLexer lexer = new SimpleDroidLexer(new ANTLRStringStream(source));
+            SimpleDroidParser parser = new SimpleDroidParser(new CommonTokenStream(lexer));
+
+            try {
+            	parser.programa(); //hace el parseo
+               // out.setText(source + " = " + parser.getSalida());
+            }
+            catch (RecognitionException e) {
+              //  out.setText("Oops: " + e.getMessage());
+            }
+        	/*TERMINA PROCESO ANTLR*/
+        	//break;
         case R.id.menu_revert:
         case R.id.menu_discard:
             cancelNote();
