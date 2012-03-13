@@ -1,3 +1,7 @@
+/* Jorge Eduardo Blanco Segura 1087740 
+   Alan Antonio Gandarilla Huerta 1087768
+   Esta clase define como esta compuesto un cuadruplo. */
+
 public class Cuadruplo{
 	int codigoOp;
 	int dv01;
@@ -5,11 +9,11 @@ public class Cuadruplo{
 	int dv03;
 
 	public Cuadruplo(int codigoOp, int dv01, int dv02, int dv03){
-        	this.codigoOp = codigoOp;
-        	this.dv01 = dv01;
+        this.codigoOp = codigoOp;
+        this.dv01 = dv01;
 		this.dv02 = dv02;
 		this.dv03 = dv03;    
-    	}
+    }
 
 	public int getCodigoOp(){
 		return codigoOp;
