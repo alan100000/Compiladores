@@ -4,11 +4,11 @@
 
 public class Cuadruplo{
 	int codigoOp;
-	int dv01;
-	int dv02;
-	int dv03;
+	String dv01;
+	String dv02;
+	String dv03;
 
-	public Cuadruplo(int codigoOp, int dv01, int dv02, int dv03){
+	public Cuadruplo(int codigoOp, String dv01, String dv02, String dv03){
         this.codigoOp = codigoOp;
         this.dv01 = dv01;
 		this.dv02 = dv02;
@@ -23,27 +23,27 @@ public class Cuadruplo{
 		this.codigoOp = codigoOp;
 	}
 
-	public int getDv01(){
+	public String getDv01(){
 		return dv01;
 	}
 
-	public void setDv01(int dv01){
+	public void setDv01(String dv01){
 		this.dv01 = dv01;
 	}
 
-	public int getDv02(){
+	public String getDv02(){
 		return dv02;
 	}
 
-	public void setDv02(int dv02){
+	public void setDv02(String dv02){
 		this.dv02 = dv02;
 	}
 
-	public int getDv03(){
+	public String getDv03(){
 		return dv03;
 	}
 
-	public void setDv03(int dv03){
+	public void setDv03(String dv03){
 		this.dv03 = dv03;
 	}
 
