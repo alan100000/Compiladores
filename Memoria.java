@@ -12,6 +12,7 @@ public class Memoria{
         constantes = new Submemoria(200, 200, 200, 200, 200);
     }
     
+
     public Submemoria getGlobal(){return global;}
     public Submemoria getLocal(){return local;}
     public Submemoria getTemporal(){return temporal;}
