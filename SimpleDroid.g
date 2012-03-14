@@ -58,11 +58,35 @@ tokens {
     static int procIndice = 0; // Indice del arreglo de procs
     static List<Procs> listaProcs = new ArrayList<Procs>(); //se inicializa la tabla de scopes
     static int numLinea = 0; //numero de Linea
+    static int dv[] = new int[10]; //contador de direcciones virtuales
+    // 0-int, 1-decimal, 2-char, 3-string, 4-boolean
+
     static CuboVars cuboVars = new CuboVars();
     public static String salida;
     
     public String getSalida(){
 	return salida;
+    }
+
+    // Metodo para reiniciar los contadores de las direcciones de las variables locales.
+    public void resetLocales(){
+	for(int i = 5; i<10; i++)
+		dv[i] = 0;
+    }
+
+    // Metodo para obtener el indice de dv[x]
+    public int getTipoNum(String tipo){
+	if(tipo.equals("int"))
+		return 0;
+	else if(tipo.equals("decimal"))
+		return 1;
+	else if(tipo.equals("char"))
+		return 2;
+	else if(tipo.equals("string"))
+		return 3;
+	else if(tipo.equals("boolean"))
+		return 4;
+	return -1;
     }
     
 
@@ -78,23 +102,35 @@ tokens {
         }
     }
 
-    public void nuevoProc(String nombre){ //agrega un nuevo Proc a la lista de procs
-	Procs aux = new Procs(nombre);
+    // Metodo para agregar un Proc, y hacer los procedimientos necesarios
+    public void nuevoProc(String nombre, String tipo){
+	Procs aux = new Procs(nombre, tipo);
 	listaProcs.add(aux);
 	procIndice++;
+	resetLocales(); //se reinician las direcciones
     }
 
     public boolean insertaVariable(String tipo){ //falta checar cubo y checar si es global
 	int i = 0;
+	int dvIndice = 0;
 	boolean globalVar;
+	String direccion;
+
+
 	if(!scopes.empty())
 		globalVar = Boolean.parseBoolean(scopes.pop().toString());
 	else
 		globalVar = true;
-	if(globalVar) //si es variable global el indice del scope es 0, el que representa las variables globales
+
+	if(globalVar || procIndice == 0){ //si es variable global el indice del scope es 0, el que representa las variables globales
 		i = 0;
-	else
+		direccion = "g:";
+	}
+	else{
 		i = procIndice;
+		direccion = "l:";
+		dvIndice = 5; // dvIndice >= 5 es para variables locales
+	}
 
 	String borrarLuego = identificadores.pop().toString(); //BORRAME
 	if(varRepetida(borrarLuego, globalVar)){
@@ -102,18 +138,30 @@ tokens {
 		salida += "Variable repetida: "+borrarLuego+", en la linea "+numLinea+"\n";
 		return false;
 	}
-	//listaProcs.get(procIndice).agregaVar(identificadores.pop().toString(), tipo);
-	listaProcs.get(i).agregaVar(borrarLuego, tipo); //BORRAME
-	System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo); //BORRAME
-	salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+"\n";
+
+	dvIndice += getTipoNum(tipo); // Si es global es 0 y por ende solo toma el valor de getTipoNum
+	direccion = direccion + tipo.charAt(0) + ":" + dv[dvIndice]; // Armar la direccion
+
+
+	//listaProcs.get(procIndice).agregaVar(identificadores.pop().toString(), tipo, direccion);
+	listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion); //BORRAME
+	System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion); //BORRAME
+	salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion+"\n";
+	
+	dv[dvIndice] = dv[dvIndice]+1; // Aumentar el contador de la direccion virtual correspondiente
+
 	if(!identificadores.empty()){
 		if(identificadores.peek().toString().equals(",")){
 			identificadores.pop();
 			borrarLuego = identificadores.pop().toString(); //BORRAME
-			//listaProcs.get(i).agregaVar(identificadores.pop().toString(), tipo);
-			listaProcs.get(i).agregaVar(borrarLuego, tipo); //BORRAME
-			System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo); //BORRAME
-			salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+"\n";
+			
+			direccion = direccion.substring(0,4) + dv[dvIndice];
+			
+			//listaProcs.get(i).agregaVar(identificadores.pop().toString(), tipo, direccion);
+			listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion); //BORRAME
+			System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion); //BORRAME
+			salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion+"\n";
+			dv[dvIndice] = dv[dvIndice]+1;
 		} 
 	}
 	return true;
@@ -174,13 +222,13 @@ fragment UPPERCASE : 'A'..'Z' ;
 programa : inicializacion vars funciones main {	System.out.println("La compilacion ha sido exitosa. Bienvenido al futuro.");
 						salida += "La compilacion ha sido exitosa. Bienvenido al futuro.";};
 
-inicializacion : {Procs aux = new Procs("global");
+inicializacion : {Procs aux = new Procs("global", "nothing");
 		  listaProcs.add(aux);
 		   };
 
 main : FUNCTION funcionExec PARIZQ PARDER LLAVEIZQ vars bloque LLAVEDER;  
 
-funcionExec: EXECUTE { nuevoProc("main"); };
+funcionExec: EXECUTE { nuevoProc("main", "nothing"); };
 
 vars : varsPrima tipo varsBiPrima SEMICOLON vars {numLinea = $SEMICOLON.getLine();} { insertaVariable($tipo.text) ;}
 	| ;
@@ -199,10 +247,10 @@ varsTriPrima : IGUAL expresion
 varsCuatriPrima : COMA varsBiPrima { identificadores.push($COMA.text); }
 	| ;
 
-funciones : FUNCTION funcionesPrima funcionId PARIZQ params PARDER LLAVEIZQ vars bloque LLAVEDER funciones 
+funciones : FUNCTION funcionId PARIZQ params PARDER LLAVEIZQ vars bloque LLAVEDER funciones 
 	| ;
 
-funcionId: ID { nuevoProc($ID.text); };
+funcionId: funcionesPrima ID { nuevoProc($ID.text, $funcionesPrima.text); };
 
 funcionesPrima : tipo
 	| NOTHING ;

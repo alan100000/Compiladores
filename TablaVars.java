@@ -1,10 +1,12 @@
 public class TablaVars{
     String nombre;
     String tipo;
+    String dv;
 
-    public TablaVars(String nombre, String tipo){
+    public TablaVars(String nombre, String tipo, String dv){
         this.nombre = nombre;
-        this.tipo = tipo;    
+        this.tipo = tipo;
+	this.dv = dv;    
     }
 
     public void setNombre(String nombre){
@@ -21,5 +23,13 @@ public class TablaVars{
 
     public String getTipo(){
         return tipo;
+    }
+
+    public String getDv(){
+	return dv;
+    }
+
+    public void setDv(String dv){
+	this.dv = dv;
     }
 }
