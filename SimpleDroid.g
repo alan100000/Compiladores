@@ -56,7 +56,7 @@ tokens {
     static Stack identificadores = new Stack();
     static Stack scopes = new Stack();
     static int procIndice = 0; // Indice del arreglo de procs
-    static List<Procs> listaProcs = new ArrayList<Procs>(); //se inicializa la tabla de scopes
+    static List<Procs> listaProcs = new ArrayList<Procs>(); //se inicializa la tabla de scopes 
     static int numLinea = 0; //numero de Linea
     static int dv[] = new int[10]; //contador de direcciones virtuales
     // 0-int, 1-decimal, 2-char, 3-string, 4-boolean
