@@ -1,9 +1,9 @@
 import java.util.ArrayList;
 import java.util.List;
 public class ListaOps{
-
+	List<String> listaOps;
 	public ListaOps(){
-		static List<String> listOps = new ArrayList<String>(); //regresan el valor del codigo de operacion
+		listaOps = new ArrayList<String>(); //regresan el valor del codigo de operacion
 		listaOps.add("+");
 		listaOps.add("-");
 		listaOps.add("*");

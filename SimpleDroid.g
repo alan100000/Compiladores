@@ -58,11 +58,17 @@ tokens {
     static int procIndice = 0; // Indice del arreglo de procs
     static List<Procs> listaProcs = new ArrayList<Procs>(); //se inicializa la tabla de scopes 
     static int numLinea = 0; //numero de Linea
-    static int dv[] = new int[10]; //contador de direcciones virtuales
-    // 0-int, 1-decimal, 2-char, 3-string, 4-boolean
-
+    static int dv[] = new int[]{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; //contador de direcciones virtuales: 0-int, 1-decimal, 2-char, 3-string, 4-boolean
     static CuboVars cuboVars = new CuboVars();
+    static ListaOps listaOps = new ListaOps();
     public static String salida;
+
+    // Pilas de los Cuadruplos
+    static Stack<String> pilaOperandos = new Stack<String>(); // Direcciones
+    static Stack<Integer> pilaOperadores = new Stack<Integer>(); // Codigo de Op
+    static List<Cuadruplo> listaCuadruplos = new ArrayList<Cuadruplo>(); // Aqui se guardan los cuadruplos
+    static String auxDireccion;
+    // End-Pilas
     
     public String getSalida(){
 	return salida;
@@ -108,6 +114,14 @@ tokens {
 	listaProcs.add(aux);
 	procIndice++;
 	resetLocales(); //se reinician las direcciones
+    }
+
+    public String getDireccion(String var){
+	TablaVars registro = listaProcs.get(procIndice).buscaVar(var);
+	if(registro!=null)
+		return registro.getDv();
+	registro = listaProcs.get(0).buscaVar(var);
+	return registro.getDv();
     }
 
     public boolean insertaVariable(String tipo){ //falta checar cubo y checar si es global
@@ -166,6 +180,16 @@ tokens {
 	}
 	return true;
     }
+
+    /* Generar cuadruplo de la regla de Expresion */
+    public void crearCuadruploExpresion(){
+	String temporal = pilaOperandos.pop().toString();
+	Cuadruplo debug = new Cuadruplo(pilaOperadores.pop(), pilaOperandos.pop().toString(), temporal, "wahoo");					
+	//listaCuadruplos.add(new Cuadruplo((int)pilaOperadores.pop(), pilaOperandos.pop().toString(), temporal, "wahoo"));
+	listaCuadruplos.add(debug);
+	System.out.println(debug.getCodigoOp() + ", "+debug.getDv01() + ", "+debug.getDv02() + ", "+debug.getDv03());	
+    }
+
 
     public boolean varDeclarada(String id){
 	TablaVars var = listaProcs.get(procIndice).buscaVar(id);
@@ -316,19 +340,31 @@ logicoPrima : AND
 exp : termino expPrima ;
 
 expPrima
-options {backtrack=true;}: MAS exp
-	| MENOS exp
+options {backtrack=true;}: pasodos exp
 	| ;
 
-termino : factor terminoPrima ;
+pasodos: MAS { pilaOperadores.push(listaOps.getOpCode($MAS.text)); }
+	| MENOS { pilaOperadores.push(listaOps.getOpCode($MENOS.text)); } ;
 
-terminoPrima : POR termino
-	| ENTRE termino
-	| MOD termino
+termino : factor terminoPrima { if(!pilaOperadores.empty()){
+				if(pilaOperadores.peek() == listaOps.getOpCode("+") || pilaOperadores.peek() == listaOps.getOpCode("-") ){
+					crearCuadruploExpresion(); } }
+			      };
+
+terminoPrima : pasotres termino
 	| ;
 
-factor : PARIZQ expresion PARDER
-	| factorPrima varcte ;
+pasotres : POR { pilaOperadores.push(listaOps.getOpCode($POR.text)); }
+	| ENTRE { pilaOperadores.push(listaOps.getOpCode($ENTRE.text)); }
+	| MOD { pilaOperadores.push(listaOps.getOpCode($MOD.text)); } ;
+
+factor : PARIZQ expresion PARDER pasocinco
+	| factorPrima varcte pasocinco ;
+
+pasocinco: { if(!pilaOperadores.empty()){
+	     if(pilaOperadores.peek() == listaOps.getOpCode("*") || pilaOperadores.peek() == listaOps.getOpCode("/") || pilaOperadores.peek() == listaOps.getOpCode("\%")){
+					crearCuadruploExpresion(); } }
+	   };
 
 factorPrima : MENOS
 	| ;
@@ -338,12 +374,12 @@ escritura : WRITE PARIZQ expresion escrituraPrima PARDER SEMICOLON ;
 escrituraPrima : MAS expresion escrituraPrima
 	| ;
 
-varcte : ID varctePrima {numLinea = $ID.getLine();}{ varDeclarada($ID.text); }
-	| CTE_ENTERA
-	| CTE_DECIMAL
-	| CTE_STRING
-	| CTE_CHAR
-	| CTE_BOOLEAN
+varcte : ID varctePrima {numLinea = $ID.getLine(); varDeclarada($ID.text); auxDireccion = getDireccion($ID.text); pilaOperandos.push(auxDireccion);}
+	| CTE_ENTERA { auxDireccion = "c:i:"+dv[15]; dv[15]++; pilaOperandos.push(auxDireccion);}
+	| CTE_DECIMAL { auxDireccion = "c:d:"+dv[16]; dv[16]++; pilaOperandos.push(auxDireccion);}
+	| CTE_STRING { auxDireccion = "c:s:"+dv[18]; dv[18]++; pilaOperandos.push(auxDireccion);}
+	| CTE_CHAR { auxDireccion = "c:c:"+dv[17]; dv[17]++; pilaOperandos.push(auxDireccion);}
+	| CTE_BOOLEAN { auxDireccion = "c:b:"+dv[19]; dv[19]++; pilaOperandos.push(auxDireccion);}
 	| invocacionDos ;
 
 varctePrima : CORIZQ CTE_ENTERA CORDER

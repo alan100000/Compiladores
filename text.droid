@@ -29,7 +29,7 @@ function int suma_b(int aux){
 	}
 	write("hey");
 	aux = aux + 1;
-	aux = 1 + aux;
+	aux = 1 * aux;
 	return aux;
 }
 
