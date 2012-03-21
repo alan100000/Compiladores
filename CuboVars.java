@@ -1,12 +1,13 @@
 public class CuboVars{
     String[][][] cubo;
+    String[][] matriz;
 	String[] operandos;
 	String[] operadores;
     public CuboVars(){
 
         matriz = new String[][]
-                  {{"error","error","error","error","boolean"}  //NOT
-                  }
+                  {{"error","error","error","error","boolean"}, //NOT   
+                   {"int","decimal","error","error","error"}}; //-
 		
         cubo =  new String[][][] 
                  {{{"int","decimal","error","error","error"}, //suma
@@ -85,7 +86,7 @@ public class CuboVars{
                    {"error","error","error","error","error"},
                    {"error","error","error","error","error"},
                    {"error","error","error","error","error"},
-                   {"error","error","error","error","boolean"}}
+                   {"error","error","error","error","boolean"}},
                   
                   {{"int","error","error","error","error"}, //=
                    {"decimal","decimal","error","error","error"},
@@ -93,6 +94,7 @@ public class CuboVars{
                    {"error","error","string","string","error"},
                    {"error","error","error","error","boolean"}}};
     }
+    
     public String verificaCubo(int i, int j, int k){
         return this.cubo[i][j][k];
     }
