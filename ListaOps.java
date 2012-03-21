@@ -24,6 +24,7 @@ public class ListaOps{
 		listaOps.add("goTo");
 		listaOps.add("goToV");
 		listaOps.add("goToF");
+        listaOps.add("goToProc");
 	}
 
 	public int getOpCode(String operacion){
