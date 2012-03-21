@@ -24,7 +24,6 @@ tokens {
 	LT = '<';
 	NE = '!';
 	EXECUTE = 'execute' ;
-	GLOBAL = 'global' ;
 	FUNCTION = 'function';
 	INVOKE = 'invoke';
 	NOTHING = 'nothing';
@@ -54,7 +53,6 @@ tokens {
 
 @members {
     static Stack identificadores = new Stack();
-    static Stack scopes = new Stack();
     static int procIndice = 0; // Indice del arreglo de procs
     static List<Procs> listaProcs = new ArrayList<Procs>(); //se inicializa la tabla de scopes 
     static int numLinea = 0; //numero de Linea
@@ -127,16 +125,9 @@ tokens {
     public boolean insertaVariable(String tipo){ //falta checar cubo y checar si es global
 	int i = 0;
 	int dvIndice = 0;
-	boolean globalVar;
 	String direccion;
 
-
-	if(!scopes.empty())
-		globalVar = Boolean.parseBoolean(scopes.pop().toString());
-	else
-		globalVar = true;
-
-	if(globalVar || procIndice == 0){ //si es variable global el indice del scope es 0, el que representa las variables globales
+	if(procIndice == 0){ //si es variable global el indice del scope es 0, el que representa las variables globales
 		i = 0;
 		direccion = "g:";
 	}
@@ -147,7 +138,7 @@ tokens {
 	}
 
 	String borrarLuego = identificadores.pop().toString(); //BORRAME
-	if(varRepetida(borrarLuego, globalVar)){
+	if(varRepetida(borrarLuego)){
 		System.out.println("Variable repetida: "+borrarLuego+", en la linea "+numLinea);
 		salida += "Variable repetida: "+borrarLuego+", en la linea "+numLinea+"\n";
 		return false;
@@ -187,7 +178,7 @@ tokens {
 	Cuadruplo debug = new Cuadruplo(pilaOperadores.pop(), pilaOperandos.pop().toString(), temporal, "wahoo");					
 	//listaCuadruplos.add(new Cuadruplo((int)pilaOperadores.pop(), pilaOperandos.pop().toString(), temporal, "wahoo"));
 	listaCuadruplos.add(debug);
-	System.out.println(debug.getCodigoOp() + ", "+debug.getDv01() + ", "+debug.getDv02() + ", "+debug.getDv03());	
+	System.out.println("EXPRESION: "+debug.getCodigoOp() + ", "+debug.getDv01() + ", "+debug.getDv02() + ", "+debug.getDv03());	
     }
 
 
@@ -206,13 +197,8 @@ tokens {
 	return false;
     }
 
-    public boolean varRepetida(String id, boolean globalVar){
-	TablaVars var;
-	if(globalVar)
-		var = listaProcs.get(0).buscaVar(id);
-	else
-		var = listaProcs.get(procIndice).buscaVar(id);
-	
+    public boolean varRepetida(String id){
+	TablaVars var = listaProcs.get(procIndice).buscaVar(id);
 	if(var != null)
 		return true;
 	else
@@ -248,17 +234,14 @@ programa : inicializacion vars funciones main {	System.out.println("La compilaci
 
 inicializacion : {Procs aux = new Procs("global", "nothing");
 		  listaProcs.add(aux);
-		   };
+		 };
 
 main : FUNCTION funcionExec PARIZQ PARDER LLAVEIZQ vars bloque LLAVEDER;  
 
 funcionExec: EXECUTE { nuevoProc("main", "nothing"); };
 
-vars : varsPrima tipo varsBiPrima SEMICOLON vars {numLinea = $SEMICOLON.getLine();} { insertaVariable($tipo.text) ;}
+vars : tipo varsBiPrima SEMICOLON vars {numLinea = $SEMICOLON.getLine();} { insertaVariable($tipo.text) ;}
 	| ;
-
-varsPrima : GLOBAL {scopes.push(true); }
-	| {scopes.push(false); } ;
 
 varsBiPrima : varsId varsTriPrima varsCuatriPrima;
 
@@ -291,8 +274,7 @@ params : paramsId paramsPrima
 paramsPrima : COMA paramsId paramsPrima
 	| ;
 
-paramsId : tipo ID { 	scopes.push(false);
-			identificadores.push($ID.text);
+paramsId : tipo ID { 	identificadores.push($ID.text);
 			insertaVariable($tipo.text); };
 
 bloque : estatuto bloque
@@ -374,12 +356,12 @@ escritura : WRITE PARIZQ expresion escrituraPrima PARDER SEMICOLON ;
 escrituraPrima : MAS expresion escrituraPrima
 	| ;
 
-varcte : ID varctePrima {numLinea = $ID.getLine(); varDeclarada($ID.text); auxDireccion = getDireccion($ID.text); pilaOperandos.push(auxDireccion);}
-	| CTE_ENTERA { auxDireccion = "c:i:"+dv[15]; dv[15]++; pilaOperandos.push(auxDireccion);}
-	| CTE_DECIMAL { auxDireccion = "c:d:"+dv[16]; dv[16]++; pilaOperandos.push(auxDireccion);}
-	| CTE_STRING { auxDireccion = "c:s:"+dv[18]; dv[18]++; pilaOperandos.push(auxDireccion);}
-	| CTE_CHAR { auxDireccion = "c:c:"+dv[17]; dv[17]++; pilaOperandos.push(auxDireccion);}
-	| CTE_BOOLEAN { auxDireccion = "c:b:"+dv[19]; dv[19]++; pilaOperandos.push(auxDireccion);}
+varcte : ID varctePrima {numLinea = $ID.getLine(); varDeclarada($ID.text); auxDireccion = getDireccion($ID.text); pilaOperandos.push(auxDireccion);System.out.println("VAR: "+auxDireccion);}
+	| CTE_ENTERA { auxDireccion = "c:i:"+dv[15]; dv[15]++; pilaOperandos.push(auxDireccion); System.out.println("CONSTANTE: "+auxDireccion);}
+	| CTE_DECIMAL { auxDireccion = "c:d:"+dv[16]; dv[16]++; pilaOperandos.push(auxDireccion);System.out.println("CONSTANTE: "+auxDireccion);}
+	| CTE_STRING { auxDireccion = "c:s:"+dv[18]; dv[18]++; pilaOperandos.push(auxDireccion);System.out.println("CONSTANTE: "+auxDireccion);}
+	| CTE_CHAR { auxDireccion = "c:c:"+dv[17]; dv[17]++; pilaOperandos.push(auxDireccion);System.out.println("CONSTANTE: "+auxDireccion);}
+	| CTE_BOOLEAN { auxDireccion = "c:b:"+dv[19]; dv[19]++; pilaOperandos.push(auxDireccion);System.out.println("CONSTANTE: "+auxDireccion);}
 	| invocacionDos ;
 
 varctePrima : CORIZQ CTE_ENTERA CORDER
