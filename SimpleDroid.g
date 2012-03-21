@@ -41,7 +41,6 @@ tokens {
 	NULL = 'null';
 	RETURN = 'return';
 	NOT = 'NOT';
-	
 	AND = 'AND';
 	OR = 'OR';
 }
@@ -56,7 +55,16 @@ tokens {
     static int procIndice = 0; // Indice del arreglo de procs
     static List<Procs> listaProcs = new ArrayList<Procs>(); //se inicializa la tabla de scopes 
     static int numLinea = 0; //numero de Linea
-    static int dv[] = new int[]{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; //contador de direcciones virtuales: 0-int, 1-decimal, 2-char, 3-string, 4-boolean
+    static boolean compError = false;
+    /* Memoria Virtual
+	0-int, 1-decimal, 2-char, 3-string, 4-boolean
+	g: global, l: temp, t: temp, c: constante
+	g: dv[0] - dv[4]
+	l: dv[5] - dv[9]
+	t: dv[10] - dv[14]
+	c: dv[15] - dv[19]
+    */
+    static int dv[] = new int[]{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; //contador de direcciones virtuales
     static CuboVars cuboVars = new CuboVars();
     static ListaOps listaOps = new ListaOps();
     public static String salida;
@@ -80,17 +88,22 @@ tokens {
 
     // Metodo para obtener el indice de dv[x]
     public int getTipoNum(String tipo){
-	if(tipo.equals("int"))
+	if(tipo.equals("int") || tipo.equals("i"))
 		return 0;
-	else if(tipo.equals("decimal"))
+	else if(tipo.equals("decimal") || tipo.equals("d"))
 		return 1;
-	else if(tipo.equals("char"))
+	else if(tipo.equals("char") || tipo.equals("c"))
 		return 2;
-	else if(tipo.equals("string"))
+	else if(tipo.equals("string") || tipo.equals("s"))
 		return 3;
-	else if(tipo.equals("boolean"))
+	else if(tipo.equals("boolean") || tipo.equals("b"))
 		return 4;
 	return -1;
+    }
+
+    public int extraerTipoNumFromDir(String direccion){
+	String subDir[] = direccion.split(":");
+	return getTipoNum(subDir[1]);
     }
     
 
@@ -174,11 +187,27 @@ tokens {
 
     /* Generar cuadruplo de la regla de Expresion */
     public void crearCuadruploExpresion(){
-	String temporal = pilaOperandos.pop().toString();
-	Cuadruplo debug = new Cuadruplo(pilaOperadores.pop(), pilaOperandos.pop().toString(), temporal, "wahoo");					
-	//listaCuadruplos.add(new Cuadruplo((int)pilaOperadores.pop(), pilaOperandos.pop().toString(), temporal, "wahoo"));
-	listaCuadruplos.add(debug);
-	System.out.println("EXPRESION: "+debug.getCodigoOp() + ", "+debug.getDv01() + ", "+debug.getDv02() + ", "+debug.getDv03());	
+	int opCode = pilaOperadores.pop();
+	String t3 = pilaOperandos.pop().toString();
+	String t2 = pilaOperandos.pop().toString();
+
+	String resultado = cuboVars.verificaCubo(opCode, extraerTipoNumFromDir(t2), extraerTipoNumFromDir(t3));
+
+	if(resultado.equals("error")){
+		compError = true;
+		System.out.println("ERROR: TYPE MISMATCH AT LINE " + numLinea);
+		salida += "ERROR: TYPE MISMATCH AT LINE " + numLinea;
+	}
+	else{ /* CREACION DEL CUADRUPLO */
+		String t4 = "t:"+resultado.charAt(0)+":"+dv[(10 + getTipoNum(resultado))]; /* El 10 debido al offset para el segmento de temporales */
+		dv[(10 + getTipoNum(resultado))]++;
+
+		pilaOperandos.push(t4); /* Metemos el resultado a la pila de operandos*/
+
+		Cuadruplo debug = new Cuadruplo(opCode, t2, t3, t4);					
+		listaCuadruplos.add(debug);
+		System.out.println("EXPRESION: "+debug.getCodigoOp() + ", "+debug.getDv01() + ", "+debug.getDv02() + ", "+debug.getDv03());
+	}
     }
 
 
@@ -295,7 +324,7 @@ asignacionId: ID {numLinea = $ID.getLine();}{ varDeclarada($ID.text); } ;
 asignacionPrima : CORIZQ CTE_ENTERA CORDER
 	| ;
 
-expresion : expresionPrima exp comparador ;
+expresion : expresionPrima exp comparador;
 
 expresionPrima : NOT
 	| ;
@@ -343,7 +372,7 @@ pasotres : POR { pilaOperadores.push(listaOps.getOpCode($POR.text)); }
 factor : PARIZQ expresion PARDER pasocinco
 	| factorPrima varcte pasocinco ;
 
-pasocinco: { if(!pilaOperadores.empty()){
+pasocinco: {if(!pilaOperadores.empty()){
 	     if(pilaOperadores.peek() == listaOps.getOpCode("*") || pilaOperadores.peek() == listaOps.getOpCode("/") || pilaOperadores.peek() == listaOps.getOpCode("\%")){
 					crearCuadruploExpresion(); } }
 	   };
@@ -356,12 +385,12 @@ escritura : WRITE PARIZQ expresion escrituraPrima PARDER SEMICOLON ;
 escrituraPrima : MAS expresion escrituraPrima
 	| ;
 
-varcte : ID varctePrima {numLinea = $ID.getLine(); varDeclarada($ID.text); auxDireccion = getDireccion($ID.text); pilaOperandos.push(auxDireccion);System.out.println("VAR: "+auxDireccion);}
-	| CTE_ENTERA { auxDireccion = "c:i:"+dv[15]; dv[15]++; pilaOperandos.push(auxDireccion); System.out.println("CONSTANTE: "+auxDireccion);}
-	| CTE_DECIMAL { auxDireccion = "c:d:"+dv[16]; dv[16]++; pilaOperandos.push(auxDireccion);System.out.println("CONSTANTE: "+auxDireccion);}
-	| CTE_STRING { auxDireccion = "c:s:"+dv[18]; dv[18]++; pilaOperandos.push(auxDireccion);System.out.println("CONSTANTE: "+auxDireccion);}
-	| CTE_CHAR { auxDireccion = "c:c:"+dv[17]; dv[17]++; pilaOperandos.push(auxDireccion);System.out.println("CONSTANTE: "+auxDireccion);}
-	| CTE_BOOLEAN { auxDireccion = "c:b:"+dv[19]; dv[19]++; pilaOperandos.push(auxDireccion);System.out.println("CONSTANTE: "+auxDireccion);}
+varcte : ID varctePrima {numLinea = $ID.getLine(); varDeclarada($ID.text); auxDireccion = getDireccion($ID.text); pilaOperandos.push(auxDireccion);}
+	| CTE_ENTERA { numLinea = $CTE_ENTERA.getLine(); auxDireccion = "c:i:"+dv[15]; dv[15]++; pilaOperandos.push(auxDireccion);}
+	| CTE_DECIMAL { numLinea = $CTE_DECIMAL.getLine(); auxDireccion = "c:d:"+dv[16]; dv[16]++; pilaOperandos.push(auxDireccion);}
+	| CTE_STRING { numLinea = $CTE_STRING.getLine(); auxDireccion = "c:s:"+dv[18]; dv[18]++; pilaOperandos.push(auxDireccion);}
+	| CTE_CHAR { numLinea = $CTE_CHAR.getLine(); auxDireccion = "c:c:"+dv[17]; dv[17]++; pilaOperandos.push(auxDireccion);}
+	| CTE_BOOLEAN { numLinea = $CTE_BOOLEAN.getLine(); auxDireccion = "c:b:"+dv[19]; dv[19]++; pilaOperandos.push(auxDireccion);}
 	| invocacionDos ;
 
 varctePrima : CORIZQ CTE_ENTERA CORDER

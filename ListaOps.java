@@ -17,8 +17,8 @@ public class ListaOps{
 		listaOps.add("!=");
 		listaOps.add("AND");
 		listaOps.add("OR");
-		listaOps.add("NOT");
 		listaOps.add("=");
+		listaOps.add("NOT");
 		listaOps.add("write");
 		listaOps.add("read");
 		listaOps.add("goTo");
