@@ -4,11 +4,14 @@ import java.util.List;
 public class Procs{
     String nombre;
     String tipo;
+    int dirInicio;
+    int[] tamano;
+    List<String> params;
     List<TablaVars> listaVars;
 
     public Procs(String nombre, String tipo){
         this.nombre = nombre;
-	this.tipo = tipo;
+	    this.tipo = tipo;
         listaVars = new ArrayList<TablaVars>();
     }
 
