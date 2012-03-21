@@ -15,7 +15,7 @@ function nothing hola_mundo(){
 }
 
 function decimal mauricio(decimal paco, decimal poco, decimal elnegroklever){
-	string mauri = "el mauricio come chile";
+	string mauri = "el mauricio";
 	write(mauri);
 }
 
@@ -27,7 +27,7 @@ function int suma_b(int aux){
 		write("ok");
 	}
 	write("hey");
-	aux = aux + "TRUENAME";
+	aux = aux + 1;
 	aux = 1 * aux;
 	return aux;
 }

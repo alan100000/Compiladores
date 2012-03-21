@@ -329,24 +329,30 @@ expresion : expresionPrima exp comparador;
 expresionPrima : NOT
 	| ;
 
-comparador : comparadorPrima logico ;
+comparador : comparadorPrima logico { if(!pilaOperadores.empty()){
+				if(pilaOperadores.peek() == listaOps.getOpCode("<") || pilaOperadores.peek() == listaOps.getOpCode(">") || pilaOperadores.peek() == listaOps.getOpCode("<=") 
+				|| pilaOperadores.peek() == listaOps.getOpCode(">=") || pilaOperadores.peek() == listaOps.getOpCode("==") || pilaOperadores.peek() == listaOps.getOpCode("!=")){
+					crearCuadruploExpresion(); } }
+			      };
 
-comparadorPrima : comparadorBiPrima comparadorTriPrima exp 
+comparadorPrima : comparadorBiPrima exp 
 	| ;
 
-comparadorBiPrima : LT
-	| GT 
-	| IGUAL IGUAL
-	| NE IGUAL;
+comparadorBiPrima : LT { pilaOperadores.push(listaOps.getOpCode("<")); }
+	| GT { pilaOperadores.push(listaOps.getOpCode(">")); }
+	| LT IGUAL { pilaOperadores.push(listaOps.getOpCode("<=")); }
+	| GT IGUAL { pilaOperadores.push(listaOps.getOpCode(">=")); }
+	| IGUAL IGUAL { pilaOperadores.push(listaOps.getOpCode("==")); }
+	| NE IGUAL { pilaOperadores.push(listaOps.getOpCode("!=")); };
 
-comparadorTriPrima : IGUAL
+logico : logicoPrima expresion { if(!pilaOperadores.empty()){
+				if(pilaOperadores.peek() == listaOps.getOpCode("AND") || pilaOperadores.peek() == listaOps.getOpCode("OR") ){
+					crearCuadruploExpresion(); } }
+			      }
 	| ;
 
-logico : logicoPrima expresion 
-	| ;
-
-logicoPrima : AND
-	| OR ;
+logicoPrima : AND { pilaOperadores.push(listaOps.getOpCode("AND")); }
+	| OR { pilaOperadores.push(listaOps.getOpCode("OR")); } ;
 
 exp : termino expPrima ;
 
