@@ -6,8 +6,9 @@ public class CuboVars{
     public CuboVars(){
 
         matriz = new String[][]
-                  {{"error","error","error","error","boolean"}, //NOT   
-                   {"int","decimal","error","error","error"}}; //-
+                  {{"int","decimal","error","error","error"},//- OJO el - debe ir al principio 
+                  {"error","error","error","error","boolean"}//NOT   
+                   }; 
 		
         cubo =  new String[][][] 
                  {{{"int","decimal","error","error","error"}, //suma
@@ -100,6 +101,9 @@ public class CuboVars{
     }
 
     public String verificaCubo(int i, int j){
-        return this.matriz[i-14][j];       
+		if(i == 1)
+			return this.matriz[0][j];
+			
+        return this.matriz[i-13][j];       
     }
 }

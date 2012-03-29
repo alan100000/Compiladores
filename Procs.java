@@ -15,6 +15,30 @@ public class Procs{
         listaVars = new ArrayList<TablaVars>();
     }
 
+	public int[] getTamano(){
+		return tamano;
+	}
+
+	public void setTamano(int[] tamano){
+		this.tamano = tamano;
+	}
+	
+	public int getDirInicio(){
+		return dirInicio;
+	}
+
+	public void setDirInicio(int dirInicio){
+		this.dirInicio = dirInicio;
+	}
+	
+	public List<String> getParams(){
+		return params;
+	}
+	
+	public void setParams (List<String> params){
+		this.params = params;
+	}
+
     public String getNombre(){
         return nombre;
     }
