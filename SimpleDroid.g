@@ -72,6 +72,7 @@ tokens {
     // Pilas de los Cuadruplos
     static Stack<String> pilaOperandos = new Stack<String>(); // Direcciones
     static Stack<Integer> pilaOperadores = new Stack<Integer>(); // Codigo de Op
+    static Stack<Integer> pilaSaltos = new Stack<Integer>(); // Saltos de Cuadruplos
     static List<Cuadruplo> listaCuadruplos = new ArrayList<Cuadruplo>(); // Aqui se guardan los cuadruplos
     static String auxDireccion;
     // End-Pilas
@@ -206,8 +207,44 @@ tokens {
 
 		Cuadruplo debug = new Cuadruplo(opCode, t2, t3, t4);					
 		listaCuadruplos.add(debug);
-		System.out.println("EXPRESION: "+debug.getCodigoOp() + ", "+debug.getDv01() + ", "+debug.getDv02() + ", "+debug.getDv03());
 	}
+    }
+
+    public void crearCuadruploIf(){ /*Y tambien el while!*/
+	String resultado = pilaOperandos.pop().toString();
+
+	/* Validacion Semantica */
+	if(extraerTipoNumFromDir(resultado) != 4){
+		System.out.println(CompError.error(69, numLinea));
+		salida += CompError.error(69, numLinea);
+	}
+	else{
+		Cuadruplo ifC = new Cuadruplo(19, resultado); /* GoToF Deja pendiente salto.*/
+		listaCuadruplos.add(ifC); /* Agregar cuadruplo incompleto.*/
+		pilaSaltos.push(listaCuadruplos.size() - 1); /* Almacenar direccion del cuadruplo actual para luego rellenarlo.*/
+	}
+    }
+
+    public void crearCuadruploElse(){
+	Cuadruplo elseC = new Cuadruplo(17); /* GoTo Deja pendiente salto.*/
+	listaCuadruplos.add(elseC); /* Agregar cuadruplo incompleto. */
+
+	int falso = pilaSaltos.pop();
+	listaCuadruplos.get(falso).setDv03(listaCuadruplos.size()); /*Rellenar GoToF con contador.*/
+	
+	pilaSaltos.push(listaCuadruplos.size() - 1);	
+    }
+
+    public void terminarWhile(){
+	int falso = pilaSaltos.pop();
+	int retorno = pilaSaltos.pop();
+
+	/* GoTo para mantener en ciclo los cuadruplos. */
+	Cuadruplo whileC = new Cuadruplo(17);
+	whileC.setDv03(retorno);
+	listaCuadruplos.add(whileC);
+
+	listaCuadruplos.get(falso).setDv03(listaCuadruplos.size()); /*Rellenar GoToF con contador.*/
     }
 
 
@@ -221,8 +258,8 @@ tokens {
 		if(var != null)
 			return true;
 	}
-	System.out.println("Variable no declarada: "+id+", en la linea"+numLinea);
-	salida += "Variable no declarada: "+id+", en la linea"+numLinea+"\n";
+	System.out.println(CompError.error(35, numLinea, id));
+	salida += CompError.error(35, numLinea, id)+"\n";
 	return false;
     }
 
@@ -232,6 +269,13 @@ tokens {
 		return true;
 	else
 		return false;
+    }
+
+
+    public void debugCuadruplos(){
+	for(int i = 0; i < listaCuadruplos.size(); i++){
+		System.out.println(i+": "+listaCuadruplos.get(i).debug());
+	}
     }
 }
 
@@ -264,6 +308,7 @@ programa : inicializacion vars funciones main {
 			salida+="Hubo errores en la compilacion.";
 		}
 		else{
+			debugCuadruplos();
 			System.out.println("La compilacion ha sido exitosa. Bienvenido al futuro.");
 			salida += "La compilacion ha sido exitosa. Bienvenido al futuro.";
 		}
@@ -417,7 +462,12 @@ varctePrima : CORIZQ CTE_ENTERA CORDER
 ciclo : xwhile
 	| xfor ;
 
-xwhile : WHILE PARIZQ expresion PARDER LLAVEIZQ bloque LLAVEDER ;
+xwhile : WHILE manejaWhile PARIZQ expresion manejaIf PARDER LLAVEIZQ bloque LLAVEDER terminaWhile;
+
+manejaWhile: { pilaSaltos.push(listaCuadruplos.size()); } ;
+
+terminaWhile: { terminarWhile(); };
+
 
 retorno : RETURN varcte SEMICOLON ;
 
@@ -431,10 +481,18 @@ paramsDos : expresion paramsDosPrima
 paramsDosPrima : COMA expresion paramsDosPrima
 	| ;
 
-condicion : IF PARIZQ expresion PARDER LLAVEIZQ bloque LLAVEDER condicionPrima ;
+condicion : IF PARIZQ expresion PARDER manejaIf LLAVEIZQ bloque LLAVEDER condicionPrima terminarIf ;
 
-condicionPrima : ELSE LLAVEIZQ bloque LLAVEDER
+manejaIf: { crearCuadruploIf(); };
+
+terminarIf: { int fin = pilaSaltos.pop();
+	      listaCuadruplos.get(fin).setDv03(listaCuadruplos.size()); /*Rellenar GoTo con contador.*/
+	    };
+
+condicionPrima : ELSE manejaElse LLAVEIZQ bloque LLAVEDER
 	| ;
+
+manejaElse: { crearCuadruploElse(); };
 
 lectura : READ PARIZQ ID PARDER SEMICOLON ;
 

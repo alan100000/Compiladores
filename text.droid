@@ -7,10 +7,10 @@ function nothing hola_mundo(){
 	int pedro;
 	int holax = (3 + 25) / ( 80 + 10 );
 	if(true){
-		write("\nHELLO WORLD!");
+		holax = 2;
 	}
 	else{
-		write("\nNO MSG FOR YOU!");
+		holax = 7;
 	}
 }
 
@@ -23,7 +23,7 @@ function int suma_b(int aux){
 	decimal maximiliano = 77.88889;
 	int hola = 2;
 	int truenaDroid = 3;
-	if( ( (3+5) > 6 ) OR true ){
+	if( ( (3+5) > 6 ) OR ( (7+9) > 3  ) ){
 		write("ok");
 	}
 	write("hey");

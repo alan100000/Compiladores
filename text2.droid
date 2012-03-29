@@ -1,0 +1,13 @@
+function execute(){
+	int holax = 0;
+	if(true){
+		holax = 2 + 2;
+	}
+	else{
+		holax = 7 - 99999999;
+	}
+
+	while(holax < 10){
+		holax = 3+3;
+	}
+}
