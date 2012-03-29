@@ -195,8 +195,8 @@ tokens {
 
 	if(resultado.equals("error")){
 		compError = true;
-		System.out.println("ERROR: TYPE MISMATCH AT LINE " + numLinea);
-		salida += "ERROR: TYPE MISMATCH AT LINE " + numLinea;
+		System.out.println(CompError.error(641, numLinea));
+		salida += CompError.error(641, numLinea);
 	}
 	else{ /* CREACION DEL CUADRUPLO */
 		String t4 = "t:"+resultado.charAt(0)+":"+dv[(10 + getTipoNum(resultado))]; /* El 10 debido al offset para el segmento de temporales */
@@ -258,8 +258,16 @@ fragment UPPERCASE : 'A'..'Z' ;
  * ANALISIS DE SINTAXIS
  *------------------------------------------------------------------*/
 
-programa : inicializacion vars funciones main {	System.out.println("La compilacion ha sido exitosa. Bienvenido al futuro.");
-						salida += "La compilacion ha sido exitosa. Bienvenido al futuro.";};
+programa : inicializacion vars funciones main {	
+		if(CompError.finalError){
+			System.out.println("Hubo errores en la compilacion.");
+			salida+="Hubo errores en la compilacion.";
+		}
+		else{
+			System.out.println("La compilacion ha sido exitosa. Bienvenido al futuro.");
+			salida += "La compilacion ha sido exitosa. Bienvenido al futuro.";
+		}
+	};
 
 inicializacion : {Procs aux = new Procs("global", "nothing");
 		  listaProcs.add(aux);
@@ -272,9 +280,7 @@ funcionExec: EXECUTE { nuevoProc("main", "nothing"); };
 vars : tipo varsBiPrima SEMICOLON vars {numLinea = $SEMICOLON.getLine();} { insertaVariable($tipo.text) ;}
 	| ;
 
-varsBiPrima : varsId varsTriPrima varsCuatriPrima;
-
-varsId: ID { identificadores.push($ID.text); };
+varsBiPrima : ID varsTriPrima varsCuatriPrima { identificadores.push($ID.text); };
 
 varsTriPrima : IGUAL expresion
 	| CORIZQ CTE_ENTERA CORDER
