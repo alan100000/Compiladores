@@ -5,7 +5,7 @@ string palabras = "\nFIN DEL PROGRAMA!";
 
 function nothing hola_mundo(){
 	int pedro;
-	int holax = 3;
+	int holax = (3 + 25) / ( 80 + 10 );
 	if(true){
 		write("\nHELLO WORLD!");
 	}

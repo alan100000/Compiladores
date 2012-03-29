@@ -152,8 +152,8 @@ tokens {
 
 	String borrarLuego = identificadores.pop().toString(); //BORRAME
 	if(varRepetida(borrarLuego)){
-		System.out.println("Variable repetida: "+borrarLuego+", en la linea "+numLinea);
-		salida += "Variable repetida: "+borrarLuego+", en la linea "+numLinea+"\n";
+		System.out.println(CompError.error(36, numLinea));
+		salida += CompError.error(36, numLinea)+"\n";
 		return false;
 	}
 
