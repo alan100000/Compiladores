@@ -381,8 +381,14 @@ pasotres : POR { pilaOperadores.push(listaOps.getOpCode($POR.text)); }
 	| ENTRE { pilaOperadores.push(listaOps.getOpCode($ENTRE.text)); }
 	| MOD { pilaOperadores.push(listaOps.getOpCode($MOD.text)); } ;
 
-factor : PARIZQ expresion PARDER pasocinco
+factor : PARIZQ meteFondoFalso expresion PARDER sacaFondoFalso pasocinco
 	| factorPrima varcte pasocinco ;
+
+meteFondoFalso: {pilaOperadores.push("(");};
+
+sacaFondoFalso: {if (!pilaOperadores.pop().toString().equals("("))
+					CompError.error(17, numLinea);
+				};
 
 pasocinco: {if(!pilaOperadores.empty()){
 	     if(pilaOperadores.peek() == listaOps.getOpCode("*") || pilaOperadores.peek() == listaOps.getOpCode("/") || pilaOperadores.peek() == listaOps.getOpCode("\%")){
