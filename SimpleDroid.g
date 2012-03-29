@@ -384,9 +384,9 @@ pasotres : POR { pilaOperadores.push(listaOps.getOpCode($POR.text)); }
 factor : PARIZQ meteFondoFalso expresion PARDER sacaFondoFalso pasocinco
 	| factorPrima varcte pasocinco ;
 
-meteFondoFalso: {pilaOperadores.push("(");};
+meteFondoFalso: {pilaOperadores.push(21);};
 
-sacaFondoFalso: {if (!pilaOperadores.pop().toString().equals("("))
+sacaFondoFalso: {if (!pilaOperadores.pop().equals(21))
 					CompError.error(17, numLinea);
 				};
 
