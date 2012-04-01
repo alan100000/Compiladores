@@ -97,12 +97,16 @@ public class CuboVars{
     }
     
     public String verificaCubo(int i, int j, int k){
+	if(i == -1 || j == -1 || k == -1)
+		return "errorDos";
         return this.cubo[i][j][k];
     }
 
     public String verificaCubo(int i, int j){
-		if(i == 1)
-			return this.matriz[0][j];
+	if(i == -1 || j == -1)
+		return "errorDos";
+	if(i == 1)
+		return this.matriz[0][j];
 			
         return this.matriz[i-13][j];       
     }

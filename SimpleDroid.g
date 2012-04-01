@@ -103,8 +103,13 @@ tokens {
     }
 
     public int extraerTipoNumFromDir(String direccion){
-	String subDir[] = direccion.split(":");
-	return getTipoNum(subDir[1]);
+	try{
+		String subDir[] = direccion.split(":");
+		return getTipoNum(subDir[1]);
+	}
+	catch(ArrayIndexOutOfBoundsException e){
+		return -1;
+	}
     }
     
 
@@ -133,7 +138,9 @@ tokens {
 	if(registro!=null)
 		return registro.getDv();
 	registro = listaProcs.get(0).buscaVar(var);
-	return registro.getDv();
+	if(registro!=null)
+		return registro.getDv();
+	return "";
     }
 
     public boolean insertaVariable(String tipo){ //falta checar cubo y checar si es global
@@ -199,7 +206,7 @@ tokens {
 		System.out.println(CompError.error(641, numLinea));
 		salida += CompError.error(641, numLinea);
 	}
-	else{ /* CREACION DEL CUADRUPLO */
+	else if(!resultado.equals("errorDos")){ /* CREACION DEL CUADRUPLO */
 		String t4 = "t:"+resultado.charAt(0)+":"+dv[(10 + getTipoNum(resultado))]; /* El 10 debido al offset para el segmento de temporales */
 		dv[(10 + getTipoNum(resultado))]++;
 
@@ -208,6 +215,13 @@ tokens {
 		Cuadruplo debug = new Cuadruplo(opCode, t2, t3, t4);					
 		listaCuadruplos.add(debug);
 	}
+    }
+
+    public void crearCuadruploAsignacion(String id){
+	String direccion = getDireccion(id);
+	Cuadruplo asignacion = new Cuadruplo(listaOps.getOpCode("="), pilaOperandos.pop());
+	asignacion.setDv03(direccion);
+	listaCuadruplos.add(asignacion);
     }
 
     public void crearCuadruploIf(){ /*Y tambien el while!*/
@@ -233,6 +247,28 @@ tokens {
 	listaCuadruplos.get(falso).setDv03(listaCuadruplos.size()); /*Rellenar GoToF con contador.*/
 	
 	pilaSaltos.push(listaCuadruplos.size() - 1);	
+    }
+
+    public void crearCuadruploRead(String id){
+	String direccion = getDireccion(id);
+	Cuadruplo read = new Cuadruplo(16);
+	read.setDv03(direccion);
+	listaCuadruplos.add(read);
+    }
+
+    public void crearCuadruploWrite(){
+	Cuadruplo write = new Cuadruplo(15);
+	write.setDv03(pilaOperandos.pop());
+	listaCuadruplos.add(write);
+    }
+
+    public void cuadruploForDos(){
+	pilaSaltos.push(listaCuadruplos.size());
+	Cuadruplo forDos = new Cuadruplo(19, pilaOperandos.pop());
+	listaCuadruplos.add(forDos);
+	pilaSaltos.push(listaCuadruplos.size());
+	Cuadruplo goTo = new Cuadruplo(17);
+	listaCuadruplos.add(goTo);
     }
 
     public void terminarWhile(){
@@ -368,7 +404,9 @@ estatuto : asignacion
 	| retorno
 	| invocacion ;
 
-asignacion : asignacionId asignacionPrima IGUAL expresion SEMICOLON ;
+asignacion : asignacionId asignacionPrima IGUAL expresion SEMICOLON { crearCuadruploAsignacion($asignacionId.text);} ;
+
+asignacionFor : asignacionId asignacionPrima IGUAL expresion { crearCuadruploAsignacion($asignacionId.text);} ;
 
 asignacionId: ID {numLinea = $ID.getLine();}{ varDeclarada($ID.text); } ;
 
@@ -443,7 +481,7 @@ pasocinco: {if(!pilaOperadores.empty()){
 factorPrima : MENOS
 	| ;
 
-escritura : WRITE PARIZQ expresion escrituraPrima PARDER SEMICOLON ;
+escritura : WRITE PARIZQ expresion escrituraPrima PARDER SEMICOLON {crearCuadruploWrite();};
 
 escrituraPrima : MAS expresion escrituraPrima
 	| ;
@@ -494,8 +532,37 @@ condicionPrima : ELSE manejaElse LLAVEIZQ bloque LLAVEDER
 
 manejaElse: { crearCuadruploElse(); };
 
-lectura : READ PARIZQ ID PARDER SEMICOLON ;
+lectura : READ PARIZQ ID PARDER SEMICOLON {numLinea = $ID.getLine(); crearCuadruploRead($ID.text); };
 
-xfor : FOR PARIZQ asignacion SEMICOLON expresion SEMICOLON asignacion PARDER LLAVEIZQ bloque LLAVEDER ;
+xfor : FOR PARIZQ asignacionFor SEMICOLON forPasoUno expresion forPasoDos SEMICOLON forPasoTres asignacionFor forPasoCuatro PARDER LLAVEIZQ bloque forPasoCinco LLAVEDER ;
+
+forPasoUno: { pilaSaltos.push(listaCuadruplos.size()); } ;
+
+forPasoDos: { cuadruploForDos(); } ;
+
+forPasoTres: {pilaSaltos.push(listaCuadruplos.size()); };
+
+forPasoCuatro: 	{ 	int temp = pilaSaltos.pop();
+			Cuadruplo aRellenar = listaCuadruplos.get(pilaSaltos.pop());
+			aRellenar.setDv03(listaCuadruplos.size()+1);
+
+			int temp2 = pilaSaltos.pop();
+			Cuadruplo goToFor = new Cuadruplo(17);
+			goToFor.setDv03(pilaSaltos.pop());
+			listaCuadruplos.add(goToFor);
+	
+			pilaSaltos.push(temp2);
+			pilaSaltos.push(temp);
+		
+		};
+
+forPasoCinco: { Cuadruplo goTo = new Cuadruplo(17);
+		goTo.setDv03(pilaSaltos.pop());
+		listaCuadruplos.add(goTo);
+		Cuadruplo aRellenar = listaCuadruplos.get(pilaSaltos.pop());
+		aRellenar.setDv03(listaCuadruplos.size());
+	      };
+		
+
 
 
