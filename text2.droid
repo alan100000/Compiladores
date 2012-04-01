@@ -1,5 +1,5 @@
 function execute(){
-	int holax = 0;
+	int holax = -10;
 	int i;
 	if(true){
 		holax = 2 + 2;
@@ -9,7 +9,8 @@ function execute(){
 	}
 
 	while(holax < 10){
-		holax = 3+3;
+		holax = 3-3;
+		holax = 17--17;
 	}
 	read(holax);
 	write("pollo" + " loco");

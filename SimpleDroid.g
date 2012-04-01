@@ -56,6 +56,7 @@ tokens {
     static List<Procs> listaProcs = new ArrayList<Procs>(); //se inicializa la tabla de scopes 
     static int numLinea = 0; //numero de Linea
     static boolean compError = false;
+    static int negativa = 1; 
     /* Memoria Virtual
 	0-int, 1-decimal, 2-char, 3-string, 4-boolean
 	g: global, l: temp, t: temp, c: constante
@@ -64,6 +65,16 @@ tokens {
 	t: dv[10] - dv[14]
 	c: dv[15] - dv[19]
     */
+
+    /* Listas de Constantes */
+
+    static List<Integer> cte_entera = new ArrayList<Integer>();
+    static List<Float> cte_decimal = new ArrayList<Float>();
+    static List<String> cte_char = new ArrayList<String>();
+    static List<String> cte_string = new ArrayList<String>();
+    static List<Boolean> cte_boolean = new ArrayList<Boolean>();
+
+    /*                      */
     static int dv[] = new int[]{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; //contador de direcciones virtuales
     static CuboVars cuboVars = new CuboVars();
     static ListaOps listaOps = new ListaOps();
@@ -76,6 +87,92 @@ tokens {
     static List<Cuadruplo> listaCuadruplos = new ArrayList<Cuadruplo>(); // Aqui se guardan los cuadruplos
     static String auxDireccion;
     // End-Pilas
+
+    /* Override del metodo de errores de ANTLR */
+    public void displayRecognitionError(String[] tokenNames, RecognitionException e){
+	String hdr = getErrorHeader(e);
+	String msg = getErrorMessage(e, tokenNames);
+	emitErrorMessage(msg+" "+hdr);
+	CompError.finalError = true;
+    }
+
+    public String getErrorHeader(RecognitionException e) {             
+	return "at line "+e.line+" on character position "+e.charPositionInLine;
+    }
+
+    public String getErrorMessage(RecognitionException e, String[] tokenNames) {
+	String msg = e.getMessage();
+	if ( e instanceof UnwantedTokenException ) {
+		UnwantedTokenException ute = (UnwantedTokenException)e;
+		String tokenName="<unknown>";
+		if ( ute.expecting== Token.EOF ) {
+			tokenName = "EOF";
+		}
+		else {
+			tokenName = tokenNames[ute.expecting];
+		}
+		msg = "extraneous input "+getTokenErrorDisplay(ute.getUnexpectedToken())+
+		" expecting "+tokenName;
+		}
+	else if ( e instanceof MissingTokenException ) {
+		MissingTokenException mte = (MissingTokenException)e;
+		String tokenName="<unknown>";
+		if ( mte.expecting== Token.EOF ) {
+			tokenName = "EOF";
+		}
+		else {
+			tokenName = tokenNames[mte.expecting];
+		}
+			msg = "missing "+tokenName+" at "+getTokenErrorDisplay(e.token);
+		}
+	else if ( e instanceof MismatchedTokenException ) {
+		MismatchedTokenException mte = (MismatchedTokenException)e;
+		String tokenName="<unknown>";
+		if ( mte.expecting== Token.EOF ) {
+			tokenName = "EOF";
+		}
+		else {
+			tokenName = tokenNames[mte.expecting];
+		}
+		msg = "mismatched input "+getTokenErrorDisplay(e.token)+
+		" expecting "+tokenName;
+	}
+	else if ( e instanceof MismatchedTreeNodeException ) {
+		MismatchedTreeNodeException mtne = (MismatchedTreeNodeException)e;
+		String tokenName="<unknown>";
+		if ( mtne.expecting==Token.EOF ) {
+			tokenName = "EOF";
+		}
+		else {
+			tokenName = tokenNames[mtne.expecting];
+		}
+		msg = "mismatched tree node: "+mtne.node+
+		" expecting "+tokenName;
+	}
+	else if ( e instanceof NoViableAltException ) {
+		msg = "Unexpected "+getTokenErrorDisplay(e.token);
+	}
+	else if ( e instanceof EarlyExitException ) {
+		msg = "required (...)+ loop did not match anything at input "+
+		getTokenErrorDisplay(e.token);
+	}
+	else if ( e instanceof MismatchedSetException ) {
+		MismatchedSetException mse = (MismatchedSetException)e;
+		msg = "mismatched input "+getTokenErrorDisplay(e.token)+
+		" expecting set "+mse.expecting;
+	}
+	else if ( e instanceof MismatchedNotSetException ) {
+		MismatchedNotSetException mse = (MismatchedNotSetException)e;
+		msg = "mismatched input "+getTokenErrorDisplay(e.token)+
+		" expecting set "+mse.expecting;
+	}
+	else if ( e instanceof FailedPredicateException ) {
+		FailedPredicateException fpe = (FailedPredicateException)e;
+		msg = "rule "+fpe.ruleName+" failed predicate: {"+
+		fpe.predicateText+"}?";
+	}
+	return "ERROR: "+msg;
+    }
     
     public String getSalida(){
 	return salida;
@@ -312,6 +409,17 @@ tokens {
 	for(int i = 0; i < listaCuadruplos.size(); i++){
 		System.out.println(i+": "+listaCuadruplos.get(i).debug());
 	}
+
+	System.out.println("Constantes Enteras");
+	for(int i = 0; i < cte_entera.size(); i++){
+		System.out.println(i+": "+cte_entera.get(i));
+	}
+    }
+
+    public void validarNeg(){
+	if(negativa == -1)
+		System.out.println(CompError.error(641, numLinea));
+	negativa = 1;
     }
 }
 
@@ -478,7 +586,7 @@ pasocinco: {if(!pilaOperadores.empty()){
 					crearCuadruploExpresion(); } }
 	   };
 
-factorPrima : MENOS
+factorPrima : MENOS { negativa = -1; }
 	| ;
 
 escritura : WRITE PARIZQ expresion escrituraPrima PARDER SEMICOLON {crearCuadruploWrite();};
@@ -487,11 +595,11 @@ escrituraPrima : MAS expresion escrituraPrima
 	| ;
 
 varcte : ID varctePrima {numLinea = $ID.getLine(); varDeclarada($ID.text); auxDireccion = getDireccion($ID.text); pilaOperandos.push(auxDireccion);}
-	| CTE_ENTERA { numLinea = $CTE_ENTERA.getLine(); auxDireccion = "c:i:"+dv[15]; dv[15]++; pilaOperandos.push(auxDireccion);}
-	| CTE_DECIMAL { numLinea = $CTE_DECIMAL.getLine(); auxDireccion = "c:d:"+dv[16]; dv[16]++; pilaOperandos.push(auxDireccion);}
-	| CTE_STRING { numLinea = $CTE_STRING.getLine(); auxDireccion = "c:s:"+dv[18]; dv[18]++; pilaOperandos.push(auxDireccion);}
-	| CTE_CHAR { numLinea = $CTE_CHAR.getLine(); auxDireccion = "c:c:"+dv[17]; dv[17]++; pilaOperandos.push(auxDireccion);}
-	| CTE_BOOLEAN { numLinea = $CTE_BOOLEAN.getLine(); auxDireccion = "c:b:"+dv[19]; dv[19]++; pilaOperandos.push(auxDireccion);}
+	| CTE_ENTERA { numLinea = $CTE_ENTERA.getLine(); auxDireccion = "c:i:"+dv[15]; dv[15]++; pilaOperandos.push(auxDireccion); cte_entera.add(Integer.parseInt($CTE_ENTERA.text)*negativa); negativa = 1; }
+	| CTE_DECIMAL { numLinea = $CTE_DECIMAL.getLine(); auxDireccion = "c:d:"+dv[16]; dv[16]++; pilaOperandos.push(auxDireccion); cte_decimal.add(Float.parseFloat($CTE_DECIMAL.text)*negativa); negativa = 1; }
+	| CTE_STRING { numLinea = $CTE_STRING.getLine(); auxDireccion = "c:s:"+dv[18]; dv[18]++; pilaOperandos.push(auxDireccion); cte_string.add($CTE_STRING.text); validarNeg(); } 
+	| CTE_CHAR { numLinea = $CTE_CHAR.getLine(); auxDireccion = "c:c:"+dv[17]; dv[17]++; pilaOperandos.push(auxDireccion); cte_char.add($CTE_CHAR.text); validarNeg(); }
+	| CTE_BOOLEAN { numLinea = $CTE_BOOLEAN.getLine(); auxDireccion = "c:b:"+dv[19]; dv[19]++; pilaOperandos.push(auxDireccion);cte_boolean.add(Boolean.parseBoolean($CTE_BOOLEAN.text)); validarNeg(); }
 	| invocacionDos ;
 
 varctePrima : CORIZQ CTE_ENTERA CORDER
