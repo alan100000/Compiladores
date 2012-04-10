@@ -3,6 +3,11 @@ public class TablaVars{
     String tipo;
     String dv;
 
+	public TablaVars(String nombre, String tipo){
+		this.nombre = nombre;
+		this.tipo = tipo;		
+	}
+
     public TablaVars(String nombre, String tipo, String dv){
         this.nombre = nombre;
         this.tipo = tipo;

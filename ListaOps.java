@@ -24,8 +24,9 @@ public class ListaOps{
 		/*17*/listaOps.add("goTo");
 		/*18*/listaOps.add("goToV");
 		/*19*/listaOps.add("goToF");
-        	/*20*/listaOps.add("goToProc");
+        /*20*/listaOps.add("goToProc");
 		/*21*/listaOps.add("FondoFalso");
+		/*22*/listaOps.add("Ret");
 	}
 
 	public int getOpCode(String operacion){

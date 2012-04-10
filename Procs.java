@@ -11,10 +11,10 @@ public class Procs{
 
     public Procs(String nombre, String tipo){
         this.nombre = nombre;
-	this.tipo = tipo;
-	cantidadParams = 0;
+		this.tipo = tipo;
         listaVars = new ArrayList<TablaVars>();
-	params = new ArrayList<TablaVars>();
+		params = new ArrayList<TablaVars>();
+		tamano = new int[5];
     }
 
     public int getCantidadParams(){
@@ -29,8 +29,12 @@ public class Procs{
 		return tamano;
 	}
 
-	public void setTamano(int[] tamano){
-		this.tamano = tamano;
+	public void setTamano(int ints, int decs, int chars, int strings, int bools){
+		this.tamano[0] = ints;
+		this.tamano[1] = decs;
+		this.tamano[2] = chars;
+		this.tamano[3] = strings;
+		this.tamano[4] = bools;
 	}
 	
 	public int getDirInicio(){
@@ -41,11 +45,11 @@ public class Procs{
 		this.dirInicio = dirInicio;
 	}
 	
-	public List<String> getParams(){
+	public List<TablaVars> getParams(){
 		return params;
 	}
 	
-	public void setParams (List<String> params){
+	public void setParams (List<TablaVars> params){
 		this.params = params;
 	}
 
@@ -68,6 +72,10 @@ public class Procs{
     public List<TablaVars> getListaVars(){
         return listaVars;
     }
+
+	public void destroyListaVars(){
+		this.listaVars = null;
+	}
 
     public TablaVars buscaVar(String var){
         TablaVars tv;
