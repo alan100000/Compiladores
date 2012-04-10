@@ -413,6 +413,8 @@ tokens {
 
 
     public void debugCuadruplos(){
+	System.out.println("Procs: ");
+
 	for(int i = 0; i < listaCuadruplos.size(); i++){
 		System.out.println(i+": "+listaCuadruplos.get(i).debug());
 	}
@@ -421,6 +423,7 @@ tokens {
 	for(int i = 0; i < cte_entera.size(); i++){
 		System.out.println(i+": "+cte_entera.get(i));
 	}
+
     }
 
     public void validarNeg(){
@@ -469,7 +472,7 @@ inicializacion : {Procs aux = new Procs("global", "nothing");
 		  listaProcs.add(aux);
 		 };
 
-main : FUNCTION funcionExec PARIZQ PARDER LLAVEIZQ vars bloque LLAVEDER;  
+main : FUNCTION funcionExec PARIZQ PARDER LLAVEIZQ vars funcionPasoSeis bloque LLAVEDER;  
 
 funcionExec: EXECUTE { nuevoProc("main", "nothing"); };
 
@@ -485,10 +488,12 @@ varsTriPrima : IGUAL expresion
 varsCuatriPrima : COMA varsBiPrima { identificadores.push($COMA.text); }
 	| ;
 
-funciones : FUNCTION funcionId PARIZQ params PARDER LLAVEIZQ vars funcionPasoSeis bloque LLAVEDER funciones 
+funciones : FUNCTION funcionId PARIZQ params PARDER LLAVEIZQ vars funcionPasoSeis bloque LLAVEDER funcionPasoSiete funciones 
 	| ;
 
-funcionPasoSeis : listaProcs.get(procIndice).setDirInicio(listaCuadruplos.size());
+funcionPasoSeis : {listaProcs.get(procIndice).setDirInicio(listaCuadruplos.size())};
+
+funcionPasoSiete : { listaProcs.get(procIndice).destroyListaVars(); Cuadruplo ret = new Cuadruplo(22); listaCuadruplos.add(ret); } ;
 
 funcionId: funcionesPrima ID { nuevoProc($ID.text, $funcionesPrima.text); };
 
@@ -512,7 +517,7 @@ paramsId : tipo ID { 	listaProcs.get(procIndice).agregaParam($ID.text, $tipo.tex
 			insertaVariable($tipo.text); };
 
 bloque : estatuto bloque
-	| { asignaTamano(); };
+	| { listaProcs.get(procIndice).setTamano(dv[5], dv[6], dv[7], dv[8], dv[9]); };
 
 estatuto : asignacion
 	| condicion
