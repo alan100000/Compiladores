@@ -223,11 +223,18 @@ tokens {
     }
 
     // Metodo para agregar un Proc, y hacer los procedimientos necesarios
-    public void nuevoProc(String nombre, String tipo){
+    public int nuevoProc(String nombre, String tipo){
+	for(int i = 0; i<listaProcs.size(); i++){
+		if(nombre.equals(listaProcs.get(i).getNombre())){
+			CompError.error(37, numLinea);
+			return -1;
+		}
+	}
 	Procs aux = new Procs(nombre, tipo);
 	listaProcs.add(aux);
 	procIndice++;
 	resetLocales(); //se reinician las direcciones
+	return 1;
     }
 
     public String getDireccion(String var){
@@ -478,8 +485,10 @@ varsTriPrima : IGUAL expresion
 varsCuatriPrima : COMA varsBiPrima { identificadores.push($COMA.text); }
 	| ;
 
-funciones : FUNCTION funcionId PARIZQ params PARDER LLAVEIZQ vars bloque LLAVEDER funciones 
+funciones : FUNCTION funcionId PARIZQ params PARDER LLAVEIZQ vars funcionPasoSeis bloque LLAVEDER funciones 
 	| ;
+
+funcionPasoSeis : listaProcs.get(procIndice).setDirInicio(listaCuadruplos.size());
 
 funcionId: funcionesPrima ID { nuevoProc($ID.text, $funcionesPrima.text); };
 
@@ -498,11 +507,12 @@ params : paramsId paramsPrima
 paramsPrima : COMA paramsId paramsPrima
 	| ;
 
-paramsId : tipo ID { 	identificadores.push($ID.text);
+paramsId : tipo ID { 	listaProcs.get(procIndice).agregaParam($ID.text, $tipo.text);
+			identificadores.push($ID.text);
 			insertaVariable($tipo.text); };
 
 bloque : estatuto bloque
-	| ;
+	| { asignaTamano(); };
 
 estatuto : asignacion
 	| condicion

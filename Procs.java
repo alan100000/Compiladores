@@ -6,13 +6,23 @@ public class Procs{
     String tipo;
     int dirInicio;
     int[] tamano;
-    List<String> params;
+    List<TablaVars> params;
     List<TablaVars> listaVars;
 
     public Procs(String nombre, String tipo){
         this.nombre = nombre;
-	    this.tipo = tipo;
+	this.tipo = tipo;
+	cantidadParams = 0;
         listaVars = new ArrayList<TablaVars>();
+	params = new ArrayList<TablaVars>();
+    }
+
+    public int getCantidadParams(){
+	return params.size();
+    }
+
+    public int getCantidadVariables(){
+	return listaVars.size();
     }
 
 	public int[] getTamano(){
@@ -74,5 +84,10 @@ public class Procs{
     public void agregaVar(String nombre, String tipo, String direccion){
         TablaVars tv = new TablaVars(nombre, tipo, direccion);
         listaVars.add(tv);
+    }
+
+    public void agregaParam(String nombre, String tipo){
+        TablaVars tv = new TablaVars(nombre, tipo);
+        params.add(tv);
     }
 }
