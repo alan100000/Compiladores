@@ -25,8 +25,8 @@ public class Procs{
 	return listaVars.size();
     }
 
-	public int[] getTamano(){
-		return tamano;
+	public String getTamano(){
+		return tamano[0] + "," + tamano[1]+ "," +tamano[2]+ "," + tamano[3]+ "," + tamano[4];
 	}
 
 	public void setTamano(int ints, int decs, int chars, int strings, int bools){
