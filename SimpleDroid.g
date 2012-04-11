@@ -414,12 +414,16 @@ tokens {
 
     public void debugCuadruplos(){
 	System.out.println("Procs: ");
+	for(int i = 0; i < listaProcs.size(); i++){
+		System.out.println(i+": "+listaProcs.get(i).debug());
+	}
 
+	System.out.println("Cuadruplos: ");
 	for(int i = 0; i < listaCuadruplos.size(); i++){
 		System.out.println(i+": "+listaCuadruplos.get(i).debug());
 	}
 
-	System.out.println("Constantes Enteras");
+	System.out.println("Constantes Enteras: ");
 	for(int i = 0; i < cte_entera.size(); i++){
 		System.out.println(i+": "+cte_entera.get(i));
 	}
@@ -491,7 +495,7 @@ varsCuatriPrima : COMA varsBiPrima { identificadores.push($COMA.text); }
 funciones : FUNCTION funcionId PARIZQ params PARDER LLAVEIZQ vars funcionPasoSeis bloque LLAVEDER funcionPasoSiete funciones 
 	| ;
 
-funcionPasoSeis : {listaProcs.get(procIndice).setDirInicio(listaCuadruplos.size())};
+funcionPasoSeis : {listaProcs.get(procIndice).setDirInicio(listaCuadruplos.size());};
 
 funcionPasoSiete : { listaProcs.get(procIndice).destroyListaVars(); Cuadruplo ret = new Cuadruplo(22); listaCuadruplos.add(ret); } ;
 

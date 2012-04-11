@@ -98,4 +98,8 @@ public class Procs{
         TablaVars tv = new TablaVars(nombre, tipo);
         params.add(tv);
     }
+
+    public String debug(){
+	return " "+nombre+" Tipo: "+tipo+" ParamsQuant: "+getCantidadParams();
+    }
 }
