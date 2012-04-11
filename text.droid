@@ -1,7 +1,6 @@
 int alfina, b = 3;
 char metamorfosis = 'a';
 decimal beta = 22.11;
-int b = 3;
 string palabras = "\nFIN DEL PROGRAMA!";
 
 
@@ -40,6 +39,6 @@ function execute(){
 		b = invoke suma_b(b);
 	}
 	write("QUIERES VER ALGO? ESCRIBE true O ESCRIBE false: ");
-	invoke hola_mundo(deseo);
+	invoke hola_mundo();
 	write(palabras);
 }

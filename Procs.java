@@ -93,6 +93,11 @@ public class Procs{
         TablaVars tv = new TablaVars(nombre, tipo, direccion);
         listaVars.add(tv);
     }
+    
+    public void agregaVar(String nombre, String tipo, String direccion, int tamanoArr){
+        TablaVars tv = new TablaVars(nombre, tipo, direccion, tamanoArr);
+        listaVars.add(tv);
+    }
 
     public void agregaParam(String nombre, String tipo){
         TablaVars tv = new TablaVars(nombre, tipo);
