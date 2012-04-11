@@ -56,6 +56,8 @@ tokens {
     static List<Procs> listaProcs = new ArrayList<Procs>(); //se inicializa la tabla de scopes 
     static int numLinea = 0; //numero de Linea
     static int k = 0; //contador de parametros
+    static int arreglo = 1; //si es 1 no es arreglo, si es mayor si
+    static Stack<Integer> tamanos = new Stack<Integer>(); //tamanos de las variables
     static int procIndiceParams = 0; //indice del proc al que estas invocando
     static boolean compError = false;
     static boolean primeraPasada = true;
@@ -306,17 +308,25 @@ tokens {
 
 		dvIndice += getTipoNum(tipo); // Si es global es 0 y por ende solo toma el valor de getTipoNum
 		direccion = direccion + tipo.charAt(0) + ":" + dv[dvIndice]; // Armar la direccion
+		if(!tamanos.empty()){
+			arreglo = tamanos.pop();
+			if(arreglo > 1){
+				listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion, arreglo);
+				dv[dvIndice] = dv[dvIndice]+arreglo; // Aumentar el contador de la direccion virtual correspondiente
+				System.out.println("Se deposito arreglo de tamano "+arreglo+"al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion); //BORRAME
+			}
+			else{
+				//listaProcs.get(procIndice).agregaVar(identificadores.pop().toString(), tipo, direccion);
+				listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion); //BORRAME
+				System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion); //BORRAME
+				salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion+"\n";
+				dv[dvIndice] = dv[dvIndice]+1; // Aumentar el contador de la direccion virtual correspondiente
+			}
+		}
 
-
-		//listaProcs.get(procIndice).agregaVar(identificadores.pop().toString(), tipo, direccion);
-		listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion); //BORRAME
-		System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion); //BORRAME
-		salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion+"\n";
-	
-		dv[dvIndice] = dv[dvIndice]+1; // Aumentar el contador de la direccion virtual correspondiente
 
 		if(!identificadores.empty()){
-			if(identificadores.peek().toString().equals(",")){
+			while(identificadores.peek().toString().equals(",")){
 				identificadores.pop();
 				borrarLuego = identificadores.pop().toString(); //BORRAME
 				if(varRepetida(borrarLuego)){
@@ -326,12 +336,23 @@ tokens {
 				}
 			
 				direccion = direccion.substring(0,4) + dv[dvIndice];
-			
-				//listaProcs.get(i).agregaVar(identificadores.pop().toString(), tipo, direccion);
-				listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion); //BORRAME
-				System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion); //BORRAME
-				salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion+"\n";
-				dv[dvIndice] = dv[dvIndice]+1;
+				
+				if(!tamanos.empty()){
+					arreglo = tamanos.pop();
+					if(arreglo > 1){
+						listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion, arreglo);
+						dv[dvIndice] = dv[dvIndice]+arreglo; // Aumentar el contador de la direccion virtual correspondiente
+						System.out.println("Se deposito arreglo de tamano "+arreglo+"al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+
+									", "+direccion); //BORRAME
+					}
+					else{
+						//listaProcs.get(i).agregaVar(identificadores.pop().toString(), tipo, direccion);
+						listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion); //BORRAME
+						System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion); //BORRAME
+						salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion+"\n";
+						dv[dvIndice] = dv[dvIndice]+1;
+					}
+				}
 			} 
 		}
 	}
@@ -567,9 +588,9 @@ vars : tipo varsBiPrima SEMICOLON vars {numLinea = $SEMICOLON.getLine();} { inse
 
 varsBiPrima : ID varsTriPrima varsCuatriPrima { if(primeraPasada){ identificadores.push($ID.text); } };
 
-varsTriPrima : IGUAL expresion
-	| CORIZQ CTE_ENTERA CORDER
-	| ;
+varsTriPrima : IGUAL expresion { if(primeraPasada){ tamanos.push(1);}}
+	| CORIZQ CTE_ENTERA CORDER { if(primeraPasada){ tamanos.push($CTE_ENTERA.value);} }
+	| { if(primeraPasada){ tamanos.push(1);}};
 
 varsCuatriPrima : COMA varsBiPrima { if(primeraPasada){ identificadores.push($COMA.text); } }
 	| ;
@@ -799,7 +820,3 @@ forPasoCinco: { if(!primeraPasada){
 			aRellenar.setDv03(listaCuadruplos.size());
 		}
 	      };
-		
-
-
-
