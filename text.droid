@@ -1,7 +1,14 @@
 int alfina, b = 3;
 char metamorfosis = 'a';
 decimal beta = 22.11;
+int b = 3;
 string palabras = "\nFIN DEL PROGRAMA!";
+
+
+function decimal mauricio(decimal paco, decimal poco, decimal elnegroklever){
+	string mauri = "el mauricio";
+	write(mauri);
+}
 
 function nothing hola_mundo(){
 	int pedro;
@@ -12,11 +19,6 @@ function nothing hola_mundo(){
 	else{
 		holax = 7;
 	}
-}
-
-function decimal mauricio(decimal paco, decimal poco, decimal elnegroklever){
-	string mauri = "el mauricio";
-	write(mauri);
 }
 
 function int suma_b(int aux){
@@ -38,7 +40,6 @@ function execute(){
 		b = invoke suma_b(b);
 	}
 	write("QUIERES VER ALGO? ESCRIBE true O ESCRIBE false: ");
-	read(deseo);
 	invoke hola_mundo(deseo);
 	write(palabras);
 }

@@ -55,7 +55,10 @@ tokens {
     static int procIndice = 0; // Indice del arreglo de procs
     static List<Procs> listaProcs = new ArrayList<Procs>(); //se inicializa la tabla de scopes 
     static int numLinea = 0; //numero de Linea
+    static int k = 0; //contador de parametros
+    static int procIndiceParams = 0; //indice del proc al que estas invocando
     static boolean compError = false;
+    static boolean primeraPasada = true;
     static int negativa = 1; 
     /* Memoria Virtual
 	0-int, 1-decimal, 2-char, 3-string, 4-boolean
@@ -92,7 +95,8 @@ tokens {
     public void displayRecognitionError(String[] tokenNames, RecognitionException e){
 	String hdr = getErrorHeader(e);
 	String msg = getErrorMessage(e, tokenNames);
-	emitErrorMessage(msg+" "+hdr);
+	if(!primeraPasada)
+		emitErrorMessage(msg+" "+hdr);
 	CompError.finalError = true;
     }
 
@@ -217,6 +221,20 @@ tokens {
  
         try {
             parser.programa(); //se inicia el parser en la regla <programa>
+	    primeraPasada = false;
+        } catch (RecognitionException e)  {
+            e.printStackTrace();
+        }
+
+        /* Segunda pasada */
+	System.out.println("**********************************SEGUNDA VUELTA");
+	procIndice = 0;
+	lex = new SimpleDroidLexer(new ANTLRFileStream(args[0])); //se crea el lexer
+        tokens = new CommonTokenStream(lex); //se crean las tokens	
+        parser = new SimpleDroidParser(tokens); //se crea el parser
+ 
+        try {
+            parser.programa(); //se inicia el parser en la regla <programa>
         } catch (RecognitionException e)  {
             e.printStackTrace();
         }
@@ -224,17 +242,33 @@ tokens {
 
     // Metodo para agregar un Proc, y hacer los procedimientos necesarios
     public int nuevoProc(String nombre, String tipo){
-	for(int i = 0; i<listaProcs.size(); i++){
-		if(nombre.equals(listaProcs.get(i).getNombre())){
-			CompError.error(37, numLinea);
-			return -1;
+	if(primeraPasada){
+		for(int i = 0; i<listaProcs.size(); i++){
+			if(nombre.equals(listaProcs.get(i).getNombre())){
+				CompError.error(37, numLinea);
+				return -1;
+			}
 		}
+		Procs aux = new Procs(nombre, tipo);
+		listaProcs.add(aux);
+		procIndice++;
+		resetLocales(); //se reinician las direcciones
+		return 1;
 	}
-	Procs aux = new Procs(nombre, tipo);
-	listaProcs.add(aux);
 	procIndice++;
 	resetLocales(); //se reinician las direcciones
 	return 1;
+    }
+
+    public int checaProc(String nombre){
+	for(int i = 0; i<listaProcs.size(); i++){
+		if(nombre.equals(listaProcs.get(i).getNombre())){
+				procIndiceParams = i;
+				return 1;
+		}
+	}
+	System.out.println(CompError.error(34, numLinea, nombre));
+	return -1;	
     }
 
     public String getDireccion(String var){
@@ -248,143 +282,187 @@ tokens {
     }
 
     public boolean insertaVariable(String tipo){ //falta checar cubo y checar si es global
-	int i = 0;
-	int dvIndice = 0;
-	String direccion;
+	if(primeraPasada){
+		int i = 0;
+		int dvIndice = 0;
+		String direccion;
 
-	if(procIndice == 0){ //si es variable global el indice del scope es 0, el que representa las variables globales
-		i = 0;
-		direccion = "g:";
-	}
-	else{
-		i = procIndice;
-		direccion = "l:";
-		dvIndice = 5; // dvIndice >= 5 es para variables locales
-	}
+		if(procIndice == 0){ //si es variable global el indice del scope es 0, el que representa las variables globales
+			i = 0;
+			direccion = "g:";
+		}
+		else{
+			i = procIndice;
+			direccion = "l:";
+			dvIndice = 5; // dvIndice >= 5 es para variables locales
+		}
 
-	String borrarLuego = identificadores.pop().toString(); //BORRAME
-	if(varRepetida(borrarLuego)){
-		System.out.println(CompError.error(36, numLinea));
-		salida += CompError.error(36, numLinea)+"\n";
-		return false;
-	}
+		String borrarLuego = identificadores.pop().toString(); //BORRAME
+		if(varRepetida(borrarLuego)){
+			System.out.println(CompError.error(36, numLinea));
+			salida += CompError.error(36, numLinea)+"\n";
+			return false;
+		}
 
-	dvIndice += getTipoNum(tipo); // Si es global es 0 y por ende solo toma el valor de getTipoNum
-	direccion = direccion + tipo.charAt(0) + ":" + dv[dvIndice]; // Armar la direccion
+		dvIndice += getTipoNum(tipo); // Si es global es 0 y por ende solo toma el valor de getTipoNum
+		direccion = direccion + tipo.charAt(0) + ":" + dv[dvIndice]; // Armar la direccion
 
 
-	//listaProcs.get(procIndice).agregaVar(identificadores.pop().toString(), tipo, direccion);
-	listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion); //BORRAME
-	System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion); //BORRAME
-	salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion+"\n";
+		//listaProcs.get(procIndice).agregaVar(identificadores.pop().toString(), tipo, direccion);
+		listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion); //BORRAME
+		System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion); //BORRAME
+		salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion+"\n";
 	
-	dv[dvIndice] = dv[dvIndice]+1; // Aumentar el contador de la direccion virtual correspondiente
+		dv[dvIndice] = dv[dvIndice]+1; // Aumentar el contador de la direccion virtual correspondiente
 
-	if(!identificadores.empty()){
-		if(identificadores.peek().toString().equals(",")){
-			identificadores.pop();
-			borrarLuego = identificadores.pop().toString(); //BORRAME
+		if(!identificadores.empty()){
+			if(identificadores.peek().toString().equals(",")){
+				identificadores.pop();
+				borrarLuego = identificadores.pop().toString(); //BORRAME
+				if(varRepetida(borrarLuego)){
+					System.out.println(CompError.error(36, numLinea));
+					salida += CompError.error(36, numLinea)+"\n";
+					return false;
+				}
 			
-			direccion = direccion.substring(0,4) + dv[dvIndice];
+				direccion = direccion.substring(0,4) + dv[dvIndice];
 			
-			//listaProcs.get(i).agregaVar(identificadores.pop().toString(), tipo, direccion);
-			listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion); //BORRAME
-			System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion); //BORRAME
-			salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion+"\n";
-			dv[dvIndice] = dv[dvIndice]+1;
-		} 
+				//listaProcs.get(i).agregaVar(identificadores.pop().toString(), tipo, direccion);
+				listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion); //BORRAME
+				System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion); //BORRAME
+				salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion+"\n";
+				dv[dvIndice] = dv[dvIndice]+1;
+			} 
+		}
 	}
 	return true;
     }
 
     /* Generar cuadruplo de la regla de Expresion */
     public void crearCuadruploExpresion(){
-	int opCode = pilaOperadores.pop();
-	String t3 = pilaOperandos.pop().toString();
-	String t2 = pilaOperandos.pop().toString();
+	if(!primeraPasada){
+		int opCode = pilaOperadores.pop();
+		String t3 = pilaOperandos.pop().toString();
+		String t2 = pilaOperandos.pop().toString();
 
-	String resultado = cuboVars.verificaCubo(opCode, extraerTipoNumFromDir(t2), extraerTipoNumFromDir(t3));
+		String resultado = cuboVars.verificaCubo(opCode, extraerTipoNumFromDir(t2), extraerTipoNumFromDir(t3));
 
-	if(resultado.equals("error")){
-		compError = true;
-		System.out.println(CompError.error(641, numLinea));
-		salida += CompError.error(641, numLinea);
+		if(resultado.equals("error")){
+			compError = true;
+			System.out.println(CompError.error(641, numLinea));
+			salida += CompError.error(641, numLinea);
+		}
+		else if(!resultado.equals("errorDos")){ /* CREACION DEL CUADRUPLO */
+			String t4 = "t:"+resultado.charAt(0)+":"+dv[(10 + getTipoNum(resultado))]; /* El 10 debido al offset para el segmento de temporales */
+			dv[(10 + getTipoNum(resultado))]++;
+
+			pilaOperandos.push(t4); /* Metemos el resultado a la pila de operandos*/
+
+			Cuadruplo debug = new Cuadruplo(opCode, t2, t3, t4);					
+			listaCuadruplos.add(debug);
+		}
 	}
-	else if(!resultado.equals("errorDos")){ /* CREACION DEL CUADRUPLO */
-		String t4 = "t:"+resultado.charAt(0)+":"+dv[(10 + getTipoNum(resultado))]; /* El 10 debido al offset para el segmento de temporales */
-		dv[(10 + getTipoNum(resultado))]++;
+    }
 
-		pilaOperandos.push(t4); /* Metemos el resultado a la pila de operandos*/
+    /* Generar cuadruplo de los parametros */
+    public void crearCuadruploParametro(){
+	if(!primeraPasada){
+		try{
+			String t2 = pilaOperandos.pop().toString();
+		
+			String tipo[] = t2.split(":");
 
-		Cuadruplo debug = new Cuadruplo(opCode, t2, t3, t4);					
-		listaCuadruplos.add(debug);
+			if(listaProcs.get(procIndiceParams).getParams().get(k).getTipo().charAt(0) == tipo[1].charAt(0)){
+				Cuadruplo param = new Cuadruplo(24, t2, ""+k);
+			}
+			else{
+				System.out.println(CompError.error(68, numLinea));
+			}
+		}
+		catch(IndexOutOfBoundsException e){
+			System.out.println(CompError.error(555, numLinea));
+		}
 	}
     }
 
     public void crearCuadruploAsignacion(String id){
-	String direccion = getDireccion(id);
-	Cuadruplo asignacion = new Cuadruplo(listaOps.getOpCode("="), pilaOperandos.pop());
-	asignacion.setDv03(direccion);
-	listaCuadruplos.add(asignacion);
+	if(!primeraPasada){
+		String direccion = getDireccion(id);
+		Cuadruplo asignacion = new Cuadruplo(listaOps.getOpCode("="), pilaOperandos.pop());
+		asignacion.setDv03(direccion);
+		listaCuadruplos.add(asignacion);
+	}
     }
 
     public void crearCuadruploIf(){ /*Y tambien el while!*/
-	String resultado = pilaOperandos.pop().toString();
+	if(!primeraPasada){
+		String resultado = pilaOperandos.pop().toString();
 
-	/* Validacion Semantica */
-	if(extraerTipoNumFromDir(resultado) != 4){
-		System.out.println(CompError.error(69, numLinea));
-		salida += CompError.error(69, numLinea);
-	}
-	else{
-		Cuadruplo ifC = new Cuadruplo(19, resultado); /* GoToF Deja pendiente salto.*/
-		listaCuadruplos.add(ifC); /* Agregar cuadruplo incompleto.*/
-		pilaSaltos.push(listaCuadruplos.size() - 1); /* Almacenar direccion del cuadruplo actual para luego rellenarlo.*/
+		/* Validacion Semantica */
+		if(extraerTipoNumFromDir(resultado) != 4){
+			System.out.println(CompError.error(69, numLinea));
+			salida += CompError.error(69, numLinea);
+		}
+		else{
+			Cuadruplo ifC = new Cuadruplo(19, resultado); /* GoToF Deja pendiente salto.*/
+			listaCuadruplos.add(ifC); /* Agregar cuadruplo incompleto.*/
+			pilaSaltos.push(listaCuadruplos.size() - 1); /* Almacenar direccion del cuadruplo actual para luego rellenarlo.*/
+		}
 	}
     }
 
     public void crearCuadruploElse(){
-	Cuadruplo elseC = new Cuadruplo(17); /* GoTo Deja pendiente salto.*/
-	listaCuadruplos.add(elseC); /* Agregar cuadruplo incompleto. */
+	if(!primeraPasada){
+		Cuadruplo elseC = new Cuadruplo(17); /* GoTo Deja pendiente salto.*/
+		listaCuadruplos.add(elseC); /* Agregar cuadruplo incompleto. */
 
-	int falso = pilaSaltos.pop();
-	listaCuadruplos.get(falso).setDv03(listaCuadruplos.size()); /*Rellenar GoToF con contador.*/
+		int falso = pilaSaltos.pop();
+		listaCuadruplos.get(falso).setDv03(listaCuadruplos.size()); /*Rellenar GoToF con contador.*/
 	
-	pilaSaltos.push(listaCuadruplos.size() - 1);	
+		pilaSaltos.push(listaCuadruplos.size() - 1);	
+	}
     }
 
     public void crearCuadruploRead(String id){
-	String direccion = getDireccion(id);
-	Cuadruplo read = new Cuadruplo(16);
-	read.setDv03(direccion);
-	listaCuadruplos.add(read);
+	if(!primeraPasada){
+		String direccion = getDireccion(id);
+		Cuadruplo read = new Cuadruplo(16);
+		read.setDv03(direccion);
+		listaCuadruplos.add(read);
+	}
     }
 
     public void crearCuadruploWrite(){
-	Cuadruplo write = new Cuadruplo(15);
-	write.setDv03(pilaOperandos.pop());
-	listaCuadruplos.add(write);
+	if(!primeraPasada){
+		Cuadruplo write = new Cuadruplo(15);
+		write.setDv03(pilaOperandos.pop());
+		listaCuadruplos.add(write);
+	}
     }
 
     public void cuadruploForDos(){
-	pilaSaltos.push(listaCuadruplos.size());
-	Cuadruplo forDos = new Cuadruplo(19, pilaOperandos.pop());
-	listaCuadruplos.add(forDos);
-	pilaSaltos.push(listaCuadruplos.size());
-	Cuadruplo goTo = new Cuadruplo(17);
-	listaCuadruplos.add(goTo);
+	if(!primeraPasada){
+		pilaSaltos.push(listaCuadruplos.size());
+		Cuadruplo forDos = new Cuadruplo(19, pilaOperandos.pop());
+		listaCuadruplos.add(forDos);
+		pilaSaltos.push(listaCuadruplos.size());
+		Cuadruplo goTo = new Cuadruplo(17);
+		listaCuadruplos.add(goTo);
+	}
     }
 
     public void terminarWhile(){
-	int falso = pilaSaltos.pop();
-	int retorno = pilaSaltos.pop();
+	if(!primeraPasada){
+		int falso = pilaSaltos.pop();
+		int retorno = pilaSaltos.pop();
 
-	/* GoTo para mantener en ciclo los cuadruplos. */
-	Cuadruplo whileC = new Cuadruplo(17);
-	whileC.setDv03(retorno);
-	listaCuadruplos.add(whileC);
+		/* GoTo para mantener en ciclo los cuadruplos. */
+		Cuadruplo whileC = new Cuadruplo(17);
+		whileC.setDv03(retorno);
+		listaCuadruplos.add(whileC);
 
-	listaCuadruplos.get(falso).setDv03(listaCuadruplos.size()); /*Rellenar GoToF con contador.*/
+		listaCuadruplos.get(falso).setDv03(listaCuadruplos.size()); /*Rellenar GoToF con contador.*/
+	}
     }
 
 
@@ -431,7 +509,7 @@ tokens {
     }
 
     public void validarNeg(){
-	if(negativa == -1)
+	if(negativa == -1 && !primeraPasada)
 		System.out.println(CompError.error(641, numLinea));
 	negativa = 1;
     }
@@ -461,19 +539,23 @@ fragment UPPERCASE : 'A'..'Z' ;
  *------------------------------------------------------------------*/
 
 programa : inicializacion vars funciones main {	
-		if(CompError.finalError){
-			System.out.println("Hubo errores en la compilacion.");
-			salida+="Hubo errores en la compilacion.";
-		}
-		else{
-			debugCuadruplos();
-			System.out.println("La compilacion ha sido exitosa. Bienvenido al futuro.");
-			salida += "La compilacion ha sido exitosa. Bienvenido al futuro.";
+		if(!primeraPasada){
+			if(CompError.finalError){
+				System.out.println("Hubo errores en la compilacion.");
+				salida+="Hubo errores en la compilacion.";
+			}
+			else{
+				debugCuadruplos();
+				System.out.println("La compilacion ha sido exitosa. Bienvenido al futuro.");
+				salida += "La compilacion ha sido exitosa. Bienvenido al futuro.";
+			}
 		}
 	};
 
-inicializacion : {Procs aux = new Procs("global", "nothing");
-		  listaProcs.add(aux);
+inicializacion : {if(primeraPasada){
+			Procs aux = new Procs("global", "nothing");
+		  	listaProcs.add(aux);
+		  }
 		 };
 
 main : FUNCTION funcionExec PARIZQ PARDER LLAVEIZQ vars funcionPasoSeis bloque LLAVEDER;  
@@ -483,23 +565,23 @@ funcionExec: EXECUTE { nuevoProc("main", "nothing"); };
 vars : tipo varsBiPrima SEMICOLON vars {numLinea = $SEMICOLON.getLine();} { insertaVariable($tipo.text) ;}
 	| ;
 
-varsBiPrima : ID varsTriPrima varsCuatriPrima { identificadores.push($ID.text); };
+varsBiPrima : ID varsTriPrima varsCuatriPrima { if(primeraPasada){ identificadores.push($ID.text); } };
 
 varsTriPrima : IGUAL expresion
 	| CORIZQ CTE_ENTERA CORDER
 	| ;
 
-varsCuatriPrima : COMA varsBiPrima { identificadores.push($COMA.text); }
+varsCuatriPrima : COMA varsBiPrima { if(primeraPasada){ identificadores.push($COMA.text); } }
 	| ;
 
 funciones : FUNCTION funcionId PARIZQ params PARDER LLAVEIZQ vars funcionPasoSeis bloque LLAVEDER funcionPasoSiete funciones 
 	| ;
 
-funcionPasoSeis : {listaProcs.get(procIndice).setDirInicio(listaCuadruplos.size());};
+funcionPasoSeis : { if(!primeraPasada){ listaProcs.get(procIndice).setDirInicio(listaCuadruplos.size());} };
 
-funcionPasoSiete : { listaProcs.get(procIndice).destroyListaVars(); Cuadruplo ret = new Cuadruplo(22); listaCuadruplos.add(ret); } ;
+funcionPasoSiete : { if(!primeraPasada){ listaProcs.get(procIndice).destroyListaVars(); Cuadruplo ret = new Cuadruplo(22); listaCuadruplos.add(ret); } } ;
 
-funcionId: funcionesPrima ID { nuevoProc($ID.text, $funcionesPrima.text); };
+funcionId: funcionesPrima ID { nuevoProc($ID.text, $funcionesPrima.text);};
 
 funcionesPrima : tipo
 	| NOTHING ;
@@ -516,12 +598,15 @@ params : paramsId paramsPrima
 paramsPrima : COMA paramsId paramsPrima
 	| ;
 
-paramsId : tipo ID { 	listaProcs.get(procIndice).agregaParam($ID.text, $tipo.text);
-			identificadores.push($ID.text);
-			insertaVariable($tipo.text); };
+paramsId : tipo ID { 	if(primeraPasada){
+				listaProcs.get(procIndice).agregaParam($ID.text, $tipo.text);
+				identificadores.push($ID.text);
+				insertaVariable($tipo.text); 
+			}
+		   };
 
 bloque : estatuto bloque
-	| { listaProcs.get(procIndice).setTamano(dv[5], dv[6], dv[7], dv[8], dv[9]); };
+	| { if(primeraPasada){ listaProcs.get(procIndice).setTamano(dv[5], dv[6], dv[7], dv[8], dv[9]); } };
 
 estatuto : asignacion
 	| condicion
@@ -535,7 +620,7 @@ asignacion : asignacionId asignacionPrima IGUAL expresion SEMICOLON { crearCuadr
 
 asignacionFor : asignacionId asignacionPrima IGUAL expresion { crearCuadruploAsignacion($asignacionId.text);} ;
 
-asignacionId: ID {numLinea = $ID.getLine();}{ varDeclarada($ID.text); } ;
+asignacionId: ID {numLinea = $ID.getLine();}{ if(primeraPasada){ varDeclarada($ID.text); } } ;
 
 asignacionPrima : CORIZQ CTE_ENTERA CORDER
 	| ;
@@ -554,12 +639,12 @@ comparador : comparadorPrima logico { if(!pilaOperadores.empty()){
 comparadorPrima : comparadorBiPrima exp 
 	| ;
 
-comparadorBiPrima : LT { pilaOperadores.push(listaOps.getOpCode("<")); }
-	| GT { pilaOperadores.push(listaOps.getOpCode(">")); }
-	| LT IGUAL { pilaOperadores.push(listaOps.getOpCode("<=")); }
-	| GT IGUAL { pilaOperadores.push(listaOps.getOpCode(">=")); }
-	| IGUAL IGUAL { pilaOperadores.push(listaOps.getOpCode("==")); }
-	| NE IGUAL { pilaOperadores.push(listaOps.getOpCode("!=")); };
+comparadorBiPrima : LT { if(!primeraPasada){ pilaOperadores.push(listaOps.getOpCode("<")); }}
+	| GT { if(!primeraPasada){ pilaOperadores.push(listaOps.getOpCode(">")); }}
+	| LT IGUAL { if(!primeraPasada){pilaOperadores.push(listaOps.getOpCode("<=")); }}
+	| GT IGUAL { if(!primeraPasada){pilaOperadores.push(listaOps.getOpCode(">=")); }}
+	| IGUAL IGUAL { if(!primeraPasada){pilaOperadores.push(listaOps.getOpCode("==")); }}
+	| NE IGUAL { if(!primeraPasada){pilaOperadores.push(listaOps.getOpCode("!=")); }};
 
 logico : logicoPrima expresion { if(!pilaOperadores.empty()){
 				if(pilaOperadores.peek() == listaOps.getOpCode("AND") || pilaOperadores.peek() == listaOps.getOpCode("OR") ){
@@ -567,8 +652,8 @@ logico : logicoPrima expresion { if(!pilaOperadores.empty()){
 			      }
 	| ;
 
-logicoPrima : AND { pilaOperadores.push(listaOps.getOpCode("AND")); }
-	| OR { pilaOperadores.push(listaOps.getOpCode("OR")); } ;
+logicoPrima : AND { if(!primeraPasada){pilaOperadores.push(listaOps.getOpCode("AND")); }}
+	| OR { if(!primeraPasada){pilaOperadores.push(listaOps.getOpCode("OR")); }} ;
 
 exp : termino expPrima ;
 
@@ -576,8 +661,8 @@ expPrima
 options {backtrack=true;}: pasodos exp
 	| ;
 
-pasodos: MAS { pilaOperadores.push(listaOps.getOpCode($MAS.text)); }
-	| MENOS { pilaOperadores.push(listaOps.getOpCode($MENOS.text)); } ;
+pasodos: MAS { if(!primeraPasada){pilaOperadores.push(listaOps.getOpCode($MAS.text)); }}
+	| MENOS { if(!primeraPasada){pilaOperadores.push(listaOps.getOpCode($MENOS.text)); }} ;
 
 termino : factor terminoPrima { if(!pilaOperadores.empty()){
 				if(pilaOperadores.peek() == listaOps.getOpCode("+") || pilaOperadores.peek() == listaOps.getOpCode("-") ){
@@ -587,18 +672,18 @@ termino : factor terminoPrima { if(!pilaOperadores.empty()){
 terminoPrima : pasotres termino
 	| ;
 
-pasotres : POR { pilaOperadores.push(listaOps.getOpCode($POR.text)); }
-	| ENTRE { pilaOperadores.push(listaOps.getOpCode($ENTRE.text)); }
-	| MOD { pilaOperadores.push(listaOps.getOpCode($MOD.text)); } ;
+pasotres : POR { if(!primeraPasada){pilaOperadores.push(listaOps.getOpCode($POR.text)); }}
+	| ENTRE { if(!primeraPasada){pilaOperadores.push(listaOps.getOpCode($ENTRE.text)); }}
+	| MOD { if(!primeraPasada){pilaOperadores.push(listaOps.getOpCode($MOD.text)); }} ;
 
 factor : PARIZQ meteFondoFalso expresion PARDER sacaFondoFalso pasocinco
 	| factorPrima varcte pasocinco ;
 
-meteFondoFalso: {pilaOperadores.push(21);};
+meteFondoFalso: {if(!primeraPasada){pilaOperadores.push(21);}};
 
-sacaFondoFalso: {if (!pilaOperadores.pop().equals(21))
-					CompError.error(17, numLinea);
-				};
+sacaFondoFalso: {if(!primeraPasada){if (!pilaOperadores.pop().equals(21))
+					System.out.println(CompError.error(17, numLinea));
+				}};
 
 pasocinco: {if(!pilaOperadores.empty()){
 	     if(pilaOperadores.peek() == listaOps.getOpCode("*") || pilaOperadores.peek() == listaOps.getOpCode("/") || pilaOperadores.peek() == listaOps.getOpCode("\%")){
@@ -613,12 +698,12 @@ escritura : WRITE PARIZQ expresion escrituraPrima PARDER SEMICOLON {crearCuadrup
 escrituraPrima : MAS expresion escrituraPrima
 	| ;
 
-varcte : ID varctePrima {numLinea = $ID.getLine(); varDeclarada($ID.text); auxDireccion = getDireccion($ID.text); pilaOperandos.push(auxDireccion);}
-	| CTE_ENTERA { numLinea = $CTE_ENTERA.getLine(); auxDireccion = "c:i:"+dv[15]; dv[15]++; pilaOperandos.push(auxDireccion); cte_entera.add(Integer.parseInt($CTE_ENTERA.text)*negativa); negativa = 1; }
-	| CTE_DECIMAL { numLinea = $CTE_DECIMAL.getLine(); auxDireccion = "c:d:"+dv[16]; dv[16]++; pilaOperandos.push(auxDireccion); cte_decimal.add(Float.parseFloat($CTE_DECIMAL.text)*negativa); negativa = 1; }
-	| CTE_STRING { numLinea = $CTE_STRING.getLine(); auxDireccion = "c:s:"+dv[18]; dv[18]++; pilaOperandos.push(auxDireccion); cte_string.add($CTE_STRING.text); validarNeg(); } 
-	| CTE_CHAR { numLinea = $CTE_CHAR.getLine(); auxDireccion = "c:c:"+dv[17]; dv[17]++; pilaOperandos.push(auxDireccion); cte_char.add($CTE_CHAR.text); validarNeg(); }
-	| CTE_BOOLEAN { numLinea = $CTE_BOOLEAN.getLine(); auxDireccion = "c:b:"+dv[19]; dv[19]++; pilaOperandos.push(auxDireccion);cte_boolean.add(Boolean.parseBoolean($CTE_BOOLEAN.text)); validarNeg(); }
+varcte : ID varctePrima {if(!primeraPasada){numLinea = $ID.getLine(); varDeclarada($ID.text); auxDireccion = getDireccion($ID.text); pilaOperandos.push(auxDireccion);}}
+	| CTE_ENTERA {if(!primeraPasada){ numLinea = $CTE_ENTERA.getLine(); auxDireccion = "c:i:"+dv[15]; dv[15]++; pilaOperandos.push(auxDireccion); cte_entera.add(Integer.parseInt($CTE_ENTERA.text)*negativa); negativa = 1; }}
+	| CTE_DECIMAL {if(!primeraPasada){ numLinea = $CTE_DECIMAL.getLine(); auxDireccion = "c:d:"+dv[16]; dv[16]++; pilaOperandos.push(auxDireccion); cte_decimal.add(Float.parseFloat($CTE_DECIMAL.text)*negativa); negativa = 1; }}
+	| CTE_STRING {if(!primeraPasada){ numLinea = $CTE_STRING.getLine(); auxDireccion = "c:s:"+dv[18]; dv[18]++; pilaOperandos.push(auxDireccion); cte_string.add($CTE_STRING.text); validarNeg();}} 
+	| CTE_CHAR {if(!primeraPasada){numLinea = $CTE_CHAR.getLine(); auxDireccion = "c:c:"+dv[17]; dv[17]++; pilaOperandos.push(auxDireccion); cte_char.add($CTE_CHAR.text); validarNeg();}}
+	| CTE_BOOLEAN {if(!primeraPasada){numLinea = $CTE_BOOLEAN.getLine(); auxDireccion = "c:b:"+dv[19]; dv[19]++; pilaOperandos.push(auxDireccion);cte_boolean.add(Boolean.parseBoolean($CTE_BOOLEAN.text)); validarNeg(); }}
 	| invocacionDos ;
 
 varctePrima : CORIZQ CTE_ENTERA CORDER
@@ -629,30 +714,52 @@ ciclo : xwhile
 
 xwhile : WHILE manejaWhile PARIZQ expresion manejaIf PARDER LLAVEIZQ bloque LLAVEDER terminaWhile;
 
-manejaWhile: { pilaSaltos.push(listaCuadruplos.size()); } ;
+manejaWhile: {if(!primeraPasada){pilaSaltos.push(listaCuadruplos.size()); }} ;
 
 terminaWhile: { terminarWhile(); };
 
 
 retorno : RETURN varcte SEMICOLON ;
 
-invocacion : INVOKE ID PARIZQ paramsDos PARDER SEMICOLON ;
+invocacion : INVOKE llamadaPasoUno PARIZQ llamadaPasoDos paramsDos PARDER llamadaPasoCinco SEMICOLON ;
 
-invocacionDos : INVOKE ID PARIZQ paramsDos PARDER ;
+invocacionDos : INVOKE llamadaPasoUno PARIZQ llamadaPasoDos paramsDos PARDER llamadaPasoCinco;
 
-paramsDos : expresion paramsDosPrima 
+llamadaPasoUno: ID { if(!primeraPasada){ checaProc($ID.text); } };
+
+llamadaPasoDos: { if(!primeraPasada){ 
+			Cuadruplo era = new Cuadruplo(23);
+			era.setDv03(listaProcs.get(procIndice).getTamano());
+			k = 0;
+		} };
+
+llamadaPasoCinco: {	if(!primeraPasada){
+				int suma_k = 0;
+				if(listaProcs.get(procIndiceParams).getParams().size()!=0)
+					suma_k =1;
+				if((k+suma_k) != listaProcs.get(procIndiceParams).getParams().size())
+					System.out.println(CompError.error(555, numLinea));
+				Cuadruplo goSub = new Cuadruplo(20, listaProcs.get(procIndiceParams).getNombre(), ""+listaProcs.get(procIndiceParams).getDirInicio());
+				listaCuadruplos.add(goSub);
+			}};
+
+paramsDos : expresion llamadaPasoTres paramsDosPrima 
 	| ;
 
-paramsDosPrima : COMA expresion paramsDosPrima
+paramsDosPrima : COMA llamadaPasoCuatro expresion llamadaPasoTres paramsDosPrima
 	| ;
+
+llamadaPasoTres: { if(!primeraPasada){ crearCuadruploParametro();} };
+
+llamadaPasoCuatro: { if(!primeraPasada){ k++;} };
 
 condicion : IF PARIZQ expresion PARDER manejaIf LLAVEIZQ bloque LLAVEDER condicionPrima terminarIf ;
 
 manejaIf: { crearCuadruploIf(); };
 
-terminarIf: { int fin = pilaSaltos.pop();
+terminarIf: { if(!primeraPasada){int fin = pilaSaltos.pop();
 	      listaCuadruplos.get(fin).setDv03(listaCuadruplos.size()); /*Rellenar GoTo con contador.*/
-	    };
+	    }};
 
 condicionPrima : ELSE manejaElse LLAVEIZQ bloque LLAVEDER
 	| ;
@@ -663,31 +770,34 @@ lectura : READ PARIZQ ID PARDER SEMICOLON {numLinea = $ID.getLine(); crearCuadru
 
 xfor : FOR PARIZQ asignacionFor SEMICOLON forPasoUno expresion forPasoDos SEMICOLON forPasoTres asignacionFor forPasoCuatro PARDER LLAVEIZQ bloque forPasoCinco LLAVEDER ;
 
-forPasoUno: { pilaSaltos.push(listaCuadruplos.size()); } ;
+forPasoUno: { if(!primeraPasada){pilaSaltos.push(listaCuadruplos.size()); }} ;
 
 forPasoDos: { cuadruploForDos(); } ;
 
 forPasoTres: {pilaSaltos.push(listaCuadruplos.size()); };
 
-forPasoCuatro: 	{ 	int temp = pilaSaltos.pop();
-			Cuadruplo aRellenar = listaCuadruplos.get(pilaSaltos.pop());
-			aRellenar.setDv03(listaCuadruplos.size()+1);
+forPasoCuatro: 	{ 	if(!primeraPasada){
+				int temp = pilaSaltos.pop();
+				Cuadruplo aRellenar = listaCuadruplos.get(pilaSaltos.pop());
+				aRellenar.setDv03(listaCuadruplos.size()+1);
 
-			int temp2 = pilaSaltos.pop();
-			Cuadruplo goToFor = new Cuadruplo(17);
-			goToFor.setDv03(pilaSaltos.pop());
-			listaCuadruplos.add(goToFor);
+				int temp2 = pilaSaltos.pop();
+				Cuadruplo goToFor = new Cuadruplo(17);
+				goToFor.setDv03(pilaSaltos.pop());
+				listaCuadruplos.add(goToFor);
 	
-			pilaSaltos.push(temp2);
-			pilaSaltos.push(temp);
-		
+				pilaSaltos.push(temp2);
+				pilaSaltos.push(temp);
+			}
 		};
 
-forPasoCinco: { Cuadruplo goTo = new Cuadruplo(17);
-		goTo.setDv03(pilaSaltos.pop());
-		listaCuadruplos.add(goTo);
-		Cuadruplo aRellenar = listaCuadruplos.get(pilaSaltos.pop());
-		aRellenar.setDv03(listaCuadruplos.size());
+forPasoCinco: { if(!primeraPasada){
+			Cuadruplo goTo = new Cuadruplo(17);
+			goTo.setDv03(pilaSaltos.pop());
+			listaCuadruplos.add(goTo);
+			Cuadruplo aRellenar = listaCuadruplos.get(pilaSaltos.pop());
+			aRellenar.setDv03(listaCuadruplos.size());
+		}
 	      };
 		
 
