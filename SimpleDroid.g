@@ -64,6 +64,9 @@ tokens {
     static boolean compError = false;
     static boolean primeraPasada = true;
     static int negativa = 1; 
+    static int hola = 0;
+    static Stack<Integer> auxT = new Stack<Integer>(); //tamanos de las variables
+    static Stack<Integer> auxTD = new Stack<Integer>(); //tamanos de las variables
     /* Memoria Virtual
 	0-int, 1-decimal, 2-char, 3-string, 4-boolean
 	g: global, l: temp, t: temp, c: constante
@@ -540,16 +543,12 @@ tokens {
     public boolean arregloDos(){
 	if(!pilaOperandos.empty()){
 		arregloDir = pilaOperandos.pop();
-		String dir[] = arregloDir.split(":");
-		System.out.println(arregloDir);
-		if(listaProcs.get(procIndice).isArray(dir[2])){
-			lsuperior = listaProcs.get(procIndice).getArraySize(dir[2]);
-			System.out.println(lsuperior);
+		if(listaProcs.get(procIndice).isArray(arregloDir)){
+			lsuperior = listaProcs.get(procIndice).getArraySize(arregloDir);
 			return true;
 		}
-		if(listaProcs.get(0).isArray(dir[2])){
-			lsuperior = listaProcs.get(0).getArraySize(dir[2]);
-			System.out.println(lsuperior);
+		if(listaProcs.get(0).isArray(arregloDir)){
+			lsuperior = listaProcs.get(0).getArraySize(arregloDir);
 			return true;
 		}
 		System.out.println(CompError.error(666, numLinea));
@@ -561,8 +560,6 @@ tokens {
 	if(!pilaOperandos.empty()){
 		String exp = pilaOperandos.pop().toString();
 		if(exp.charAt(2)=='i'){
-			System.out.println("ARREGLO DIR: "+arregloDir);
-			System.out.println("EXP: "+exp);
 			Cuadruplo ver = new Cuadruplo(25, exp, ""+lsuperior);
 			listaCuadruplos.add(ver);
 			int indice = Integer.parseInt(arregloDir.substring(4)) + Integer.parseInt(exp.substring(4));
@@ -579,6 +576,7 @@ tokens {
 	}
 	return false;
     }
+    
 }
 
 
@@ -633,12 +631,13 @@ vars : tipo varsBiPrima SEMICOLON vars {numLinea = $SEMICOLON.getLine();} { inse
 
 varsBiPrima : ID varsTriPrima varsCuatriPrima { if(!primeraPasada){ identificadores.push($ID.text); } };
 
+
 varsTriPrima : IGUAL expresion { if(!primeraPasada){ tamanos.push(1);}}
 	| CORIZQ CTE_ENTERA CORDER { if(!primeraPasada){ tamanos.push(Integer.parseInt($CTE_ENTERA.text));} }
 	| { if(!primeraPasada){ tamanos.push(1);}};
 
-varsCuatriPrima : COMA varsBiPrima { if(!primeraPasada){ identificadores.push($COMA.text); } }
-	| ;
+varsCuatriPrima : COMA varsBiPrima { if(!primeraPasada){ identificadores.push($COMA.text); hola++;} }
+	| {int primer=0; int pp; boolean no =false; if(hola>0){hola++;hola++;while(hola!=0){ if(no){pp = tamanos.pop();System.out.println(pp); auxT.push(pp);}else{primer=tamanos.pop();no=true;} hola--;} while(!auxT.empty()){auxTD.push(auxT.pop());}while(!auxTD.empty()){tamanos.push(auxTD.pop());}tamanos.push(primer);}};
 
 funciones : FUNCTION funcionId PARIZQ params PARDER LLAVEIZQ vars funcionPasoSeis bloque LLAVEDER funcionPasoSiete funciones 
 	| ;
@@ -664,12 +663,14 @@ params : paramsId paramsPrima
 paramsPrima : COMA paramsId paramsPrima
 	| ;
 
-paramsId : tipo ID { 	if(primeraPasada){
-				listaProcs.get(procIndice).agregaParam($ID.text, $tipo.text);
+paramsId : tipo ID { 	if(!primeraPasada){
+				
 				identificadores.push($ID.text);
 				tamanos.push(1);
 				insertaVariable($tipo.text); 
 			}
+			else
+				listaProcs.get(procIndice).agregaParam($ID.text, $tipo.text);
 		   };
 
 bloque : estatuto bloque
@@ -692,7 +693,22 @@ asignacionId: ID {numLinea = $ID.getLine();}{ if(!primeraPasada){ arregloDir = $
 asignacionPrima : CORIZQ arrPasoDosA expresion arrPasoTresA CORDER
 	| ;
 
-arrPasoDosA: { if(!primeraPasada){ pilaOperandos.push(listaProcs.get(procIndice).buscaVar(arregloDir).getDv()); arregloDos();} };
+arrPasoDosA: { 
+		if(!primeraPasada){
+			TablaVars tv = listaProcs.get(procIndice).buscaVar(arregloDir);
+			String dv = "";
+			if(tv!=null)
+				dv = tv.getDv();
+			else{
+				tv = listaProcs.get(0).buscaVar(arregloDir);
+				if(tv!=null)
+					dv = tv.getDv();
+				else
+					CompError.error(35, numLinea, arregloDir);
+			}	
+			pilaOperandos.push(dv); 
+			arregloDos();
+		} };
 
 arrPasoTresA: { if(!primeraPasada){arregloTres();}};
 

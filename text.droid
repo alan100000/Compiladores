@@ -1,9 +1,11 @@
 int alfina, betina, b = 3;
 char metamorfosis = 'a';
 decimal beta = 22.11;
-int peeeee[5];
-int spiderman[10], wolverine[17];
+int oliver;
+int peeeee[5], spiderman[10], pewe[44], popo[18];
+int wolverine[17];
 int tope = 33;
+int profeco;
 string palabras = "\nFIN DEL PROGRAMA!";
 
 
