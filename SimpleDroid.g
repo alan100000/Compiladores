@@ -554,7 +554,7 @@ tokens {
 
     public boolean arregloTres(){
 	String exp = pilaOperandos.pop().toString();
-	Cuadruplo ver = new Cuadruplo(25, exp, lsuperior);
+	Cuadruplo ver = new Cuadruplo(25, exp, ""+lsuperior);
 	int indice = Integer.parseInt(arregloDir.substring(5)) + Integer.parseInt(exp.substring(5));
 	arregloDir = arregloDir.substring(0,4) + indice;
 	pilaOperandos.push(arregloDir);
