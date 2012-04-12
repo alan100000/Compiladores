@@ -51,22 +51,40 @@ tokens {
 }
 
 @members {
-    static Stack identificadores = new Stack();
-    static int procIndice = 0; // Indice del arreglo de procs
-    static List<Procs> listaProcs = new ArrayList<Procs>(); //se inicializa la tabla de scopes 
-    static int numLinea = 0; //numero de Linea
-    static int k = 0; //contador de parametros
-    static int arreglo = 1; //si es 1 no es arreglo, si es mayor si
-    static int lsuperior = 0; //tama;o del arreglo que se checa actualmente
-    static String arregloDir = ""; //direccion a accesar en un arreglo
-    static Stack<Integer> tamanos = new Stack<Integer>(); //tamanos de las variables
-    static int procIndiceParams = 0; //indice del proc al que estas invocando
-    static boolean compError = false;
-    static boolean primeraPasada = true;
-    static int negativa = 1; 
-    static int hola = 0;
-    static Stack<Integer> auxT = new Stack<Integer>(); //tamanos de las variables
-    static Stack<Integer> auxTD = new Stack<Integer>(); //tamanos de las variables
+    /* Manejo de Output     */
+    public static String salida;	/* String que contiene el mensaje de compilacion. Ya sea de errores o exito. */
+    /*                      */
+
+    /* Manejo de Variables  */
+    static Stack identificadores = new Stack(); 	/* Pila de IDs de las variables. */
+    /*                      */
+
+    /* Manejo de Procs      */
+    static int procIndice = 0; 					/* Indice del proc actual. */
+    static List<Procs> listaProcs = new ArrayList<Procs>(); 	/* Tabla de Procs. */ 
+    static int k = 0; 						/* Contador de parametros.*/
+    static int procIndiceParams = 0;				/* Indice del proc al que estas invocando.*/
+    /*                      */
+
+    /* Banderas especiales  */
+    static boolean compError = false; 		/* Bandera para impedir que se repitan multiples veces algunas indicaciones de error. */
+    static boolean primeraPasada = true; 	/* Bandera para indicar que se esta en la primer pasada del codigo. */
+    static int negativa = 1; 			/* Bandera para detectar que se esta usando una variable negativa y no una resta. */
+    /*                      */
+
+    /* Manejo de arreglos.  */
+    static int arreglo = 1; 					/* Guarda el tamano de un arreglo especifico. */
+    static int lsuperior = 0; 					/* Tamano del arreglo que se checa actualmente. */
+    static String arregloDir = ""; 				/* Direccion a accesar en un arreglo. */
+    static Stack<Integer> tamanos = new Stack<Integer>(); 	/* Tamanos de las variables. */
+    /*                      */
+
+    /* Manejo de declaracion de arreglos separados por comas.*/
+    static int comaCont = 0; 					/* Cantidad de variables que estan en un mismo renglon separadas por coma. */
+    static Stack<Integer> auxT = new Stack<Integer>(); 		/* Pila para revertir los tamanos de las variables en caso de separacion por comas (Paso 1). */
+    static Stack<Integer> auxTD = new Stack<Integer>(); 	/* Pila para revertir los tamanos de las variables en caso de separacion por comas (Paso 2). */
+    /*                      */
+
     /* Memoria Virtual
 	0-int, 1-decimal, 2-char, 3-string, 4-boolean
 	g: global, l: temp, t: temp, c: constante
@@ -74,29 +92,31 @@ tokens {
 	l: dv[5] - dv[9]
 	t: dv[10] - dv[14]
 	c: dv[15] - dv[19]
-    */
+    			    */
+    static int dv[] = new int[]{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; /* Contador de direcciones virtuales. */
+    /*                      */
 
     /* Listas de Constantes */
-
     static List<Integer> cte_entera = new ArrayList<Integer>();
     static List<Float> cte_decimal = new ArrayList<Float>();
     static List<String> cte_char = new ArrayList<String>();
     static List<String> cte_string = new ArrayList<String>();
     static List<Boolean> cte_boolean = new ArrayList<Boolean>();
-
     /*                      */
-    static int dv[] = new int[]{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; //contador de direcciones virtuales
-    static CuboVars cuboVars = new CuboVars();
-    static ListaOps listaOps = new ListaOps();
-    public static String salida;
+    
+    /* Manejo de Validaciones */
+    static CuboVars cuboVars = new CuboVars();		/* Cubo Semantico. */
+    static int numLinea = 0; 				/* Numero de Linea. */
+    /*                      */
 
-    // Pilas de los Cuadruplos
-    static Stack<String> pilaOperandos = new Stack<String>(); // Direcciones
-    static Stack<Integer> pilaOperadores = new Stack<Integer>(); // Codigo de Op
-    static Stack<Integer> pilaSaltos = new Stack<Integer>(); // Saltos de Cuadruplos
-    static List<Cuadruplo> listaCuadruplos = new ArrayList<Cuadruplo>(); // Aqui se guardan los cuadruplos
-    static String auxDireccion;
-    // End-Pilas
+    /* Manejo de Cuadruplos */
+    static Stack<String> pilaOperandos = new Stack<String>();			/* Direcciones, etc. */
+    static Stack<Integer> pilaOperadores = new Stack<Integer>();		/* Codigos de Operacion. */
+    static Stack<Integer> pilaSaltos = new Stack<Integer>();			/* Saltos de Cuadruplos. */
+    static List<Cuadruplo> listaCuadruplos = new ArrayList<Cuadruplo>();	/* Lista de Cuadruplos. */
+    static ListaOps listaOps = new ListaOps();					/* Para acceso al Codigo de Operacion dado el signo. */
+    static String auxDireccion;							/* Auxilia direccion. Mas que nada para los casos de pop en aux, pop, push aux. */
+    /*                      */
 
     /* Override del metodo de errores de ANTLR */
     public void displayRecognitionError(String[] tokenNames, RecognitionException e){
@@ -234,7 +254,6 @@ tokens {
         }
 
         /* Segunda pasada */
-	System.out.println("**********************************SEGUNDA VUELTA");
 	procIndice = 0;
 	lex = new SimpleDroidLexer(new ANTLRFileStream(args[0])); //se crea el lexer
         tokens = new CommonTokenStream(lex); //se crean las tokens	
@@ -317,12 +336,14 @@ tokens {
 			arreglo = tamanos.pop();
 			if(arreglo > 1){
 				listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion, arreglo);
+				rellenaCuadruplos(borrarLuego, direccion);
 				dv[dvIndice] = dv[dvIndice]+arreglo; // Aumentar el contador de la direccion virtual correspondiente
 				System.out.println("Se deposito arreglo de tamano "+arreglo+" al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion); //BORRAME
 			}
 			else{
 				//listaProcs.get(procIndice).agregaVar(identificadores.pop().toString(), tipo, direccion);
 				listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion); //BORRAME
+				rellenaCuadruplos(borrarLuego, direccion);
 				System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion); //BORRAME
 				salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion+"\n";
 				dv[dvIndice] = dv[dvIndice]+1; // Aumentar el contador de la direccion virtual correspondiente
@@ -346,6 +367,7 @@ tokens {
 					arreglo = tamanos.pop();
 					if(arreglo > 1){
 						listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion, arreglo);
+						rellenaCuadruplos(borrarLuego, direccion);
 						dv[dvIndice] = dv[dvIndice]+arreglo; // Aumentar el contador de la direccion virtual correspondiente
 						System.out.println("Se deposito arreglo de tamano "+arreglo+" al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+
 									", "+direccion); //BORRAME
@@ -353,6 +375,7 @@ tokens {
 					else{
 						//listaProcs.get(i).agregaVar(identificadores.pop().toString(), tipo, direccion);
 						listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion); //BORRAME
+						rellenaCuadruplos(borrarLuego, direccion);
 						System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion); //BORRAME
 						salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion+"\n";
 						dv[dvIndice] = dv[dvIndice]+1;
@@ -413,10 +436,23 @@ tokens {
 
     public void crearCuadruploAsignacion(String id){
 	if(!primeraPasada){
-		String direccion = getDireccion(id);
-		Cuadruplo asignacion = new Cuadruplo(listaOps.getOpCode("="), pilaOperandos.pop());
-		asignacion.setDv03(direccion);
-		listaCuadruplos.add(asignacion);
+		if(!pilaOperandos.empty()){
+			String direccion = getDireccion(id);
+			Cuadruplo asignacion = new Cuadruplo(listaOps.getOpCode("="), pilaOperandos.pop());
+			if(direccion.equals(""))
+				asignacion.setDv03(id);
+			else
+				asignacion.setDv03(direccion);
+			listaCuadruplos.add(asignacion);
+		}
+	}
+    }
+
+    public void rellenaCuadruplos(String id, String direccion){
+	for(int i = 0; i<listaCuadruplos.size(); i++){
+		if(listaCuadruplos.get(i).getDv03().equals(id)){
+			listaCuadruplos.get(i).setDv03(direccion);
+		}
 	}
     }
 
@@ -563,6 +599,7 @@ tokens {
 			Cuadruplo ver = new Cuadruplo(25, exp, ""+lsuperior);
 			listaCuadruplos.add(ver);
 			int indice = Integer.parseInt(arregloDir.substring(4)) + Integer.parseInt(exp.substring(4));
+			System.out.println("indice inicial: "+Integer.parseInt(arregloDir.substring(4)) + " indice sumar: "+Integer.parseInt(exp.substring(4))); /*GRAN FALACIA*/
 			arregloDir = arregloDir.substring(0,3) + indice;
 			pilaOperandos.push(arregloDir);
 			arregloDir = "";
@@ -629,15 +666,41 @@ funcionExec: EXECUTE { nuevoProc("main", "nothing"); };
 vars : tipo varsBiPrima SEMICOLON vars {numLinea = $SEMICOLON.getLine();} { insertaVariable($tipo.text) ;}
 	| ;
 
-varsBiPrima : ID varsTriPrima varsCuatriPrima { if(!primeraPasada){ identificadores.push($ID.text); } };
+varsBiPrima : ID varsTriPrima varsCuatriPrima { if(!primeraPasada){ identificadores.push($ID.text); crearCuadruploAsignacion($ID.text);} };
 
-
-varsTriPrima : IGUAL expresion { if(!primeraPasada){ tamanos.push(1);}}
+varsTriPrima : IGUAL expresion { if(!primeraPasada){ tamanos.push(1); }}
 	| CORIZQ CTE_ENTERA CORDER { if(!primeraPasada){ tamanos.push(Integer.parseInt($CTE_ENTERA.text));} }
 	| { if(!primeraPasada){ tamanos.push(1);}};
 
-varsCuatriPrima : COMA varsBiPrima { if(!primeraPasada){ identificadores.push($COMA.text); hola++;} }
-	| {int primer=0; int pp; boolean no =false; if(hola>0){hola++;hola++;while(hola!=0){ if(no){pp = tamanos.pop();System.out.println(pp); auxT.push(pp);}else{primer=tamanos.pop();no=true;} hola--;} while(!auxT.empty()){auxTD.push(auxT.pop());}while(!auxTD.empty()){tamanos.push(auxTD.pop());}tamanos.push(primer);}};
+varsCuatriPrima : COMA varsBiPrima { if(!primeraPasada){ identificadores.push($COMA.text); comaCont++;} }
+	| {	if(!primeraPasada){
+			int primer=0; /* Variable que auxiliara el tamano de la variable antes del listado de comas. */
+			boolean skipPrimer = false; /* Bandera para auxiliar en primer el primero de la pila. */
+			if(comaCont>0){
+				comaCont++; /* El caso de la variables antes del listado de comas, dado que esta al frente de la pila.*/
+				comaCont++; /* El caso del ultimo del listado de comas.*/
+				while(comaCont!=0){ 
+					if(skipPrimer){
+						auxT.push(tamanos.pop());
+					}
+					else{
+						primer=tamanos.pop();
+						skipPrimer=true;
+					}
+					comaCont--;
+				}
+				/* Invertir la pila. */
+				while(!auxT.empty()){
+					auxTD.push(auxT.pop());
+				}
+				while(!auxTD.empty()){
+					tamanos.push(auxTD.pop());
+				}
+				/* Regresar el primero al tope.*/
+				tamanos.push(primer);
+			}
+		}
+	 };
 
 funciones : FUNCTION funcionId PARIZQ params PARDER LLAVEIZQ vars funcionPasoSeis bloque LLAVEDER funcionPasoSiete funciones 
 	| ;
@@ -663,8 +726,7 @@ params : paramsId paramsPrima
 paramsPrima : COMA paramsId paramsPrima
 	| ;
 
-paramsId : tipo ID { 	if(!primeraPasada){
-				
+paramsId : tipo ID { 	if(!primeraPasada){				
 				identificadores.push($ID.text);
 				tamanos.push(1);
 				insertaVariable($tipo.text); 
@@ -688,7 +750,7 @@ asignacion : asignacionId asignacionPrima IGUAL expresion SEMICOLON { crearCuadr
 
 asignacionFor : asignacionId asignacionPrima IGUAL expresion { crearCuadruploAsignacion($asignacionId.text);} ;
 
-asignacionId: ID {numLinea = $ID.getLine();}{ if(!primeraPasada){ arregloDir = $ID.text; varDeclarada($ID.text); } } ;
+asignacionId: ID {numLinea = $ID.getLine(); if(!primeraPasada){ arregloDir = $ID.text; varDeclarada($ID.text); } } ;
 
 asignacionPrima : CORIZQ arrPasoDosA expresion arrPasoTresA CORDER
 	| ;
