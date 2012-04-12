@@ -29,6 +29,7 @@ public class ListaOps{
 		/*22*/listaOps.add("RET");
 		/*23*/listaOps.add("ERA");
 		/*24*/listaOps.add("PARAM");
+		/*25*/listaOps.add("VERIFICA");
 	}
 
 	public int getOpCode(String operacion){
