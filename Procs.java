@@ -93,10 +93,9 @@ public class Procs{
         TablaVars tv;
         for(int i =0; i<listaVars.size();i++){
             tv = (TablaVars)listaVars.get(i);
-            if(dv.equals(tv.getDv())){
+            if(tv.getDv().equals(dv)){
                 if(tv.getTamano()>1)
                 	return true;
-                return false;
             }
         }
         
@@ -105,10 +104,10 @@ public class Procs{
     
     public int getArraySize(String dv){
         TablaVars tv;
-        for(int i =0; i<listaVars.size();i++){
-            tv = (TablaVars)listaVars.get(i);
-            if(dv.equals(tv.getDv())){
-                return tv.getTamano();
+        for(int i = 0; i<listaVars.size();i++){
+            tv = (TablaVars) listaVars.get(i);
+            if(tv.getDv().equals(dv)){
+            	return tv.getTamano();
             }
         }
         
