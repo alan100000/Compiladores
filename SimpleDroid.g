@@ -57,6 +57,8 @@ tokens {
     static int numLinea = 0; //numero de Linea
     static int k = 0; //contador de parametros
     static int arreglo = 1; //si es 1 no es arreglo, si es mayor si
+    static int lsuperior = 0; //tama;o del arreglo que se checa actualmente
+    static String arregloDir = ""; //direccion a accesar en un arreglo
     static Stack<Integer> tamanos = new Stack<Integer>(); //tamanos de las variables
     static int procIndiceParams = 0; //indice del proc al que estas invocando
     static boolean compError = false;
@@ -313,7 +315,7 @@ tokens {
 			if(arreglo > 1){
 				listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion, arreglo);
 				dv[dvIndice] = dv[dvIndice]+arreglo; // Aumentar el contador de la direccion virtual correspondiente
-				System.out.println("Se deposito arreglo de tamano "+arreglo+"al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion); //BORRAME
+				System.out.println("Se deposito arreglo de tamano "+arreglo+" al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion); //BORRAME
 			}
 			else{
 				//listaProcs.get(procIndice).agregaVar(identificadores.pop().toString(), tipo, direccion);
@@ -326,7 +328,7 @@ tokens {
 
 
 		if(!identificadores.empty()){
-			while(identificadores.peek().toString().equals(",")){
+			while(!identificadores.empty() && identificadores.peek().toString().equals(",")){
 				identificadores.pop();
 				borrarLuego = identificadores.pop().toString(); //BORRAME
 				if(varRepetida(borrarLuego)){
@@ -342,7 +344,7 @@ tokens {
 					if(arreglo > 1){
 						listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion, arreglo);
 						dv[dvIndice] = dv[dvIndice]+arreglo; // Aumentar el contador de la direccion virtual correspondiente
-						System.out.println("Se deposito arreglo de tamano "+arreglo+"al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+
+						System.out.println("Se deposito arreglo de tamano "+arreglo+" al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+
 									", "+direccion); //BORRAME
 					}
 					else{
@@ -534,6 +536,31 @@ tokens {
 		System.out.println(CompError.error(641, numLinea));
 	negativa = 1;
     }
+
+    public boolean arregloDos(){
+	arregloDir = pilaOperandos.pop();
+	String dir[] = arregloDir.split(":");
+	if(listaProcs.get(procIndice).isArray(dir[2])){
+		lsuperior = listaProcs.get(procIndice).getArraySize(dir[2]);
+		return true;
+	}
+	if(listaProcs.get(0).isArray(dir[2])){
+		lsuperior = listaProcs.get(0).getArraySize(dir[2]);
+		return true;
+	}
+	System.out.println(CompError.error(666, numLinea));
+	return false;
+    }
+
+    public boolean arregloTres(){
+	String exp = pilaOperandos.pop().toString();
+	Cuadruplo ver = new Cuadruplo(25, exp, lsuperior);
+	int indice = Integer.parseInt(arregloDir.substring(5)) + Integer.parseInt(exp.substring(5));
+	arregloDir = arregloDir.substring(0,4) + indice;
+	pilaOperandos.push(arregloDir);
+	arregloDir = "";
+	lsuperior = 0;
+    }
 }
 
 
@@ -589,7 +616,7 @@ vars : tipo varsBiPrima SEMICOLON vars {numLinea = $SEMICOLON.getLine();} { inse
 varsBiPrima : ID varsTriPrima varsCuatriPrima { if(primeraPasada){ identificadores.push($ID.text); } };
 
 varsTriPrima : IGUAL expresion { if(primeraPasada){ tamanos.push(1);}}
-	| CORIZQ CTE_ENTERA CORDER { if(primeraPasada){ tamanos.push($CTE_ENTERA.value);} }
+	| CORIZQ CTE_ENTERA CORDER { if(primeraPasada){ tamanos.push(Integer.parseInt($CTE_ENTERA.text));} }
 	| { if(primeraPasada){ tamanos.push(1);}};
 
 varsCuatriPrima : COMA varsBiPrima { if(primeraPasada){ identificadores.push($COMA.text); } }
@@ -622,6 +649,7 @@ paramsPrima : COMA paramsId paramsPrima
 paramsId : tipo ID { 	if(primeraPasada){
 				listaProcs.get(procIndice).agregaParam($ID.text, $tipo.text);
 				identificadores.push($ID.text);
+				tamanos.push(1);
 				insertaVariable($tipo.text); 
 			}
 		   };
@@ -719,7 +747,7 @@ escritura : WRITE PARIZQ expresion escrituraPrima PARDER SEMICOLON {crearCuadrup
 escrituraPrima : MAS expresion escrituraPrima
 	| ;
 
-varcte : ID varctePrima {if(!primeraPasada){numLinea = $ID.getLine(); varDeclarada($ID.text); auxDireccion = getDireccion($ID.text); pilaOperandos.push(auxDireccion);}}
+varcte : arrPasoUno varctePrima 
 	| CTE_ENTERA {if(!primeraPasada){ numLinea = $CTE_ENTERA.getLine(); auxDireccion = "c:i:"+dv[15]; dv[15]++; pilaOperandos.push(auxDireccion); cte_entera.add(Integer.parseInt($CTE_ENTERA.text)*negativa); negativa = 1; }}
 	| CTE_DECIMAL {if(!primeraPasada){ numLinea = $CTE_DECIMAL.getLine(); auxDireccion = "c:d:"+dv[16]; dv[16]++; pilaOperandos.push(auxDireccion); cte_decimal.add(Float.parseFloat($CTE_DECIMAL.text)*negativa); negativa = 1; }}
 	| CTE_STRING {if(!primeraPasada){ numLinea = $CTE_STRING.getLine(); auxDireccion = "c:s:"+dv[18]; dv[18]++; pilaOperandos.push(auxDireccion); cte_string.add($CTE_STRING.text); validarNeg();}} 
@@ -727,8 +755,14 @@ varcte : ID varctePrima {if(!primeraPasada){numLinea = $ID.getLine(); varDeclara
 	| CTE_BOOLEAN {if(!primeraPasada){numLinea = $CTE_BOOLEAN.getLine(); auxDireccion = "c:b:"+dv[19]; dv[19]++; pilaOperandos.push(auxDireccion);cte_boolean.add(Boolean.parseBoolean($CTE_BOOLEAN.text)); validarNeg(); }}
 	| invocacionDos ;
 
-varctePrima : CORIZQ CTE_ENTERA CORDER
+arrPasoUno: ID {if(!primeraPasada){numLinea = $ID.getLine(); varDeclarada($ID.text); auxDireccion = getDireccion($ID.text); pilaOperandos.push(auxDireccion);}} ;
+
+varctePrima : CORIZQ arrPasoDos expresion arrPasoTres CORDER 
 	| ;
+
+arrPasoDos: { arregloDos(); };
+
+arrPasoTres: { arregloTres();};
 
 ciclo : xwhile
 	| xfor ;

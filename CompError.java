@@ -11,6 +11,7 @@ public class CompError{
 			case 69: toReturn = "ERROR: Condition is not a boolean expression at line " + numLinea; break; /*If/While no contiene boolean como condicion.*/
 			case 555: toReturn = "ERROR: Wrong number of paramaters at line " + numLinea; break; /* Cantidad erronea de parametros.*/
 			case 641: toReturn = "ERROR: Type mismatch at line " + numLinea; break; /* Type-mismatch: Cubo Validation */
+			case 666: toReturn = "ERROR: Variable is not an array at line " + numLinea; break;/* Variable referenciada no es un arreglo. */
 		}
 		finalError = true;
 		return toReturn;

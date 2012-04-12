@@ -3,11 +3,13 @@ char metamorfosis = 'a';
 decimal beta = 22.11;
 int peeeee[5];
 int spiderman[10], wolverine[17];
+int tope = 33;
 string palabras = "\nFIN DEL PROGRAMA!";
 
 
 function decimal mauricio(decimal paco, decimal poco, decimal elnegroklever){
 	string mauri = "el mauricio";
+	decimal pacopoco = paco + poco;
 	write(mauri);
 }
 
