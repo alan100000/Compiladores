@@ -88,6 +88,32 @@ public class Procs{
         
         return null;
     }
+    
+    public boolean isArray(String dv){
+        TablaVars tv;
+        for(int i =0; i<listaVars.size();i++){
+            tv = (TablaVars)listaVars.get(i);
+            if(var.equals(tv.getDv())){
+                if(tv.getTamano()>1)
+                	return true;
+                return false;
+            }
+        }
+        
+        return false;
+    }
+    
+    public int getArraySize(String dv){
+        TablaVars tv;
+        for(int i =0; i<listaVars.size();i++){
+            tv = (TablaVars)listaVars.get(i);
+            if(var.equals(tv.getDv())){
+                return tv.getTamano();
+            }
+        }
+        
+        return -1;
+    }
 
     public void agregaVar(String nombre, String tipo, String direccion){
         TablaVars tv = new TablaVars(nombre, tipo, direccion);
