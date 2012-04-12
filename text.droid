@@ -16,6 +16,7 @@ function decimal mauricio(decimal paco, decimal poco, decimal elnegroklever){
 function nothing hola_mundo(){
 	int pedro;
 	int holax = (3 + 25) / ( 80 + 10 );
+	spiderman[3] = 4;
 	if(true){
 		holax = 2;
 	}

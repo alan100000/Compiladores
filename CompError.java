@@ -12,6 +12,7 @@ public class CompError{
 			case 555: toReturn = "ERROR: Wrong number of paramaters at line " + numLinea; break; /* Cantidad erronea de parametros.*/
 			case 641: toReturn = "ERROR: Type mismatch at line " + numLinea; break; /* Type-mismatch: Cubo Validation */
 			case 666: toReturn = "ERROR: Variable is not an array at line " + numLinea; break;/* Variable referenciada no es un arreglo. */
+			case 667: toReturn = "ERROR: Array index must be an integer at line " + numLinea; break;/* Variable referenciada no es un arreglo. */
 		}
 		finalError = true;
 		return toReturn;
