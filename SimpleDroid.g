@@ -646,6 +646,8 @@ programa : inicializacion vars funciones main {
 				salida+="Hubo errores en la compilacion.";
 			}
 			else{
+				Cuadruplo endP = new Cuadruplo(26);
+				listaCuadruplos.add(endP); /* Agregar cuadruplo de terminacion. */
 				debugCuadruplos();
 				System.out.println("La compilacion ha sido exitosa. Bienvenido al futuro.");
 				salida += "La compilacion ha sido exitosa. Bienvenido al futuro.";
