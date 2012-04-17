@@ -8,13 +8,6 @@ int tope = 33;
 int profeco;
 string palabras = "\nFIN DEL PROGRAMA!";
 
-
-function decimal mauricio(decimal paco, decimal poco, decimal elnegroklever){
-	string mauri = "el mauricio";
-	decimal pacopoco = paco + poco;
-	write(mauri);
-}
-
 function nothing hola_mundo(){
 	int pedro;
 	int holax = (3 + 25) / ( 80 + 10 );
@@ -26,6 +19,15 @@ function nothing hola_mundo(){
 		holax = 7;
 	}
 }
+
+function decimal mauricio(decimal paco, decimal poco, decimal elnegroklever){
+	boolean deseo;
+	string mauri = "el mauricio";
+	decimal pacopoco = paco + poco;
+	write(mauri);
+}
+
+
 
 function int suma_b(int aux){
 	decimal maximiliano = 77.88889;
@@ -41,6 +43,8 @@ function int suma_b(int aux){
 }
 
 function execute(){
+	int juju;
+	int hellooooooo;
 	boolean deseo;
 	while( b < 4 ){
 		b = invoke suma_b(b);
