@@ -8,6 +8,7 @@ public class Procs{
     int[] tamano;
     List<TablaVars> params;
     List<TablaVars> listaVars;
+    String returnVar;
 
     public Procs(String nombre, String tipo){
         this.nombre = nombre;
@@ -15,6 +16,7 @@ public class Procs{
         listaVars = new ArrayList<TablaVars>();
 		params = new ArrayList<TablaVars>();
 		tamano = new int[5];
+		returnVar = "";
     }
 
     public int getCantidadParams(){
@@ -67,6 +69,14 @@ public class Procs{
 
     public void setTipo(String tipo){
 	this.tipo = tipo;
+    }
+
+	public String getReturnVar(){
+	return returnVar;
+    }
+
+    public void setReturnVar(String returnVar){
+	this.returnVar = returnVar;
     }
 
     public List<TablaVars> getListaVars(){
