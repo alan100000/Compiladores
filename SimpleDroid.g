@@ -75,10 +75,10 @@ tokens {
     /* Manejo de arreglos.  */
     static int arreglo = 1; 					/* Guarda el tamano de un arreglo especifico. */
     static int lsuperior = 0; 					/* Tamano del arreglo que se checa actualmente. */
-    static String arregloDir = ""; 				/* Direccion a accesar en un arreglo. */
+    static String arregloNom = ""; 				/* ID de un arreglo. */
     static Stack<Integer> tamanos = new Stack<Integer>(); 	/* Tamanos de las variables. */
     static boolean asignacionArreglo = false;			/* Para saber si se asignara un arreglo. */
-    static Stack<String> dirBases;				/* Pila de direcciones base, sirve en caso de anidamiento de arreglos.*/
+    static Stack<String> dirBases = new Stack<String>();				/* Pila de direcciones base, sirve en caso de anidamiento de arreglos.*/
     /*                      */
 
     /* Manejo de declaracion de arreglos separados por comas.*/
@@ -586,21 +586,24 @@ tokens {
 
     public boolean arregloDos(){
 	if(!pilaOperandos.empty()){
-		arregloDir = pilaOperandos.pop();
-		if(listaProcs.get(procIndice).isArray(arregloDir)){
-			lsuperior = listaProcs.get(procIndice).getArraySize(arregloDir);
-			return true;
-		}
-		if(listaProcs.get(0).isArray(arregloDir)){
-			lsuperior = listaProcs.get(0).getArraySize(arregloDir);
-			return true;
-		}
-		System.out.println(CompError.error(666, numLinea));
+		dirBases.push(pilaOperandos.pop());
 	}
 	return false;
     }
 
     public boolean arregloTres(){
+	/* Validar que sea arreglo*/
+	String arregloDir = dirBases.pop();
+	if(listaProcs.get(procIndice).isArray(arregloDir)){
+		lsuperior = listaProcs.get(procIndice).getArraySize(arregloDir);
+	}
+	else if(listaProcs.get(0).isArray(arregloDir)){
+		lsuperior = listaProcs.get(0).getArraySize(arregloDir);
+	}
+	else{
+		System.out.println(CompError.error(666, numLinea));
+		return false;
+	}
 	if(!pilaOperandos.empty()){
 		String exp = pilaOperandos.pop().toString();
 		if(exp.charAt(2)=='i' || exp.charAt(3)=='i'){
@@ -785,23 +788,23 @@ asignacion : asignacionId asignacionPrima IGUAL expresion SEMICOLON { crearCuadr
 
 asignacionFor : asignacionId asignacionPrima IGUAL expresion { crearCuadruploAsignacion($asignacionId.text);} ;
 
-asignacionId: ID {numLinea = $ID.getLine(); if(!primeraPasada){ arregloDir = $ID.text; varDeclarada($ID.text); } } ;
+asignacionId: ID {numLinea = $ID.getLine(); if(!primeraPasada){ arregloNom = $ID.text; varDeclarada($ID.text); } } ;
 
 asignacionPrima : CORIZQ meteFondoFalso arrPasoDosA expresion arrPasoTresA sacaFondoFalso CORDER
 	| ;
 
 arrPasoDosA: { 
 		if(!primeraPasada){
-			TablaVars tv = listaProcs.get(procIndice).buscaVar(arregloDir);
+			TablaVars tv = listaProcs.get(procIndice).buscaVar(arregloNom);
 			String dv = "";
 			if(tv!=null)
 				dv = tv.getDv();
 			else{
-				tv = listaProcs.get(0).buscaVar(arregloDir);
+				tv = listaProcs.get(0).buscaVar(arregloNom);
 				if(tv!=null)
 					dv = tv.getDv();
 				else
-					CompError.error(35, numLinea, arregloDir);
+					CompError.error(35, numLinea, arregloNom);
 			}	
 			pilaOperandos.push(dv); 
 			arregloDos();
