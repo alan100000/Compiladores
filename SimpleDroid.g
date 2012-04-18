@@ -541,6 +541,7 @@ tokens {
 	}
     }
 
+/* Metodo que clausura un ciclo while, Se encarga de llenar varios saltos y crear uno nuevo para formar el ciclo. */
     public void terminarWhile(){
 	if(!primeraPasada){
 		int falso = pilaSaltos.pop();
@@ -555,62 +556,65 @@ tokens {
 	}
     }
 
-
+/* Revisa si una variable ha sido declarada antes */
     public boolean varDeclarada(String id){
-	TablaVars var = listaProcs.get(procIndice).buscaVar(id);
+		TablaVars var = listaProcs.get(procIndice).buscaVar(id);
 
-	if(var != null)
-		return true;	
-	else{
-		var = listaProcs.get(0).buscaVar(id);
+		if(var != null)
+			return true;	
+		else{
+			var = listaProcs.get(0).buscaVar(id);
+			if(var != null)
+				return true;
+		}
+		System.out.println(CompError.error(35, numLinea, id));
+		salida += CompError.error(35, numLinea, id)+"\n";
+		return false;
+		}
+
+		public boolean varRepetida(String id){
+		TablaVars var = listaProcs.get(procIndice).buscaVar(id);
 		if(var != null)
 			return true;
-	}
-	System.out.println(CompError.error(35, numLinea, id));
-	salida += CompError.error(35, numLinea, id)+"\n";
-	return false;
-    }
-
-    public boolean varRepetida(String id){
-	TablaVars var = listaProcs.get(procIndice).buscaVar(id);
-	if(var != null)
-		return true;
-	else
-		return false;
+		else
+			return false;
     }
 
 
     public void debugCuadruplos(){
-	System.out.println("Procs: ");
-	for(int i = 0; i < listaProcs.size(); i++){
-		System.out.println(i+": "+listaProcs.get(i).debug());
-	}
+		System.out.println("Procs: ");
+		for(int i = 0; i < listaProcs.size(); i++){
+			System.out.println(i+": "+listaProcs.get(i).debug());
+		}
 
-	System.out.println("Cuadruplos: ");
-	for(int i = 0; i < listaCuadruplos.size(); i++){
-		System.out.println(i+": "+listaCuadruplos.get(i).debug());
-	}
+		System.out.println("Cuadruplos: ");
+		for(int i = 0; i < listaCuadruplos.size(); i++){
+			System.out.println(i+": "+listaCuadruplos.get(i).debug());
+		}
 
-	System.out.println("Constantes Enteras: ");
-	for(int i = 0; i < cte_entera.size(); i++){
-		System.out.println(i+": "+cte_entera.get(i));
-	}
+		System.out.println("Constantes Enteras: ");
+		for(int i = 0; i < cte_entera.size(); i++){
+			System.out.println(i+": "+cte_entera.get(i));
+		}
 
     }
 
+	/* Valida que no se le aplique un signo negativo a cualquier cosa que no sea un numero */
     public void validarNeg(){
-	if(negativa == -1 && !primeraPasada)
-		System.out.println(CompError.error(641, numLinea));
-	negativa = 1;
+		if(negativa == -1 && !primeraPasada)
+			System.out.println(CompError.error(641, numLinea));
+		negativa = 1;
     }
 
-    public boolean arregloDos(){
-	if(!pilaOperandos.empty()){
-		dirBases.push(pilaOperandos.pop());
-	}
-	return false;
+	/* Metodo que guarda la direccion base de un arreglo en una pila, esto para que en caso de tener mas de un arreglo 		en una instruccion, no se pierdan los valores de sus bases.*/
+    public void arregloDos(){
+		if(!pilaOperandos.empty())
+			dirBases.push(pilaOperandos.pop());
     }
 
+
+	/* Tercer metodo que se invoca cuando el lenguaje reconoce un arreglo, aqui se encarga de verificar que la variable 	sea un arreglo, crea el cuadruplo que verifica que el indice que se quiere accesar este contenido y genera el 	
+	cuadruplo que accesara al arreglo */
     public boolean arregloTres(){
 	/* Validar que sea arreglo*/
 	String arregloDir = dirBases.pop();
