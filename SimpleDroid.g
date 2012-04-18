@@ -75,8 +75,10 @@ tokens {
     /* Manejo de arreglos.  */
     static int arreglo = 1; 					/* Guarda el tamano de un arreglo especifico. */
     static int lsuperior = 0; 					/* Tamano del arreglo que se checa actualmente. */
-    static String arregloDir = ""; 				/* Direccion a accesar en un arreglo. */
+    static String arregloNom = ""; 				/* ID de un arreglo. */
     static Stack<Integer> tamanos = new Stack<Integer>(); 	/* Tamanos de las variables. */
+    static boolean asignacionArreglo = false;			/* Para saber si se asignara un arreglo. */
+    static Stack<String> dirBases = new Stack<String>();				/* Pila de direcciones base, sirve en caso de anidamiento de arreglos.*/
     /*                      */
 
     /* Manejo de declaracion de arreglos separados por comas.*/
@@ -116,6 +118,7 @@ tokens {
     static List<Cuadruplo> listaCuadruplos = new ArrayList<Cuadruplo>();	/* Lista de Cuadruplos. */
     static ListaOps listaOps = new ListaOps();					/* Para acceso al Codigo de Operacion dado el signo. */
     static String auxDireccion;							/* Auxilia direccion. Mas que nada para los casos de pop en aux, pop, push aux. */
+    static int mainP;								/* Auxilia indice de cuadruplo esperando el jump para saltar al main. */
     /*                      */
 
     /* Override del metodo de errores de ANTLR */
@@ -441,6 +444,11 @@ tokens {
 			Cuadruplo asignacion = new Cuadruplo(listaOps.getOpCode("="), pilaOperandos.pop());
 			if(direccion.equals(""))
 				asignacion.setDv03(id);
+			else if(asignacionArreglo){
+				if(!pilaOperandos.empty())
+					asignacion.setDv03(pilaOperandos.pop());
+				asignacionArreglo = false;
+			}
 			else
 				asignacion.setDv03(direccion);
 			listaCuadruplos.add(asignacion);
@@ -578,30 +586,44 @@ tokens {
 
     public boolean arregloDos(){
 	if(!pilaOperandos.empty()){
-		arregloDir = pilaOperandos.pop();
-		if(listaProcs.get(procIndice).isArray(arregloDir)){
-			lsuperior = listaProcs.get(procIndice).getArraySize(arregloDir);
-			return true;
-		}
-		if(listaProcs.get(0).isArray(arregloDir)){
-			lsuperior = listaProcs.get(0).getArraySize(arregloDir);
-			return true;
-		}
-		System.out.println(CompError.error(666, numLinea));
+		dirBases.push(pilaOperandos.pop());
 	}
 	return false;
     }
 
     public boolean arregloTres(){
+	/* Validar que sea arreglo*/
+	String arregloDir = dirBases.pop();
+	if(listaProcs.get(procIndice).isArray(arregloDir)){
+		lsuperior = listaProcs.get(procIndice).getArraySize(arregloDir);
+	}
+	else if(listaProcs.get(0).isArray(arregloDir)){
+		lsuperior = listaProcs.get(0).getArraySize(arregloDir);
+	}
+	else{
+		System.out.println(CompError.error(666, numLinea));
+		return false;
+	}
 	if(!pilaOperandos.empty()){
 		String exp = pilaOperandos.pop().toString();
-		if(exp.charAt(2)=='i'){
+		if(exp.charAt(2)=='i' || exp.charAt(3)=='i'){
 			Cuadruplo ver = new Cuadruplo(25, exp, ""+lsuperior);
-			listaCuadruplos.add(ver);
-			int indice = Integer.parseInt(arregloDir.substring(4)) + Integer.parseInt(exp.substring(4));
-			System.out.println("indice inicial: "+Integer.parseInt(arregloDir.substring(4)) + " indice sumar: "+Integer.parseInt(exp.substring(4))); /*GRAN FALACIA*/
-			arregloDir = arregloDir.substring(0,3) + indice;
-			pilaOperandos.push(arregloDir);
+			listaCuadruplos.add(ver);		
+			System.out.println("dir base: "+arregloDir + " indice sumar: "+exp); /*GRAN FALACIA*/
+
+			String resultado = cuboVars.verificaCubo(0, extraerTipoNumFromDir(arregloDir), extraerTipoNumFromDir(exp));
+			if(resultado.equals("int")){
+				String temp = "&t:"+resultado.charAt(0)+":"+dv[(10 + getTipoNum(resultado))]; /* El 10 debido al offset para el segmento de temporales */
+				dv[(10 + getTipoNum(resultado))]++;
+				pilaOperandos.push(temp); /* Metemos el resultado a la pila de operandos*/
+				Cuadruplo accArr = new Cuadruplo(0, arregloDir, exp, temp);
+				listaCuadruplos.add(accArr);
+			}
+			else{
+				compError = true;
+				System.out.println(CompError.error(641, numLinea));
+				salida += CompError.error(641, numLinea);
+			}
 			arregloDir = "";
 			lsuperior = 0;
 			return true;
@@ -639,7 +661,7 @@ fragment UPPERCASE : 'A'..'Z' ;
  * ANALISIS DE SINTAXIS
  *------------------------------------------------------------------*/
 
-programa : inicializacion vars funciones main {	
+programa : inicializacion vars agregaSalto funciones main {	
 		if(!primeraPasada){
 			if(CompError.finalError){
 				System.out.println("Hubo errores en la compilacion.");
@@ -655,13 +677,27 @@ programa : inicializacion vars funciones main {
 		}
 	};
 
+agregaSalto: {	if(!primeraPasada){
+			Cuadruplo salta = new Cuadruplo(17);
+			listaCuadruplos.add(salta);
+			mainP = listaCuadruplos.size()-1;
+		}
+	     };
+
 inicializacion : {if(primeraPasada){
 			Procs aux = new Procs("global", "nothing");
 		  	listaProcs.add(aux);
 		  }
 		 };
 
-main : FUNCTION funcionExec PARIZQ PARDER LLAVEIZQ vars funcionPasoSeis bloque LLAVEDER;  
+main : agregaSaltoDos FUNCTION funcionExec PARIZQ PARDER LLAVEIZQ vars funcionPasoSeis bloque LLAVEDER; 
+
+agregaSaltoDos: {if(!primeraPasada){ 
+			while(!pilaOperandos.empty()){
+				System.out.println(pilaOperandos.pop().toString());
+			}
+			listaCuadruplos.get(mainP).setDv03(""+listaCuadruplos.size());
+		}}; 
 
 funcionExec: EXECUTE { nuevoProc("main", "nothing"); };
 
@@ -752,29 +788,29 @@ asignacion : asignacionId asignacionPrima IGUAL expresion SEMICOLON { crearCuadr
 
 asignacionFor : asignacionId asignacionPrima IGUAL expresion { crearCuadruploAsignacion($asignacionId.text);} ;
 
-asignacionId: ID {numLinea = $ID.getLine(); if(!primeraPasada){ arregloDir = $ID.text; varDeclarada($ID.text); } } ;
+asignacionId: ID {numLinea = $ID.getLine(); if(!primeraPasada){ arregloNom = $ID.text; varDeclarada($ID.text); } } ;
 
-asignacionPrima : CORIZQ arrPasoDosA expresion arrPasoTresA CORDER
+asignacionPrima : CORIZQ meteFondoFalso arrPasoDosA expresion arrPasoTresA sacaFondoFalso CORDER
 	| ;
 
 arrPasoDosA: { 
 		if(!primeraPasada){
-			TablaVars tv = listaProcs.get(procIndice).buscaVar(arregloDir);
+			TablaVars tv = listaProcs.get(procIndice).buscaVar(arregloNom);
 			String dv = "";
 			if(tv!=null)
 				dv = tv.getDv();
 			else{
-				tv = listaProcs.get(0).buscaVar(arregloDir);
+				tv = listaProcs.get(0).buscaVar(arregloNom);
 				if(tv!=null)
 					dv = tv.getDv();
 				else
-					CompError.error(35, numLinea, arregloDir);
+					CompError.error(35, numLinea, arregloNom);
 			}	
 			pilaOperandos.push(dv); 
 			arregloDos();
 		} };
 
-arrPasoTresA: { if(!primeraPasada){arregloTres();}};
+arrPasoTresA: { if(!primeraPasada){asignacionArreglo = true; arregloTres();}};
 
 expresion : expresionPrima exp comparador;
 
@@ -859,7 +895,7 @@ varcte : arrPasoUno varctePrima
 
 arrPasoUno: ID {if(!primeraPasada){numLinea = $ID.getLine(); varDeclarada($ID.text); auxDireccion = getDireccion($ID.text); pilaOperandos.push(auxDireccion);}} ;
 
-varctePrima : CORIZQ arrPasoDos expresion arrPasoTres CORDER 
+varctePrima : CORIZQ meteFondoFalso arrPasoDos expresion arrPasoTres sacaFondoFalso CORDER 
 	| ;
 
 arrPasoDos: { if(!primeraPasada){arregloDos();} };
