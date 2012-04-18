@@ -121,7 +121,7 @@ tokens {
     static int mainP;								/* Auxilia indice de cuadruplo esperando el jump para saltar al main. */
     /*                      */
 
-    /* Override del metodo de errores de ANTLR */
+    /* Override del metodo de despliegue de errores de ANTLR para que se ajuste a nuestro formato de errores. */
     public void displayRecognitionError(String[] tokenNames, RecognitionException e){
 	String hdr = getErrorHeader(e);
 	String msg = getErrorMessage(e, tokenNames);
@@ -130,10 +130,12 @@ tokens {
 	CompError.finalError = true;
     }
 
+    /* Override del metodo de encabezado de errores de ANTLR para que se ajuste a nuestro formato de errores. */
     public String getErrorHeader(RecognitionException e) {             
 	return "at line "+e.line+" on character position "+e.charPositionInLine;
     }
 
+    /* Override del metodo de errores de ANTLR para que se ajuste a nuestro formato de errores. */
     public String getErrorMessage(RecognitionException e, String[] tokenNames) {
 	String msg = e.getMessage();
 	if ( e instanceof UnwantedTokenException ) {
@@ -208,17 +210,18 @@ tokens {
 	return "ERROR: "+msg;
     }
     
+    /* Regresa el String de salida que se accesara desde las Activities de Android. */
     public String getSalida(){
 	return salida;
     }
 
-    // Metodo para reiniciar los contadores de las direcciones de las variables locales.
+    /* Metodo para reiniciar los contadores de las direcciones de las variables locales. */
     public void resetLocales(){
 	for(int i = 5; i<10; i++)
 		dv[i] = 0;
     }
 
-    // Metodo para obtener el indice de dv[x]
+    /* Metodo para transformar el tipo de variable en un valor numerico con fines de indexamiento. */
     public int getTipoNum(String tipo){
 	if(tipo.equals("int") || tipo.equals("i"))
 		return 0;
@@ -233,6 +236,7 @@ tokens {
 	return -1;
     }
 
+    /* Dada una direccion se extrae el valor numerico del tipo con fines de indexamiento. */
     public int extraerTipoNumFromDir(String direccion){
 	try{
 		String subDir[] = direccion.split(":");
@@ -243,7 +247,7 @@ tokens {
 	}
     }
     
-
+    /* Metodo main: Incluye las dos pasadas. */
     public static void main(String[] args) throws Exception {
         SimpleDroidLexer lex = new SimpleDroidLexer(new ANTLRFileStream(args[0])); //se crea el lexer
         CommonTokenStream tokens = new CommonTokenStream(lex); //se crean las tokens	
@@ -269,7 +273,7 @@ tokens {
         }
     }
 
-    // Metodo para agregar un Proc, y hacer los procedimientos necesarios
+    /* Metodo para agregar un Proc, asignandole una variable global de retorno en caso de tener tipo. */
     public int nuevoProc(String nombre, String tipo){
 	if(primeraPasada){
 		for(int i = 0; i<listaProcs.size(); i++){
@@ -297,6 +301,7 @@ tokens {
 	return 1;
     }
 
+    /* Encuentra, dado el nombre de un proc, su numero de indice en la lista. */
     public int checaProc(String nombre){
 	for(int i = 0; i<listaProcs.size(); i++){
 		if(nombre.equals(listaProcs.get(i).getNombre())){
@@ -308,6 +313,7 @@ tokens {
 	return -1;	
     }
 
+    /* Dado el nombre de una variable, regresa su direccion en memoria. */
     public String getDireccion(String var){
 	TablaVars registro = listaProcs.get(procIndice).buscaVar(var);
 	if(registro!=null)
@@ -318,46 +324,47 @@ tokens {
 	return "";
     }
 
-    public boolean insertaVariable(String tipo){ //falta checar cubo y checar si es global
+    /* Metodo que se encarga de asignar una direccion en memoria a una variable e insertarla al proc correspondiente. Ademas incrementa el contador de variables de su scope y tipo correspondiente. 	
+	Tambien se encarga del manejo de variables consecutivas, separadas por coma. */
+    public boolean insertaVariable(String tipo){
 	if(!primeraPasada){
 		int i = 0;
 		int dvIndice = 0;
 		String direccion;
 
-		if(procIndice == 0){ //si es variable global el indice del scope es 0, el que representa las variables globales
+		if(procIndice == 0){ /* Si es variable global el indice del scope es 0, el que representa las variables globales. */
 			i = 0;
 			direccion = "g:";
 		}
 		else{
 			i = procIndice;
 			direccion = "l:";
-			dvIndice = 5; // dvIndice >= 5 es para variables locales
+			dvIndice = 5; /* dvIndice >= 5 es para variables locales. */
 		}
 
-		String borrarLuego = identificadores.pop().toString(); //BORRAME
-		if(varRepetida(borrarLuego)){
+		String idPop = identificadores.pop().toString();
+		if(varRepetida(idPop)){
 			System.out.println(CompError.error(36, numLinea));
 			salida += CompError.error(36, numLinea)+"\n";
 			return false;
 		}
 
-		dvIndice += getTipoNum(tipo); // Si es global es 0 y por ende solo toma el valor de getTipoNum
-		direccion = direccion + tipo.charAt(0) + ":" + dv[dvIndice]; // Armar la direccion
+		dvIndice += getTipoNum(tipo); /* Si es global es 0 y por ende solo toma el valor de getTipoNum. */
+		direccion = direccion + tipo.charAt(0) + ":" + dv[dvIndice]; /* Armar la direccion. */
 		if(!tamanos.empty()){
 			arreglo = tamanos.pop();
 			if(arreglo > 1){
-				listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion, arreglo);
-				rellenaCuadruplos(borrarLuego, direccion);
-				dv[dvIndice] = dv[dvIndice]+arreglo; // Aumentar el contador de la direccion virtual correspondiente
-				System.out.println("Se deposito arreglo de tamano "+arreglo+" al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion); //BORRAME
+				listaProcs.get(i).agregaVar(idPop, tipo, direccion, arreglo);
+				rellenaCuadruplos(idPop, direccion);
+				dv[dvIndice] = dv[dvIndice]+arreglo; /* Aumentar el contador de la direccion virtual correspondiente. */
+				System.out.println("Se deposito arreglo de tamano "+arreglo+" al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+idPop+", "+tipo+", "+direccion); //BORRAME
 			}
 			else{
-				//listaProcs.get(procIndice).agregaVar(identificadores.pop().toString(), tipo, direccion);
-				listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion); //BORRAME
-				rellenaCuadruplos(borrarLuego, direccion);
-				System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion); //BORRAME
-				salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion+"\n";
-				dv[dvIndice] = dv[dvIndice]+1; // Aumentar el contador de la direccion virtual correspondiente
+				listaProcs.get(i).agregaVar(idPop, tipo, direccion);
+				rellenaCuadruplos(idPop, direccion);
+				System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+idPop+", "+tipo+", "+direccion); //BORRAME
+				salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+idPop+", "+tipo+", "+direccion+"\n";
+				dv[dvIndice] = dv[dvIndice]+1; /* Aumentar el contador de la direccion virtual correspondiente. */
 			}
 		}
 
@@ -365,8 +372,8 @@ tokens {
 		if(!identificadores.empty()){
 			while(!identificadores.empty() && identificadores.peek().toString().equals(",")){
 				identificadores.pop();
-				borrarLuego = identificadores.pop().toString(); //BORRAME
-				if(varRepetida(borrarLuego)){
+				idPop = identificadores.pop().toString();
+				if(varRepetida(idPop)){
 					System.out.println(CompError.error(36, numLinea));
 					salida += CompError.error(36, numLinea)+"\n";
 					return false;
@@ -377,18 +384,17 @@ tokens {
 				if(!tamanos.empty()){
 					arreglo = tamanos.pop();
 					if(arreglo > 1){
-						listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion, arreglo);
-						rellenaCuadruplos(borrarLuego, direccion);
-						dv[dvIndice] = dv[dvIndice]+arreglo; // Aumentar el contador de la direccion virtual correspondiente
-						System.out.println("Se deposito arreglo de tamano "+arreglo+" al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+
-									", "+direccion); //BORRAME
+						listaProcs.get(i).agregaVar(idPop, tipo, direccion, arreglo);
+						rellenaCuadruplos(idPop, direccion);
+						dv[dvIndice] = dv[dvIndice]+arreglo; /* Aumentar el contador de la direccion virtual correspondiente. */
+						System.out.println("Se deposito arreglo de tamano "+arreglo+" al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+idPop+", "+tipo+
+									", "+direccion);
 					}
 					else{
-						//listaProcs.get(i).agregaVar(identificadores.pop().toString(), tipo, direccion);
-						listaProcs.get(i).agregaVar(borrarLuego, tipo, direccion); //BORRAME
-						rellenaCuadruplos(borrarLuego, direccion);
-						System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion); //BORRAME
-						salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+borrarLuego+", "+tipo+", "+direccion+"\n";
+						listaProcs.get(i).agregaVar(idPop, tipo, direccion);
+						rellenaCuadruplos(idPop, direccion);
+						System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+idPop+", "+tipo+", "+direccion); //BORRAME
+						salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+idPop+", "+tipo+", "+direccion+"\n";
 						dv[dvIndice] = dv[dvIndice]+1;
 					}
 				}
@@ -398,7 +404,7 @@ tokens {
 	return true;
     }
 
-    /* Generar cuadruplo de la regla de Expresion */
+    /* Generar cuadruplo de la regla de Expresion, asi como sus validaciones semanticas correspondientes (El Cubo). */
     public void crearCuadruploExpresion(){
 	if(!primeraPasada){
 		int opCode = pilaOperadores.pop();
@@ -410,11 +416,11 @@ tokens {
 			System.out.println(CompError.error(641, numLinea));
 			salida += CompError.error(641, numLinea);
 		}
-		else if(!resultado.equals("errorDos")){ /* CREACION DEL CUADRUPLO */
-			String t4 = "t:"+resultado.charAt(0)+":"+dv[(10 + getTipoNum(resultado))]; /* El 10 debido al offset para el segmento de temporales */
+		else if(!resultado.equals("errorDos")){ /* Creacion del cuadruplo. */
+			String t4 = "t:"+resultado.charAt(0)+":"+dv[(10 + getTipoNum(resultado))]; /* El 10 debido al offset para el segmento de temporales. */
 			dv[(10 + getTipoNum(resultado))]++;
 
-			pilaOperandos.push(t4); /* Metemos el resultado a la pila de operandos*/
+			pilaOperandos.push(t4); /* Metemos el resultado a la pila de operandos. */
 
 			Cuadruplo debug = new Cuadruplo(opCode, t2, t3, t4);					
 			listaCuadruplos.add(debug);
@@ -422,7 +428,7 @@ tokens {
 	}
     }
 
-    /* Generar cuadruplo de los parametros */
+    /* Generar cuadruplo de los Parametros, incluyendo sus validaciones semanticas. */
     public void crearCuadruploParametro(){
 	if(!primeraPasada){
 		try{
@@ -457,6 +463,7 @@ tokens {
 	}
     }
 
+    /* Generar cuadruplo de Asignacion ya sea de tipo estatuto o de tipo declaracion. */
     public void crearCuadruploAsignacion(String id){
 	if(!primeraPasada){
 		if(!pilaOperandos.empty()){
@@ -476,6 +483,7 @@ tokens {
 	}
     }
 
+    /* Metodo para agregar las direcciones a los cuadruplos que de asignacion que se crearon durante la declaracion de variables ya que en ese momento aun no tenian una direccion en memoria asignada. */
     public void rellenaCuadruplos(String id, String direccion){
 	for(int i = 0; i<listaCuadruplos.size(); i++){
 		if(listaCuadruplos.get(i).getDv03().equals(id)){
@@ -484,35 +492,38 @@ tokens {
 	}
     }
 
-    public void crearCuadruploIf(){ /*Y tambien el while!*/
+    /* Generar el cuadruplo de If y del While. */
+    public void crearCuadruploIf(){
 	if(!primeraPasada){
 		String resultado = pilaOperandos.pop().toString();
 
-		/* Validacion Semantica */
+		/* Validacion Semantica. */
 		if(extraerTipoNumFromDir(resultado) != 4){
 			System.out.println(CompError.error(69, numLinea));
 			salida += CompError.error(69, numLinea);
 		}
 		else{
-			Cuadruplo ifC = new Cuadruplo(19, resultado); /* GoToF Deja pendiente salto.*/
-			listaCuadruplos.add(ifC); /* Agregar cuadruplo incompleto.*/
-			pilaSaltos.push(listaCuadruplos.size() - 1); /* Almacenar direccion del cuadruplo actual para luego rellenarlo.*/
+			Cuadruplo ifC = new Cuadruplo(19, resultado); /* GoToF Deja pendiente salto. */
+			listaCuadruplos.add(ifC); /* Agregar cuadruplo incompleto. */
+			pilaSaltos.push(listaCuadruplos.size() - 1); /* Almacenar direccion del cuadruplo actual para luego rellenarlo. */
 		}
 	}
     }
 
+    /* Generar el cuadruplo en el caso de Else de los Ifs. */
     public void crearCuadruploElse(){
 	if(!primeraPasada){
-		Cuadruplo elseC = new Cuadruplo(17); /* GoTo Deja pendiente salto.*/
+		Cuadruplo elseC = new Cuadruplo(17); /* GoTo Deja pendiente salto. */
 		listaCuadruplos.add(elseC); /* Agregar cuadruplo incompleto. */
 
 		int falso = pilaSaltos.pop();
-		listaCuadruplos.get(falso).setDv03(listaCuadruplos.size()); /*Rellenar GoToF con contador.*/
+		listaCuadruplos.get(falso).setDv03(listaCuadruplos.size()); /*Rellenar GoToF con contador. */
 	
 		pilaSaltos.push(listaCuadruplos.size() - 1);	
 	}
     }
 
+    /* Generar el cuadruplo del estatuto Read. */
     public void crearCuadruploRead(String id){
 	if(!primeraPasada){
 		String direccion = getDireccion(id);
@@ -522,6 +533,7 @@ tokens {
 	}
     }
 
+    /* Generar el cuadruplo del estatuto Write. */
     public void crearCuadruploWrite(){
 	if(!primeraPasada){
 		Cuadruplo write = new Cuadruplo(15);
@@ -530,6 +542,7 @@ tokens {
 	}
     }
 
+    /* Segundo paso de la generacion de Cuadruplos en el estatuto For. Se preparan los saltos que se haran despues y se incluyen en la pila de saltos. Se encarga de checar la condicion y de saltarse el 	 primer incremento. */
     public void cuadruploForDos(){
 	if(!primeraPasada){
 		pilaSaltos.push(listaCuadruplos.size());
