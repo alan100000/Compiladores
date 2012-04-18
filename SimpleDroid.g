@@ -279,6 +279,14 @@ tokens {
 			}
 		}
 		Procs aux = new Procs(nombre, tipo);
+
+		int dvIndice = getTipoNum(tipo);
+		if(dvIndice >= 0){ /*Si no es void.*/
+			String direccion = "g:"+tipo.charAt(0)+":"+dv[dvIndice];
+			dv[dvIndice]++;
+			aux.setReturnVar(direccion);		
+		}
+
 		listaProcs.add(aux);
 		procIndice++;
 		resetLocales(); //se reinician las direcciones
@@ -396,9 +404,7 @@ tokens {
 		int opCode = pilaOperadores.pop();
 		String t3 = pilaOperandos.pop().toString();
 		String t2 = pilaOperandos.pop().toString();
-
 		String resultado = cuboVars.verificaCubo(opCode, extraerTipoNumFromDir(t2), extraerTipoNumFromDir(t3));
-
 		if(resultado.equals("error")){
 			compError = true;
 			System.out.println(CompError.error(641, numLinea));
@@ -433,6 +439,20 @@ tokens {
 		}
 		catch(IndexOutOfBoundsException e){
 			System.out.println(CompError.error(555, numLinea));
+		}
+	}
+    }
+
+    /* Generar cuadruplo de retuurn en una funcion. */
+    public void crearCuadruploReturn(){
+	if(!primeraPasada && !pilaOperandos.empty()){
+		String toReturn = pilaOperandos.pop();
+		if(extraerTipoNumFromDir(toReturn) == getTipoNum(listaProcs.get(procIndice).getTipo())){
+			Cuadruplo ret = new Cuadruplo(27, toReturn);
+			listaCuadruplos.add(ret);
+		}
+		else{
+			System.out.println(CompError.error(77, numLinea));
 		}
 	}
     }
@@ -609,7 +629,6 @@ tokens {
 		if(exp.charAt(2)=='i' || exp.charAt(3)=='i'){
 			Cuadruplo ver = new Cuadruplo(25, exp, ""+lsuperior);
 			listaCuadruplos.add(ver);		
-			System.out.println("dir base: "+arregloDir + " indice sumar: "+exp); /*GRAN FALACIA*/
 
 			String resultado = cuboVars.verificaCubo(0, extraerTipoNumFromDir(arregloDir), extraerTipoNumFromDir(exp));
 			if(resultado.equals("int")){
@@ -774,7 +793,7 @@ paramsId : tipo ID { 	if(!primeraPasada){
 		   };
 
 bloque : estatuto bloque
-	| { if(primeraPasada){ listaProcs.get(procIndice).setTamano(dv[5], dv[6], dv[7], dv[8], dv[9]); } };
+	| { if(!primeraPasada){ listaProcs.get(procIndice).setTamano(dv[5], dv[6], dv[7], dv[8], dv[9]); } };
 
 estatuto : asignacion
 	| condicion
@@ -912,17 +931,18 @@ manejaWhile: {if(!primeraPasada){pilaSaltos.push(listaCuadruplos.size()); }} ;
 terminaWhile: { terminarWhile(); };
 
 
-retorno : RETURN varcte SEMICOLON ;
+retorno : RETURN exp SEMICOLON { crearCuadruploReturn(); };
 
 invocacion : INVOKE llamadaPasoUno PARIZQ llamadaPasoDos paramsDos PARDER llamadaPasoCinco SEMICOLON ;
 
 invocacionDos : INVOKE llamadaPasoUno PARIZQ llamadaPasoDos paramsDos PARDER llamadaPasoCinco;
 
-llamadaPasoUno: ID { if(!primeraPasada){ checaProc($ID.text); } };
+llamadaPasoUno: ID { if(!primeraPasada){ numLinea = $ID.getLine(); checaProc($ID.text); } };
 
 llamadaPasoDos: { if(!primeraPasada){ 
 			Cuadruplo era = new Cuadruplo(23);
-			era.setDv03(listaProcs.get(procIndice).getTamano());
+			era.setDv03(listaProcs.get(procIndiceParams).getTamano());
+			listaCuadruplos.add(era);
 			k = 0;
 		} };
 
@@ -934,6 +954,16 @@ llamadaPasoCinco: {	if(!primeraPasada){
 					System.out.println(CompError.error(555, numLinea));
 				Cuadruplo goSub = new Cuadruplo(20, listaProcs.get(procIndiceParams).getNombre(), ""+listaProcs.get(procIndiceParams).getDirInicio());
 				listaCuadruplos.add(goSub);
+
+				if(!listaProcs.get(procIndiceParams).getTipo().equals("nothing")){
+					String resultado = listaProcs.get(procIndiceParams).getReturnVar();
+					Cuadruplo guardaRet = new Cuadruplo(13, resultado);
+					String temp = "t:"+resultado.charAt(2)+":"+dv[(10 + getTipoNum(resultado.substring(2,3)))]; /* El 10 debido al offset para el segmento de temporales */
+					dv[(10 + getTipoNum(resultado.substring(2,3)))]++;
+					guardaRet.setDv03(temp);
+					pilaOperandos.push(temp); /* Metemos el resultado a la pila de operandos*/
+					listaCuadruplos.add(guardaRet);
+				}
 			}};
 
 paramsDos : expresion llamadaPasoTres paramsDosPrima 

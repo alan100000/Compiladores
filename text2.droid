@@ -1,5 +1,7 @@
+function int hola(){ 
+	return 2;
+}
+
 function execute(){
-	int holax[10];
-	int k = 3;
-	k = holax[holax[1] + holax[2]] - holax[2];
+	int k = invoke hola() * invoke hola();	
 }
