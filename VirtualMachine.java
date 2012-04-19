@@ -522,20 +522,20 @@ public class VirtualMachine{
 				break;
 			
 			case 17:/* GoTo */
-				execPtr = Integer.parseInt(dv03);
+				execPtr = Integer.parseInt(dv03) - 1;
 				break;
 			
 			case 18:/* GoToV */
 				boolean operandoT = mem.getBooleanVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 				if(operandoT){
-					execPtr = Integer.parseInt(dv03);
+					execPtr = Integer.parseInt(dv03) - 1;
 				}
 				break;
 				
 			case 19:/*GoToF*/
 				boolean operandoF = mem.getBooleanVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 				if(!operandoF){
-					execPtr = Integer.parseInt(dv03);
+					execPtr = Integer.parseInt(dv03) - 1;
 				}
 				break;
 			
