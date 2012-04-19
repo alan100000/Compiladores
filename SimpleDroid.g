@@ -127,7 +127,7 @@ tokens {
 	String msg = getErrorMessage(e, tokenNames);
 	if(!primeraPasada)
 		emitErrorMessage(msg+" "+hdr);
-	CompError.finalError = true;
+	DroidError.finalError = true;
     }
 
     /* Override del metodo de encabezado de errores de ANTLR para que se ajuste a nuestro formato de errores. */
@@ -271,9 +271,11 @@ tokens {
         } catch (RecognitionException e)  {
             e.printStackTrace();
         }
-	System.out.println("VIRTUAL MACHINE HAS BEGUN");
-	VirtualMachine vm = new VirtualMachine(listaCuadruplos, listaProcs, dv, cte_entera, cte_decimal, cte_char, cte_string, cte_boolean);
-	vm.run();
+	if(!DroidError.finalError){
+		System.out.println("VIRTUAL MACHINE HAS BEGUN");
+		VirtualMachine vm = new VirtualMachine(listaCuadruplos, listaProcs, dv, cte_entera, cte_decimal, cte_char, cte_string, cte_boolean);
+		vm.run();
+	}
     }
 
     /* Metodo para agregar un Proc, asignandole una variable global de retorno en caso de tener tipo. */
@@ -281,7 +283,7 @@ tokens {
 	if(primeraPasada){
 		for(int i = 0; i<listaProcs.size(); i++){
 			if(nombre.equals(listaProcs.get(i).getNombre())){
-				CompError.error(37, numLinea);
+				DroidError.error(37, numLinea);
 				return -1;
 			}
 		}
@@ -312,7 +314,7 @@ tokens {
 				return 1;
 		}
 	}
-	System.out.println(CompError.error(34, numLinea, nombre));
+	System.out.println(DroidError.error(34, numLinea, nombre));
 	return -1;	
     }
 
@@ -347,8 +349,8 @@ tokens {
 
 		String idPop = identificadores.pop().toString();
 		if(varRepetida(idPop)){
-			System.out.println(CompError.error(36, numLinea));
-			salida += CompError.error(36, numLinea)+"\n";
+			System.out.println(DroidError.error(36, numLinea));
+			salida += DroidError.error(36, numLinea)+"\n";
 			return false;
 		}
 
@@ -377,8 +379,8 @@ tokens {
 				identificadores.pop();
 				idPop = identificadores.pop().toString();
 				if(varRepetida(idPop)){
-					System.out.println(CompError.error(36, numLinea));
-					salida += CompError.error(36, numLinea)+"\n";
+					System.out.println(DroidError.error(36, numLinea));
+					salida += DroidError.error(36, numLinea)+"\n";
 					return false;
 				}
 			
@@ -416,8 +418,8 @@ tokens {
 		String resultado = cuboVars.verificaCubo(opCode, extraerTipoNumFromDir(t2), extraerTipoNumFromDir(t3));
 		if(resultado.equals("error")){
 			compError = true;
-			System.out.println(CompError.error(641, numLinea));
-			salida += CompError.error(641, numLinea);
+			System.out.println(DroidError.error(641, numLinea));
+			salida += DroidError.error(641, numLinea);
 		}
 		else if(!resultado.equals("errorDos")){ /* Creacion del cuadruplo. */
 			String t4 = "t:"+resultado.charAt(0)+":"+dv[(10 + getTipoNum(resultado))]; /* El 10 debido al offset para el segmento de temporales. */
@@ -443,11 +445,11 @@ tokens {
 				Cuadruplo param = new Cuadruplo(24, t2, ""+k);
 			}
 			else{
-				System.out.println(CompError.error(68, numLinea));
+				System.out.println(DroidError.error(68, numLinea));
 			}
 		}
 		catch(IndexOutOfBoundsException e){
-			System.out.println(CompError.error(555, numLinea));
+			System.out.println(DroidError.error(555, numLinea));
 		}
 	}
     }
@@ -461,7 +463,7 @@ tokens {
 			listaCuadruplos.add(ret);
 		}
 		else{
-			System.out.println(CompError.error(77, numLinea));
+			System.out.println(DroidError.error(77, numLinea));
 		}
 	}
     }
@@ -502,8 +504,8 @@ tokens {
 
 		/* Validacion Semantica. */
 		if(extraerTipoNumFromDir(resultado) != 4){
-			System.out.println(CompError.error(69, numLinea));
-			salida += CompError.error(69, numLinea);
+			System.out.println(DroidError.error(69, numLinea));
+			salida += DroidError.error(69, numLinea);
 		}
 		else{
 			Cuadruplo ifC = new Cuadruplo(19, resultado); /* GoToF Deja pendiente salto. */
@@ -583,8 +585,8 @@ tokens {
 			if(var != null)
 				return true;
 		}
-		System.out.println(CompError.error(35, numLinea, id));
-		salida += CompError.error(35, numLinea, id)+"\n";
+		System.out.println(DroidError.error(35, numLinea, id));
+		salida += DroidError.error(35, numLinea, id)+"\n";
 		return false;
 		}
 
@@ -618,7 +620,7 @@ tokens {
     /* Valida que no se le aplique un signo negativo a cualquier cosa que no sea un numero. */
     public void validarNeg(){
 		if(negativa == -1 && !primeraPasada)
-			System.out.println(CompError.error(641, numLinea));
+			System.out.println(DroidError.error(641, numLinea));
 		negativa = 1;
     }
 
@@ -640,7 +642,7 @@ tokens {
 		lsuperior = listaProcs.get(0).getArraySize(arregloDir);
 	}
 	else{
-		System.out.println(CompError.error(666, numLinea));
+		System.out.println(DroidError.error(666, numLinea));
 		return false;
 	}
 	if(!pilaOperandos.empty()){
@@ -659,15 +661,15 @@ tokens {
 			}
 			else{
 				compError = true;
-				System.out.println(CompError.error(641, numLinea));
-				salida += CompError.error(641, numLinea);
+				System.out.println(DroidError.error(641, numLinea));
+				salida += DroidError.error(641, numLinea);
 			}
 			arregloDir = "";
 			lsuperior = 0;
 			return true;
 		}
 		else{
-			System.out.println(CompError.error(667, numLinea));
+			System.out.println(DroidError.error(667, numLinea));
 			return false;
 		}
 	}
@@ -701,7 +703,7 @@ fragment UPPERCASE : 'A'..'Z' ;
 
 programa : inicializacion vars agregaSalto funciones main {	
 		if(!primeraPasada){
-			if(CompError.finalError){
+			if(DroidError.finalError){
 				System.out.println("Hubo errores en la compilacion.");
 				salida+="Hubo errores en la compilacion.";
 			}
@@ -842,7 +844,7 @@ arrPasoDosA: {
 				if(tv!=null)
 					dv = tv.getDv();
 				else
-					CompError.error(35, numLinea, arregloNom);
+					DroidError.error(35, numLinea, arregloNom);
 			}	
 			pilaOperandos.push(dv); 
 			arregloDos();
@@ -907,7 +909,7 @@ factor : PARIZQ meteFondoFalso expresion PARDER sacaFondoFalso pasocinco
 meteFondoFalso: {if(!primeraPasada){pilaOperadores.push(21);}};
 
 sacaFondoFalso: {if(!primeraPasada){if (!pilaOperadores.pop().equals(21))
-					System.out.println(CompError.error(17, numLinea));
+					System.out.println(DroidError.error(17, numLinea));
 				}};
 
 pasocinco: {if(!pilaOperadores.empty()){
@@ -970,7 +972,7 @@ llamadaPasoCinco: {	if(!primeraPasada){
 				if(listaProcs.get(procIndiceParams).getParams().size()!=0)
 					suma_k =1;
 				if((k+suma_k) != listaProcs.get(procIndiceParams).getParams().size())
-					System.out.println(CompError.error(555, numLinea));
+					System.out.println(DroidError.error(555, numLinea));
 				Cuadruplo goSub = new Cuadruplo(20, listaProcs.get(procIndiceParams).getNombre(), ""+listaProcs.get(procIndiceParams).getDirInicio());
 				listaCuadruplos.add(goSub);
 

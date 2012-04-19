@@ -31,4 +31,13 @@ public class CompError{
 		finalError = true;
 		return toReturn;
 	}
+
+	/* Regresa el mensaje de error durante tiempo de ejecucion. */
+	public static String error(int errorCode){
+		String toReturn = "";
+		switch(errorCode){
+			case 999: toReturn = "ERROR: Mismatching type on input"; break; /* Semantica Dinamica: El tipo leido no corresponde al tipo de la variable. */
+		}
+		return toReturn;
+	}
 }
