@@ -196,4 +196,15 @@ public class Memoria{
     	
     	return false;
 	}
+	
+	public void debug(){
+		System.out.println("////////// Memoria Global ///////////");
+		global.debug();
+		System.out.println("////////// Memoria Local ///////////");
+		local.debug();
+		System.out.println("////////// Memoria Temporal ///////////");
+		temporal.debug();
+		System.out.println("////////// Memoria Constantes ///////////");
+		constantes.debug();
+	}
 }

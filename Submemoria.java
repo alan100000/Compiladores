@@ -52,4 +52,22 @@ public class Submemoria{
     public void addBoolean(int pos, boolean valor){
         booleans[pos] = valor;
     }
+    
+    public void debug(){
+    	for(int i = 0; i<integers.length; i++)
+    		System.out.println(integers[i]);
+
+		for(int i = 0; i<decimals.length; i++)
+    		System.out.println(decimals[i]);
+
+		for(int i = 0; i<chars.length; i++)
+    		System.out.println(chars[i]);
+
+		for(int i = 0; i<strings.length; i++)
+    		System.out.println(strings[i]);
+
+	    for(int i = 0; i<booleans.length; i++)
+    		System.out.println(booleans[i]);
+    		
+    }
 }

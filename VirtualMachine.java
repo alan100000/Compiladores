@@ -46,6 +46,7 @@ public class VirtualMachine{
 		for(execPtr =0; execPtr<cuadruplos.size();execPtr++){
 			interpretaCuadruplo(cuadruplos.get(execPtr));	
 		}
+		mem.debug();
 	}
 
 	public void interpretaCuadruplo(Cuadruplo cuad){
