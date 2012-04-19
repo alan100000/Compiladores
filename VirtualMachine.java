@@ -6,14 +6,19 @@ import java.io.*;
 public class VirtualMachine{
 	List<Cuadruplo> cuadruplos;
 	List<Procs> procs;
+	Stack<Era> eras;
 	Memoria mem;
 	int procIndex, execPtr;
+	int tamanos[];
+	Submemoria memoriaLocal;
 
 	public VirtualMachine(List<Cuadruplo> cuadruplos, List<Procs> procs, int[] tamanos, List<Integer> constantesEnteras, List<Float> constantesFlotantes, List<String> constantesChar, List<String> constantesString, List<Boolean> constantesBooleanas){
 		execPtr = 0;
 		procIndex = 0;
+		this.tamanos = tamanos;
 		this.cuadruplos = cuadruplos;
 		this.procs = procs;
+		eras = new Stack<Era>();
 		mem = new Memoria (tamanos);
 		inicializaConstantes(constantesEnteras, constantesFlotantes, constantesChar, constantesString, constantesBooleanas);	
 	}
@@ -44,7 +49,9 @@ public class VirtualMachine{
 	}
 /* Metodo que va recorriendo la lista de cuadruplos y manda interpretar cada uno.*/
 	public void run() throws IOException{
+		procIndex = procs.size() - 1; /* Incializamos el procIndex en el indice del Main. */
 		for(execPtr =0; execPtr<cuadruplos.size();execPtr++){
+			System.out.println("SIG A INTERPRETAR: "+cuadruplos.get(execPtr).debug());
 			interpretaCuadruplo(cuadruplos.get(execPtr));	
 		}
 		mem.debug();
@@ -596,16 +603,70 @@ public class VirtualMachine{
 				}
 				break;
 			
-			case 20:
+			case 20:/*GoToProc*/
+				for(int i = 0; i<procs.size(); i++){
+					if(procs.get(i).getNombre().equals(dv03)){
+						execPtr = procs.get(i).getDirInicio() - 1;
+						i = procs.size(); /* Sale del ciclo porque ya lo encontro. */
+					}
+				}
+				mem.local =  memoriaLocal; /* Cambio de memoria. */
 				break;
 			
-			case 22:
+			case 22:/*Ret*/
+				Era regreso = eras.pop();
+				mem.local = regreso.getSubmemoria();
+				procIndex = regreso.getProcIndex();
 				break;
 			
-			case 23:
+			case 23:/*ERA*/
+				Era registro = new Era(procIndex, mem.local);
+				eras.push(registro);
+				memoriaLocal = new Submemoria(tamanos[5], tamanos[6], tamanos[7], tamanos[8], tamanos[9]);
+				for(int i = 0; i<procs.size(); i++){
+					if(procs.get(i).getNombre().equals(dv03)){
+						procIndex = i;
+						i = procs.size(); /* Sale del ciclo porque ya lo encontro. */
+					}
+				}
 				break;
 			
-			case 24:
+			case 24:/*Param*/
+				dv03 = procs.get(procIndex).getParams().get(Integer.parseInt(dv02)).getDv();
+				if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv03)=='i'){ /*Entero = Entero*/
+					int operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+					memoriaLocal.addInt(getIndexFromDir(dv03), operando1);
+				}
+				
+				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv03)=='f'){ /*Flotante = Entero*/
+					int operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+					memoriaLocal.addDecimal(getIndexFromDir(dv03), operando1);
+				}
+				
+				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv03)=='f'){ /* Flotante = Flotante*/
+					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+					memoriaLocal.addDecimal(getIndexFromDir(dv03), operando1);
+				}
+				
+				else if(getTipoFromDir(dv01)=='c'&&getTipoFromDir(dv03)=='c'){ /* Char = Char*/
+					char operando1 = mem.getCharVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+					memoriaLocal.addChar(getIndexFromDir(dv03), operando1);
+				}
+				
+				else if(getTipoFromDir(dv01)=='c'&&getTipoFromDir(dv03)=='s'){ /* String = Char*/
+					char operando1 = mem.getCharVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+					memoriaLocal.addString(getIndexFromDir(dv03), ""+operando1);
+				}
+				
+				else if(getTipoFromDir(dv01)=='s'&&getTipoFromDir(dv03)=='s'){ /*String = String*/
+					String operando1 = mem.getStringVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+					memoriaLocal.addString(getIndexFromDir(dv03), operando1);
+				}
+
+				else if(getTipoFromDir(dv01)=='b'&&getTipoFromDir(dv03)=='b'){ /*Boolean = Boolean*/
+					boolean operando1 = mem.getBooleanVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+					memoriaLocal.addBoolean(getIndexFromDir(dv03), operando1);
+				}
 				break;
 			
 			case 25:/*Verifica*/
@@ -626,7 +687,42 @@ public class VirtualMachine{
 				}
 				break;
 			
-			case 27:
+			case 27:/*Return*/
+				dv03 = procs.get(procIndex).getReturnVar();
+				if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv03)=='i'){ /*Entero = Entero*/
+					int operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1);
+				}
+				
+				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv03)=='f'){ /*Flotante = Entero*/
+					int operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1);
+				}
+				
+				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv03)=='f'){ /* Flotante = Flotante*/
+					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1);
+				}
+				
+				else if(getTipoFromDir(dv01)=='c'&&getTipoFromDir(dv03)=='c'){ /* Char = Char*/
+					char operando1 = mem.getCharVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1);
+				}
+				
+				else if(getTipoFromDir(dv01)=='c'&&getTipoFromDir(dv03)=='s'){ /* String = Char*/
+					char operando1 = mem.getCharVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1);
+				}
+				
+				else if(getTipoFromDir(dv01)=='s'&&getTipoFromDir(dv03)=='s'){ /*String = String*/
+					String operando1 = mem.getStringVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1);
+				}
+
+				else if(getTipoFromDir(dv01)=='b'&&getTipoFromDir(dv03)=='b'){ /*Boolean = Boolean*/
+					boolean operando1 = mem.getBooleanVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1);
+				}
 				break;
 		}
 	}

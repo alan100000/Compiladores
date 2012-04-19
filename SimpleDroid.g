@@ -64,6 +64,8 @@ tokens {
     static List<Procs> listaProcs = new ArrayList<Procs>(); 	/* Tabla de Procs. */ 
     static int k = 0; 						/* Contador de parametros.*/
     static int procIndiceParams = 0;				/* Indice del proc al que estas invocando.*/
+    static boolean isParam = false;				/* Para saber si la variable que se inserta va a ser un parametro. */
+    static String paramDir;					/* Direccion de un parametro para actualizarlo en su tabla. */
     /*                      */
 
     /* Banderas especiales  */
@@ -356,6 +358,10 @@ tokens {
 
 		dvIndice += getTipoNum(tipo); /* Si es global es 0 y por ende solo toma el valor de getTipoNum. */
 		direccion = direccion + tipo.charAt(0) + ":" + dv[dvIndice]; /* Armar la direccion. */
+
+		if(isParam)
+			paramDir = direccion;
+
 		if(!tamanos.empty()){
 			arreglo = tamanos.pop();
 			if(arreglo > 1){
@@ -443,6 +449,7 @@ tokens {
 
 			if(listaProcs.get(procIndiceParams).getParams().get(k).getTipo().charAt(0) == tipo[1].charAt(0)){
 				Cuadruplo param = new Cuadruplo(24, t2, ""+k);
+				listaCuadruplos.add(param);
 			}
 			else{
 				System.out.println(DroidError.error(68, numLinea));
@@ -542,7 +549,8 @@ tokens {
     public void crearCuadruploWrite(){
 	if(!primeraPasada){
 		Cuadruplo write = new Cuadruplo(15);
-		write.setDv03(pilaOperandos.pop());
+		if(!pilaOperandos.empty())
+			write.setDv03(pilaOperandos.pop());
 		listaCuadruplos.add(write);
 	}
     }
@@ -807,7 +815,10 @@ paramsPrima : COMA paramsId paramsPrima
 paramsId : tipo ID { 	if(!primeraPasada){				
 				identificadores.push($ID.text);
 				tamanos.push(1);
-				insertaVariable($tipo.text); 
+				isParam = true;
+				insertaVariable($tipo.text);
+				listaProcs.get(procIndice).modParam($ID.text, paramDir);
+				isParam = false;
 			}
 			else
 				listaProcs.get(procIndice).agregaParam($ID.text, $tipo.text);
@@ -962,7 +973,7 @@ llamadaPasoUno: ID { if(!primeraPasada){ numLinea = $ID.getLine(); checaProc($ID
 
 llamadaPasoDos: { if(!primeraPasada){ 
 			Cuadruplo era = new Cuadruplo(23);
-			era.setDv03(listaProcs.get(procIndiceParams).getTamano());
+			era.setDv03(listaProcs.get(procIndiceParams).getNombre());
 			listaCuadruplos.add(era);
 			k = 0;
 		} };

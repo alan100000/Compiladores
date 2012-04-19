@@ -55,6 +55,15 @@ public class Procs{
 		this.params = params;
 	}
 
+    public void modParam(String nombre, String direccion){
+	for(int i = 0; i<params.size(); i++){
+		if(nombre.equals(params.get(i).getNombre())){
+			params.get(i).setDv(direccion);
+			i = params.size();
+		}
+	}
+    }
+
     public String getNombre(){
         return nombre;
     }
@@ -71,7 +80,7 @@ public class Procs{
 	this.tipo = tipo;
     }
 
-	public String getReturnVar(){
+    public String getReturnVar(){
 	return returnVar;
     }
 

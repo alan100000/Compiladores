@@ -1,7 +1,11 @@
+function nothing uno(int perico){
+	write("hey! "+perico);	
+}
+
 function execute(){
 	int k;
 	int p[10];
-	read(k);
 	write(k);
+	invoke uno(k);
 	p[0] = 2;	
 }
