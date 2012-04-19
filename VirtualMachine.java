@@ -1,6 +1,7 @@
 import java.util.Stack;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.*;
 
 public class VirtualMachine{
 	List<Cuadruplo> cuadruplos;
@@ -42,14 +43,14 @@ public class VirtualMachine{
 		}
 	}
 /* Metodo que va recorriendo la lista de cuadruplos y manda interpretar cada uno.*/
-	public void run(){
+	public void run() throws IOException{
 		for(execPtr =0; execPtr<cuadruplos.size();execPtr++){
 			interpretaCuadruplo(cuadruplos.get(execPtr));	
 		}
 		mem.debug();
 	}
 
-	public void interpretaCuadruplo(Cuadruplo cuad){
+	public void interpretaCuadruplo (Cuadruplo cuad) throws IOException{
 		String dv01 = cuad.getDv01();
 		String dv02 = cuad.getDv02();
 		String dv03 = cuad.getDv03();
@@ -518,7 +519,63 @@ public class VirtualMachine{
 				}				
 				break;
 			
-			case 16:
+			case 16:/* Read */
+				BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+				if(getTipoFromDir(dv03)=='i'){/* Lectura enteros */
+					int valorI = 0;
+					try{
+						valorI = Integer.parseInt(stdIn.readLine());
+					}
+					catch(NumberFormatException e){
+						System.out.println(DroidError.error(999));
+						System.exit(0);
+					}
+					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), valorI);
+				}
+				else if(getTipoFromDir(dv03)=='f'){/* Lectura flotante */
+					float valorD = 0;
+					try{
+						valorD = Float.parseFloat(stdIn.readLine());
+					}
+					catch(NumberFormatException e){
+						System.out.println(DroidError.error(999));
+						System.exit(0);
+					}
+					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), valorD);
+				}
+				else if(getTipoFromDir(dv03)=='c'){/* Lectura caracter */
+					char valorC = ' ';
+					try{
+						valorC = (char)stdIn.read();
+					}
+					catch(NumberFormatException e){
+						System.out.println(DroidError.error(999));
+						System.exit(0);
+					}
+					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), valorC);
+				}
+				else if(getTipoFromDir(dv03)=='s'){/* Lectura string */
+					String valorS = "";
+					try{
+						valorS = stdIn.readLine();
+					}
+					catch(NumberFormatException e){
+						System.out.println(DroidError.error(999));
+						System.exit(0);
+					}
+					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), valorS);
+				}
+				else if(getTipoFromDir(dv03)=='b'){/* Lectura booleana */
+					boolean valorB = false;
+					try{
+						valorB = Boolean.parseBoolean(stdIn.readLine());
+					}
+					catch(NumberFormatException e){
+						System.out.println(DroidError.error(999));
+						System.exit(0);
+					}
+					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), valorB);
+				}
 				break;
 			
 			case 17:/* GoTo */
