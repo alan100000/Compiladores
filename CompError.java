@@ -1,5 +1,7 @@
 public class CompError{
-	static boolean finalError = false;
+	static boolean finalError = false; /* Booleana que indica si hubo algun error durante la compilacion. */
+
+        /* Regresa el mensaje de error con todo y numero de linea. */
 	public static String error(int errorCode, int numLinea){
 		String toReturn = "";
 		switch(errorCode){
@@ -19,6 +21,7 @@ public class CompError{
 		return toReturn;
 	}
 
+	/* Regresa el mensaje de error con todo y el ID de la variable y el numero de linea. */
 	public static String error(int errorCode, int numLinea, String id){
 		String toReturn = "";
 		switch(errorCode){

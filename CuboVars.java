@@ -11,10 +11,10 @@ public class CuboVars{
                    }; 
 		
         cubo =  new String[][][] 
-                 {{{"int","decimal","error","error","error"}, //suma
-                   {"decimal","decimal","error","error","error"},
+                 {{{"int","decimal","error","string","error"}, //suma
+                   {"decimal","decimal","error","string","error"},
                    {"error","error","string","string","error"},
-                   {"error","error","string","string","error"},
+                   {"string","string","string","string","error"},
                    {"error","error","error","error","error"}},
                 
                   {{"int","decimal","error","error","error"}, //resta

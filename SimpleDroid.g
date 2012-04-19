@@ -271,6 +271,9 @@ tokens {
         } catch (RecognitionException e)  {
             e.printStackTrace();
         }
+	System.out.println("VIRTUAL MACHINE HAS BEGUN");
+	VirtualMachine vm = new VirtualMachine(listaCuadruplos, listaProcs, dv, cte_entera, cte_decimal, cte_char, cte_string, cte_boolean);
+	vm.run();
     }
 
     /* Metodo para agregar un Proc, asignandole una variable global de retorno en caso de tener tipo. */

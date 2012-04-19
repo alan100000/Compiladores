@@ -1,7 +1,7 @@
-function int hola(){ 
-	return 2;
-}
-
 function execute(){
-	int k = invoke hola() * invoke hola();	
+	int k = 50 + 50;
+	int p;
+	
+	p = k * 2;	
+	write(k);	
 }
