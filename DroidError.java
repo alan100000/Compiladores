@@ -36,7 +36,9 @@ public class DroidError{
 	public static String error(int errorCode){
 		String toReturn = "";
 		switch(errorCode){
+			case 888: toReturn = "ERROR: Array index out of bounds"; break; /* El indice del arreglo no esta dentro de las dimensiones posibles del mismo. */
 			case 999: toReturn = "ERROR: Mismatching type on input"; break; /* Semantica Dinamica: El tipo leido no corresponde al tipo de la variable. */
+			case 1000: toReturn = "ERROR: Program ended abruptly"; break; /* La ejecucion termino antes de tiempo. */
 		}
 		return toReturn;
 	}

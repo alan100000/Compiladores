@@ -608,10 +608,22 @@ public class VirtualMachine{
 			case 24:
 				break;
 			
-			case 25:
+			case 25:/*Verifica*/
+				int ver1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+				int ver2 = Integer.parseInt(dv02);
+				if(ver1 < 0 || ver1 >= ver2){
+					System.out.println(DroidError.error(888));
+					System.exit(0);
+				}
 				break;
 			
-			case 26:
+			case 26:/*End*/
+				if(execPtr >= (cuadruplos.size() - 1))
+					System.out.println("Program execution ended properly.");
+				else{
+					System.out.println(DroidError.error(1000));
+					System.exit(0);
+				}
 				break;
 			
 			case 27:

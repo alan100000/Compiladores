@@ -1,5 +1,7 @@
 function execute(){
 	int k;
+	int p[10];
 	read(k);
-	write(k);	
+	write(k);
+	p[0] = 2;	
 }
