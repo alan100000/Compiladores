@@ -1,6 +1,7 @@
 public class Era{
 	Submemoria memoria;
 	int procIndex;
+	int execPtr;
 	
 	public Era(int procIndex, Submemoria memoria, int execPtr){
 		this.procIndex = procIndex;
