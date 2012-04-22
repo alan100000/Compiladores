@@ -661,10 +661,11 @@ tokens {
 
 			String resultado = cuboVars.verificaCubo(0, extraerTipoNumFromDir(arregloDir), extraerTipoNumFromDir(exp));
 			if(resultado.equals("int")){
-				String temp = "&t:"+resultado.charAt(0)+":"+dv[(10 + getTipoNum(resultado))]; /* El 10 debido al offset para el segmento de temporales */
-				dv[(10 + getTipoNum(resultado))]++;
+				String temp = "&t:s:"+dv[13]; /* El 10 debido al offset para el segmento de temporales */
+				dv[13]++;
 				pilaOperandos.push(temp); /* Metemos el resultado a la pila de operandos*/
-				Cuadruplo accArr = new Cuadruplo(0, arregloDir, exp, temp);
+				//Cuadruplo accArr = new Cuadruplo(0, arregloDir, exp, temp);
+				Cuadruplo accArr = new Cuadruplo(28, arregloDir, exp, temp);
 				listaCuadruplos.add(accArr);
 			}
 			else{

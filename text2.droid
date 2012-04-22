@@ -3,9 +3,12 @@ function nothing uno(int perico){
 }
 
 function execute(){
-	int k;
+	int k = 4;
 	int p[10];
 	write(k);
 	invoke uno(k);
-	p[0] = 2;	
+	p[0] = 2;
+	write(p[0]);
+	p[4] = 88 + 44;
+	write(p[4]);	
 }

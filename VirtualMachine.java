@@ -51,9 +51,10 @@ public class VirtualMachine{
 	public void run() throws IOException{
 		procIndex = procs.size() - 1; /* Incializamos el procIndex en el indice del Main. */
 		for(execPtr =0; execPtr<cuadruplos.size();execPtr++){
-			System.out.println("SIG A INTERPRETAR: "+cuadruplos.get(execPtr).debug());
+			//System.out.println("SIG A INTERPRETAR: "+cuadruplos.get(execPtr).debug());
 			interpretaCuadruplo(cuadruplos.get(execPtr));	
 		}
+		System.out.println("+++++++++++++DEBUG+++++++++++++++");
 		mem.debug();
 	}
 
@@ -61,6 +62,19 @@ public class VirtualMachine{
 		String dv01 = cuad.getDv01();
 		String dv02 = cuad.getDv02();
 		String dv03 = cuad.getDv03();
+
+		if(!dv01.equals("")){
+			if(dv01.charAt(0) == '&')
+				dv01 = mem.getStringVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+		}
+		if(!dv02.equals("")){
+			if(dv02.charAt(0) == '&')
+				dv02 = mem.getStringVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
+		}
+		if(!dv03.equals("")){
+			if(dv03.charAt(0) == '&' && cuad.getCodigoOp() != 28)
+				dv03 = mem.getStringVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03));
+		}
 		
 		switch(cuad.getCodigoOp()){
 			case 0: /*Suma + */
@@ -615,12 +629,13 @@ public class VirtualMachine{
 			
 			case 22:/*Ret*/
 				Era regreso = eras.pop();
+				execPtr = regreso.getExecPtr();
 				mem.local = regreso.getSubmemoria();
 				procIndex = regreso.getProcIndex();
 				break;
 			
 			case 23:/*ERA*/
-				Era registro = new Era(procIndex, mem.local);
+				Era registro = new Era(procIndex, mem.local, execPtr);
 				eras.push(registro);
 				memoriaLocal = new Submemoria(tamanos[5], tamanos[6], tamanos[7], tamanos[8], tamanos[9]);
 				for(int i = 0; i<procs.size(); i++){
@@ -724,6 +739,13 @@ public class VirtualMachine{
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1);
 				}
 				break;
+			case 28: /*Suma-Dir + */
+				if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='i'){ /*Entero + Entero*/
+					int operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+					int operando2 = mem.getIntVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
+					int suma = operando1+operando2;
+					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), getSubmemFromDir(dv01)+":"+getTipoFromDir(dv01)+":"+suma);
+				}
 		}
 	}
 
