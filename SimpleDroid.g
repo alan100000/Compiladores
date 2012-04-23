@@ -285,7 +285,8 @@ tokens {
 	if(primeraPasada){
 		for(int i = 0; i<listaProcs.size(); i++){
 			if(nombre.equals(listaProcs.get(i).getNombre())){
-				DroidError.error(37, numLinea);
+				System.out.println(DroidError.error(37, numLinea));
+				salida+=DroidError.error(37, numLinea)+"\n";
 				return -1;
 			}
 		}
@@ -317,6 +318,7 @@ tokens {
 		}
 	}
 	System.out.println(DroidError.error(34, numLinea, nombre));
+	salida+=DroidError.error(34, numLinea, nombre)+"\n";
 	return -1;	
     }
 
@@ -374,7 +376,6 @@ tokens {
 				listaProcs.get(i).agregaVar(idPop, tipo, direccion);
 				rellenaCuadruplos(idPop, direccion);
 				System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+idPop+", "+tipo+", "+direccion); //BORRAME
-				salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+idPop+", "+tipo+", "+direccion+"\n";
 				dv[dvIndice] = dv[dvIndice]+1; /* Aumentar el contador de la direccion virtual correspondiente. */
 			}
 		}
@@ -405,7 +406,6 @@ tokens {
 						listaProcs.get(i).agregaVar(idPop, tipo, direccion);
 						rellenaCuadruplos(idPop, direccion);
 						System.out.println("Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+idPop+", "+tipo+", "+direccion); //BORRAME
-						salida += "Se deposito al proc["+i+"][\""+listaProcs.get(i).getNombre()+"\"]: "+idPop+", "+tipo+", "+direccion+"\n";
 						dv[dvIndice] = dv[dvIndice]+1;
 					}
 				}
@@ -457,6 +457,7 @@ tokens {
 		}
 		catch(IndexOutOfBoundsException e){
 			System.out.println(DroidError.error(555, numLinea));
+			salida += DroidError.error(555, numLinea) + "\n";
 		}
 	}
     }
@@ -471,6 +472,7 @@ tokens {
 		}
 		else{
 			System.out.println(DroidError.error(77, numLinea));
+			salida += DroidError.error(77, numLinea)+"\n";
 		}
 	}
     }
@@ -651,6 +653,7 @@ tokens {
 	}
 	else{
 		System.out.println(DroidError.error(666, numLinea));
+		salida += DroidError.error(666, numLinea)+"\n";
 		return false;
 	}
 	if(!pilaOperandos.empty()){
@@ -680,10 +683,51 @@ tokens {
 		}
 		else{
 			System.out.println(DroidError.error(667, numLinea));
+			salida += DroidError.error(667, numLinea)+"\n";
 			return false;
 		}
 	}
 	return false;
+    }
+
+    /* Metodo que reinicializa todas las variables estaticas. */
+    public static void reInit(){
+	salida = "";
+	identificadores = new Stack();
+	procIndice = 0; 
+	listaProcs = new ArrayList<Procs>(); 
+    	k = 0; 
+    	procIndiceParams = 0;
+    	isParam = false;
+	paramDir = "";
+        compError = false;
+    	primeraPasada = true;
+    	negativa = 1;
+    	arreglo = 1; 
+    	lsuperior = 0;
+    	arregloNom = "";
+    	tamanos = new Stack<Integer>();
+    	asignacionArreglo = false;
+    	dirBases = new Stack<String>();	
+	comaCont = 0;
+	auxT = new Stack<Integer>(); 
+	auxTD = new Stack<Integer>();
+	for(int i = 0; i < dv.length; i++)
+		dv[i] = 0;
+	cte_entera = new ArrayList<Integer>();
+	cte_decimal = new ArrayList<Float>();
+	cte_char = new ArrayList<String>();
+	cte_string = new ArrayList<String>();
+	cte_boolean = new ArrayList<Boolean>();
+	cuboVars = new CuboVars();
+	numLinea = 0;
+	pilaOperandos = new Stack<String>();
+	pilaOperadores = new Stack<Integer>();
+	pilaSaltos = new Stack<Integer>();
+	listaCuadruplos = new ArrayList<Cuadruplo>();
+	listaOps = new ListaOps();
+	auxDireccion = "";
+	mainP = 0;
     }
     
 }
@@ -856,8 +900,10 @@ arrPasoDosA: {
 				tv = listaProcs.get(0).buscaVar(arregloNom);
 				if(tv!=null)
 					dv = tv.getDv();
-				else
-					DroidError.error(35, numLinea, arregloNom);
+				else{
+					System.out.println(DroidError.error(35, numLinea, arregloNom));
+					salida += DroidError.error(35, numLinea, arregloNom)+"\n";
+				}
 			}	
 			pilaOperandos.push(dv); 
 			arregloDos();
@@ -921,8 +967,8 @@ factor : PARIZQ meteFondoFalso expresion PARDER sacaFondoFalso pasocinco
 
 meteFondoFalso: {if(!primeraPasada){pilaOperadores.push(21);}};
 
-sacaFondoFalso: {if(!primeraPasada){if (!pilaOperadores.pop().equals(21))
-					System.out.println(DroidError.error(17, numLinea));
+sacaFondoFalso: {if(!primeraPasada){if (!pilaOperadores.pop().equals(21)){
+					System.out.println(DroidError.error(17, numLinea)); salida+=DroidError.error(17, numLinea)+"\n";}
 				}};
 
 pasocinco: {if(!pilaOperadores.empty()){
@@ -985,8 +1031,10 @@ llamadaPasoCinco: {	if(!primeraPasada){
 				int suma_k = 0;
 				if(listaProcs.get(procIndiceParams).getParams().size()!=0)
 					suma_k =1;
-				if((k+suma_k) != listaProcs.get(procIndiceParams).getParams().size())
+				if((k+suma_k) != listaProcs.get(procIndiceParams).getParams().size()){
 					System.out.println(DroidError.error(555, numLinea));
+					salida += DroidError.error(555, numLinea) + "\n";
+				}
 				Cuadruplo goSub = new Cuadruplo(20, listaProcs.get(procIndiceParams).getNombre(), ""+listaProcs.get(procIndiceParams).getDirInicio());
 				listaCuadruplos.add(goSub);
 

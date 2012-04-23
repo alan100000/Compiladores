@@ -83,15 +83,27 @@ public class CompilerOutput extends Activity implements View.OnClickListener {
         b.setOnClickListener(this);
         
         /*INICIA PROCESO ANTLR*/
+        SimpleDroidParser.reInit();
         String source = NoteEditor.compiler;
         SimpleDroidLexer lexer = new SimpleDroidLexer(new ANTLRStringStream(source));
         SimpleDroidParser parser = new SimpleDroidParser(new CommonTokenStream(lexer));
         try {
         	parser.programa(); //hace el parseo
-        	mText.setText(parser.getSalida());
         }
            catch (RecognitionException e) {
              mText.setText("Oops: " + e.getMessage());
+        }
+        
+        /* Segunda pasada */
+        SimpleDroidParser.primeraPasada = false;
+    	SimpleDroidParser.procIndice = 0;
+    	lexer = new SimpleDroidLexer(new ANTLRStringStream(source));
+        parser = new SimpleDroidParser(new CommonTokenStream(lexer)); //se crea el parser
+        try {
+        	parser.programa(); //se inicia el parser en la regla <programa>
+        	mText.setText(parser.getSalida());
+        } catch (RecognitionException e)  {
+            e.printStackTrace();
         }
        	/*TERMINA PROCESO ANTLR*/
     }

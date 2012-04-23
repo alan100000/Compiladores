@@ -249,7 +249,7 @@ public class NoteEditor extends Activity {
         intent.addCategory(Intent.CATEGORY_ALTERNATIVE);
         menu.addIntentOptions(Menu.CATEGORY_ALTERNATIVE, 0, 0,
                 new ComponentName(this, NoteEditor.class), null, intent, 0, null);
-
+        compiler = mText.getText().toString();
         return super.onCreateOptionsMenu(menu);
     }
     
