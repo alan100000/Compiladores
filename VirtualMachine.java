@@ -546,7 +546,13 @@ public class VirtualMachine{
 				}
 
 				if(getTipoFromDir(dv03)=='s'){/* Imprime string */
+					String[] escape;
 					String operando = mem.getStringVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03));
+					escape = operando.split("\"");
+					operando = "";
+					for(int i = 0; i<escape.length; i++){
+						operando = operando + escape[i];
+					}
 					System.out.println(operando);
 				}
 
