@@ -20,4 +20,8 @@ public class Era{
 	public int getProcIndex(){
 		return procIndex;
 	}
+	
+	public void setExecPtr(int execPtr){
+		this.execPtr = execPtr;
+	}
 }
