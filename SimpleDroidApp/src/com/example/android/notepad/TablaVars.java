@@ -2,10 +2,27 @@ package com.example.android.notepad;
 public class TablaVars{
     String nombre;
     String tipo;
+    String dv;
+    int tamano;
 
-    public TablaVars(String nombre, String tipo){
+	public TablaVars(String nombre, String tipo){
+		this.nombre = nombre;
+		this.tipo = tipo;
+		tamano = 1;	
+	}
+
+    public TablaVars(String nombre, String tipo, String dv){
         this.nombre = nombre;
-        this.tipo = tipo;    
+        this.tipo = tipo;
+		this.dv = dv; 
+		tamano = 1;   
+    }
+    
+    public TablaVars(String nombre, String tipo, String dv, int tamano){
+        this.nombre = nombre;
+        this.tipo = tipo;
+		this.dv = dv;  
+		this.tamano = tamano;  
     }
 
     public void setNombre(String nombre){
@@ -22,5 +39,21 @@ public class TablaVars{
 
     public String getTipo(){
         return tipo;
+    }
+
+    public String getDv(){
+	return dv;
+    }
+
+    public void setDv(String dv){
+	this.dv = dv;
+    }
+    
+    public int getTamano(){
+    	return tamano;
+    }
+    
+    public void setTamano(int tamano){
+    	this.tamano = tamano;
     }
 }

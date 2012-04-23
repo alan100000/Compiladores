@@ -6,5 +6,5 @@ function execute(){
 	int k = 3;
 	int p[10];
 	k = 4 + invoke uno(k);
-	write("LA INVOCACION DA: " + invoke uno(k) + "hola!! ");	
+	write("LA INVOCACION DA: " + invoke uno(k));	
 }
