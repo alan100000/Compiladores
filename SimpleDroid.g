@@ -661,11 +661,12 @@ tokens {
 
 			String resultado = cuboVars.verificaCubo(0, extraerTipoNumFromDir(arregloDir), extraerTipoNumFromDir(exp));
 			if(resultado.equals("int")){
-				String temp = "&t:s:"+dv[13]; /* El 10 debido al offset para el segmento de temporales */
-				dv[13]++;
+				String temp = "&t:"+resultado.charAt(0)+":"+dv[(10 + getTipoNum(resultado))]; /* El 10 debido al offset para el segmento de temporales */
+				dv[(10 + getTipoNum(resultado))]++;
+				String dirOrig[] = arregloDir.split(":");
+				temp = temp + ":" + arregloDir.charAt(0)+":"+dirOrig[1];
 				pilaOperandos.push(temp); /* Metemos el resultado a la pila de operandos*/
-				//Cuadruplo accArr = new Cuadruplo(0, arregloDir, exp, temp);
-				Cuadruplo accArr = new Cuadruplo(28, arregloDir, exp, temp);
+				Cuadruplo accArr = new Cuadruplo(0, "*"+arregloDir, exp, temp);
 				listaCuadruplos.add(accArr);
 			}
 			else{
@@ -973,6 +974,7 @@ invocacionDos : INVOKE llamadaPasoUno PARIZQ llamadaPasoDos paramsDos PARDER lla
 llamadaPasoUno: ID { if(!primeraPasada){ numLinea = $ID.getLine(); checaProc($ID.text); } };
 
 llamadaPasoDos: { if(!primeraPasada){ 
+			pilaOperadores.push(21);
 			Cuadruplo era = new Cuadruplo(23);
 			era.setDv03(listaProcs.get(procIndiceParams).getNombre());
 			listaCuadruplos.add(era);
@@ -994,6 +996,8 @@ llamadaPasoCinco: {	if(!primeraPasada){
 					String temp = "t:"+resultado.charAt(2)+":"+dv[(10 + getTipoNum(resultado.substring(2,3)))]; /* El 10 debido al offset para el segmento de temporales */
 					dv[(10 + getTipoNum(resultado.substring(2,3)))]++;
 					guardaRet.setDv03(temp);
+					if(!pilaOperadores.empty())
+						pilaOperadores.pop(); /* Sacamos fondo falso. */
 					pilaOperandos.push(temp); /* Metemos el resultado a la pila de operandos*/
 					listaCuadruplos.add(guardaRet);
 				}

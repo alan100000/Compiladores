@@ -54,20 +54,25 @@ public class Submemoria{
     }
     
     public void debug(){
-    	for(int i = 0; i<integers.length; i++)
-    		System.out.println(integers[i]);
+		System.out.println("Integers");
+    		for(int i = 0; i<integers.length; i++)
+    		System.out.println(i+": "+integers[i]);
 
+		System.out.println("Decimals");
 		for(int i = 0; i<decimals.length; i++)
-    		System.out.println(decimals[i]);
+    		System.out.println(i+": "+decimals[i]);
 
+		System.out.println("Chars");
 		for(int i = 0; i<chars.length; i++)
-    		System.out.println(chars[i]);
+    		System.out.println(i+": "+chars[i]);
 
+		System.out.println("Strings");
 		for(int i = 0; i<strings.length; i++)
-    		System.out.println(strings[i]);
+    		System.out.println(i+": "+strings[i]);
 
-	    for(int i = 0; i<booleans.length; i++)
-    		System.out.println(booleans[i]);
+		System.out.println("Booleans");
+	   	for(int i = 0; i<booleans.length; i++)
+    		System.out.println(i+": "+booleans[i]);
     		
     }
 }

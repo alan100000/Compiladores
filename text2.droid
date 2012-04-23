@@ -1,14 +1,10 @@
-function nothing uno(int perico){
-	write("hey! "+perico);	
+function int uno(int perico){
+	return perico * 2;
 }
 
 function execute(){
-	int k = 4;
+	int k = 3;
 	int p[10];
-	write(k);
-	invoke uno(k);
-	p[0] = 2;
-	write(p[0]);
-	p[4] = 88 + 44;
-	write(p[4]);	
+	k = 4 + invoke uno(k);
+	write("LA INVOCACION DA: " + invoke uno(k) + "hola!! ");	
 }

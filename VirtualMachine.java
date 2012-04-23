@@ -12,6 +12,8 @@ public class VirtualMachine{
 	int tamanos[];
 	Submemoria memoriaLocal;
 
+	boolean arreglo;
+
 	public VirtualMachine(List<Cuadruplo> cuadruplos, List<Procs> procs, int[] tamanos, List<Integer> constantesEnteras, List<Float> constantesFlotantes, List<String> constantesChar, List<String> constantesString, List<Boolean> constantesBooleanas){
 		execPtr = 0;
 		procIndex = 0;
@@ -20,6 +22,7 @@ public class VirtualMachine{
 		this.procs = procs;
 		eras = new Stack<Era>();
 		mem = new Memoria (tamanos);
+		arreglo = false;
 		inicializaConstantes(constantesEnteras, constantesFlotantes, constantesChar, constantesString, constantesBooleanas);	
 	}
 
@@ -51,7 +54,7 @@ public class VirtualMachine{
 	public void run() throws IOException{
 		procIndex = procs.size() - 1; /* Incializamos el procIndex en el indice del Main. */
 		for(execPtr =0; execPtr<cuadruplos.size();execPtr++){
-			//System.out.println("SIG A INTERPRETAR: "+cuadruplos.get(execPtr).debug());
+			System.out.println("SIG A INTERPRETAR: "+cuadruplos.get(execPtr).debug());
 			interpretaCuadruplo(cuadruplos.get(execPtr));	
 		}
 		System.out.println("+++++++++++++DEBUG+++++++++++++++");
@@ -62,19 +65,32 @@ public class VirtualMachine{
 		String dv01 = cuad.getDv01();
 		String dv02 = cuad.getDv02();
 		String dv03 = cuad.getDv03();
+		String dirPointer[];
+		int pointer;
 
 		if(!dv01.equals("")){
-			if(dv01.charAt(0) == '&')
-				dv01 = mem.getStringVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+			if(dv01.charAt(0) == '&'){
+				pointer = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+				dirPointer = dv01.split(":");
+				dv01 = dirPointer[3] + ":" + dirPointer[4] + ":" + pointer;
+			}
 		}
 		if(!dv02.equals("")){
-			if(dv02.charAt(0) == '&')
-				dv02 = mem.getStringVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
+			if(dv02.charAt(0) == '&'){
+				pointer = mem.getIntVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
+				dirPointer = dv02.split(":");
+				dv02 = dirPointer[3] + ":" + dirPointer[4] + ":" + pointer;
+			}
 		}
-		if(!dv03.equals("")){
-			if(dv03.charAt(0) == '&' && cuad.getCodigoOp() != 28)
-				dv03 = mem.getStringVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03));
+		if(!dv03.equals("") && !arreglo){
+			if(dv03.charAt(0) == '&' && cuad.getCodigoOp() != 28){
+				pointer = mem.getIntVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03));
+				dirPointer = dv03.split(":");
+				dv03 = dirPointer[3] + ":" + dirPointer[4] + ":" + pointer;
+			}
 		}
+		if(arreglo)
+			arreglo = false;
 		
 		switch(cuad.getCodigoOp()){
 			case 0: /*Suma + */
@@ -618,8 +634,11 @@ public class VirtualMachine{
 				break;
 			
 			case 20:/*GoToProc*/
+				if(!eras.empty()){
+					eras.peek().setExecPtr(execPtr);
+				}
 				for(int i = 0; i<procs.size(); i++){
-					if(procs.get(i).getNombre().equals(dv03)){
+					if(procs.get(i).getNombre().equals(dv01)){
 						execPtr = procs.get(i).getDirInicio() - 1;
 						i = procs.size(); /* Sale del ciclo porque ya lo encontro. */
 					}
@@ -691,6 +710,7 @@ public class VirtualMachine{
 					System.out.println(DroidError.error(888));
 					System.exit(0);
 				}
+				arreglo = true;
 				break;
 			
 			case 26:/*End*/
@@ -739,13 +759,6 @@ public class VirtualMachine{
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1);
 				}
 				break;
-			case 28: /*Suma-Dir + */
-				if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='i'){ /*Entero + Entero*/
-					int operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
-					int operando2 = mem.getIntVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
-					int suma = operando1+operando2;
-					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), getSubmemFromDir(dv01)+":"+getTipoFromDir(dv01)+":"+suma);
-				}
 		}
 	}
 
@@ -756,8 +769,7 @@ public class VirtualMachine{
 
 	public char getSubmemFromDir(String dir){
 		String arr[] = dir.split(":");
-		if(arr[0].length() > 1){
-		//de alguna forma hay que marcar que es un ptr
+		if(arr[0].charAt(0) == '&'){
 			return arr[0].charAt(1);
 		}
 		return arr[0].charAt(0);

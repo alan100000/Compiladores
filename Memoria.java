@@ -120,6 +120,8 @@ public class Memoria{
 
     		case 'c':
     			return constantes.getInt(index);
+		case '*':
+			return index;
     	}
     	
     	return -1;

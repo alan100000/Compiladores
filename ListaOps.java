@@ -32,7 +32,6 @@ public class ListaOps{
 		/*25*/listaOps.add("VERIFICA");
 		/*26*/listaOps.add("END");
 		/*27*/listaOps.add("RETURN");
-		/*28*/listaOps.add("SUMA-DIR");
 	}
 
 	public int getOpCode(String operacion){
