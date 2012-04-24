@@ -768,6 +768,7 @@ programa : inicializacion vars agregaSalto funciones main {
 				System.out.println("La compilacion ha sido exitosa. Bienvenido al futuro.");
 				salida += "La compilacion ha sido exitosa. Bienvenido al futuro.";
 			}
+			compError = DroidError.finalError;
 		}
 	};
 

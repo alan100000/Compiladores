@@ -22,6 +22,7 @@ import org.antlr.runtime.RecognitionException;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -79,8 +80,7 @@ public class CompilerOutput extends Activity implements View.OnClickListener {
         mText = (TextView) this.findViewById(R.id.compilerOutput);
         //mText.setOnClickListener(this);
         
-        Button b = (Button) findViewById(R.id.ok);
-        b.setOnClickListener(this);
+        
         
         /*INICIA PROCESO ANTLR*/
         SimpleDroidParser.reInit();
@@ -106,6 +106,20 @@ public class CompilerOutput extends Activity implements View.OnClickListener {
             e.printStackTrace();
         }
        	/*TERMINA PROCESO ANTLR*/
+        
+        Button b = (Button) findViewById(R.id.ok);
+        if(!SimpleDroidParser.compError){	
+	        b.setOnClickListener(new View.OnClickListener() {
+	            public void onClick(View view) {
+	                Intent myIntent = new Intent(view.getContext(), VirtualMachineOutput.class);
+	                startActivityForResult(myIntent, 0);
+	            }
+	
+	        });
+        }
+        else{
+        	b.setOnClickListener(this);
+        }
     }
 
     @Override

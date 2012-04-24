@@ -21,16 +21,17 @@ public final class R {
         public static final int live_folder_notes=0x7f020007;
     }
     public static final class id {
+        public static final int Button02=0x7f060004;
         public static final int compilerOutput=0x7f060000;
-        public static final int context_delete=0x7f06000b;
-        public static final int context_open=0x7f06000a;
-        public static final int menu_add=0x7f06000c;
-        public static final int menu_delete=0x7f060007;
-        public static final int menu_discard=0x7f060009;
-        public static final int menu_group_edit=0x7f060005;
-        public static final int menu_group_insert=0x7f060008;
-        public static final int menu_revert=0x7f060006;
-        public static final int menu_save=0x7f060004;
+        public static final int context_delete=0x7f06000c;
+        public static final int context_open=0x7f06000b;
+        public static final int menu_add=0x7f06000d;
+        public static final int menu_delete=0x7f060008;
+        public static final int menu_discard=0x7f06000a;
+        public static final int menu_group_edit=0x7f060006;
+        public static final int menu_group_insert=0x7f060009;
+        public static final int menu_revert=0x7f060007;
+        public static final int menu_save=0x7f060005;
         public static final int note=0x7f060002;
         public static final int ok=0x7f060001;
         public static final int title=0x7f060003;
@@ -40,6 +41,7 @@ public final class R {
         public static final int note_editor=0x7f030001;
         public static final int noteslist_item=0x7f030002;
         public static final int title_editor=0x7f030003;
+        public static final int virtual_machine_output=0x7f030004;
     }
     public static final class menu {
         public static final int editor_options_menu=0x7f050000;
