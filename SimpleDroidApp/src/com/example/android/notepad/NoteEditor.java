@@ -249,6 +249,7 @@ public class NoteEditor extends Activity {
         intent.addCategory(Intent.CATEGORY_ALTERNATIVE);
         menu.addIntentOptions(Menu.CATEGORY_ALTERNATIVE, 0, 0,
                 new ComponentName(this, NoteEditor.class), null, intent, 0, null);
+        saveNote();
         compiler = mText.getText().toString();
         return super.onCreateOptionsMenu(menu);
     }
@@ -284,7 +285,7 @@ public class NoteEditor extends Activity {
         	compiler = "";
         	compiler = mText.getText().toString();
             saveNote();
-            finish();
+            //finish();
             break;
         case R.id.menu_delete:
             deleteNote();
@@ -316,7 +317,7 @@ public class NoteEditor extends Activity {
         
     }
     
-    private final void saveNote() {
+    public final void saveNote() {
         // Make sure their current
         // changes are safely saved away in the provider.  We don't need
         // to do this if only editing.

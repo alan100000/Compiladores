@@ -74,6 +74,7 @@ public class CompilerOutput extends Activity implements View.OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        
         setContentView(R.layout.compiler_output);
 
         // Set up click handlers for the text field and button
@@ -87,6 +88,8 @@ public class CompilerOutput extends Activity implements View.OnClickListener {
         String source = NoteEditor.compiler;
         SimpleDroidLexer lexer = new SimpleDroidLexer(new ANTLRStringStream(source));
         SimpleDroidParser parser = new SimpleDroidParser(new CommonTokenStream(lexer));
+        SimpleDroidParser.compError = false;
+        DroidError.finalError = false;
         try {
         	parser.programa(); //hace el parseo
         }
@@ -109,9 +112,10 @@ public class CompilerOutput extends Activity implements View.OnClickListener {
         
         Button b = (Button) findViewById(R.id.ok);
         if(!SimpleDroidParser.compError){	
+        	b.setText("Run");
         	/* Pasamos la maquina virtual.*/
         	MyApp appState = ((MyApp)getApplicationContext());
-            appState.setVM(SimpleDroidParser.vm);
+            appState.initializeVM(SimpleDroidParser.listaCuadruplos, SimpleDroidParser.listaProcs, SimpleDroidParser.dv, SimpleDroidParser.cte_entera, SimpleDroidParser.cte_decimal, SimpleDroidParser.cte_char, SimpleDroidParser.cte_string, SimpleDroidParser.cte_boolean);
             /* Migracion de actividad. */
 	        b.setOnClickListener(new View.OnClickListener() {
 	            public void onClick(View view) {
@@ -122,6 +126,7 @@ public class CompilerOutput extends Activity implements View.OnClickListener {
 	        });
         }
         else{
+        	b.setText("Go Back");
         	b.setOnClickListener(this);
         }
     }
