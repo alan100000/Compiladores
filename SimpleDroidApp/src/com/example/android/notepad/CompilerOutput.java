@@ -109,6 +109,10 @@ public class CompilerOutput extends Activity implements View.OnClickListener {
         
         Button b = (Button) findViewById(R.id.ok);
         if(!SimpleDroidParser.compError){	
+        	/* Pasamos la maquina virtual.*/
+        	MyApp appState = ((MyApp)getApplicationContext());
+            appState.setVM(SimpleDroidParser.vm);
+            /* Migracion de actividad. */
 	        b.setOnClickListener(new View.OnClickListener() {
 	            public void onClick(View view) {
 	                Intent myIntent = new Intent(view.getContext(), VirtualMachineOutput.class);

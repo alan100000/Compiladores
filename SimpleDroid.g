@@ -53,6 +53,7 @@ tokens {
 @members {
     /* Manejo de Output     */
     public static String salida;	/* String que contiene el mensaje de compilacion. Ya sea de errores o exito. */
+    public static VirtualMachine vm;	/* Maquina Virtual. */
     /*                      */
 
     /* Manejo de Variables  */
@@ -275,8 +276,8 @@ tokens {
         }
 	if(!DroidError.finalError){
 		System.out.println("VIRTUAL MACHINE HAS BEGUN");
-		VirtualMachine vm = new VirtualMachine(listaCuadruplos, listaProcs, dv, cte_entera, cte_decimal, cte_char, cte_string, cte_boolean);
-		vm.run();
+		VirtualMachine virtualMachine = new VirtualMachine(listaCuadruplos, listaProcs, dv, cte_entera, cte_decimal, cte_char, cte_string, cte_boolean);
+		virtualMachine.run();
 	}
     }
 
@@ -769,6 +770,9 @@ programa : inicializacion vars agregaSalto funciones main {
 				salida += "La compilacion ha sido exitosa. Bienvenido al futuro.";
 			}
 			compError = DroidError.finalError;
+			if(!DroidError.finalError){
+				vm = new VirtualMachine(listaCuadruplos, listaProcs, dv, cte_entera, cte_decimal, cte_char, cte_string, cte_boolean);
+			}
 		}
 	};
 

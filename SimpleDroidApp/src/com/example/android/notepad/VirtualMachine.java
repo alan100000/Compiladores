@@ -14,6 +14,8 @@ public class VirtualMachine{
 	Submemoria memoriaLocal;
 
 	boolean arreglo;
+	
+	public String temporal; /* Para propositos de testing. */
 
 	public VirtualMachine(List<Cuadruplo> cuadruplos, List<Procs> procs, int[] tamanos, List<Integer> constantesEnteras, List<Float> constantesFlotantes, List<String> constantesChar, List<String> constantesString, List<Boolean> constantesBooleanas){
 		execPtr = 0;
@@ -53,6 +55,7 @@ public class VirtualMachine{
 	}
 /* Metodo que va recorriendo la lista de cuadruplos y manda interpretar cada uno.*/
 	public void run() throws IOException{
+		temporal = "";
 		procIndex = procs.size() - 1; /* Incializamos el procIndex en el indice del Main. */
 		for(execPtr =0; execPtr<cuadruplos.size();execPtr++){
 			System.out.println("SIG A INTERPRETAR: "+cuadruplos.get(execPtr).debug());
@@ -534,16 +537,19 @@ public class VirtualMachine{
 				if(getTipoFromDir(dv03)=='i'){/*Imprime entero*/
 					int operando = mem.getIntVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03));
 					System.out.println(operando);
+					temporal += temporal + operando + "\n"; //DEBUG
 				}
 
 				if(getTipoFromDir(dv03)=='d'){/* Imprime decimal */
 					float operando = mem.getDecimalVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03));
 					System.out.println(operando);
+					temporal += temporal + operando + "\n"; //DEBUG
 				}
 
 				if(getTipoFromDir(dv03)=='c'){/* Imprime caracter */
 					char operando = mem.getCharVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03));
 					System.out.println(operando);
+					temporal += temporal + operando + "\n"; //DEBUG
 				}
 
 				if(getTipoFromDir(dv03)=='s'){/* Imprime string */
@@ -555,11 +561,13 @@ public class VirtualMachine{
 						operando = operando + escape[i];
 					}
 					System.out.println(operando);
+					temporal += temporal + operando + "\n"; //DEBUG
 				}
 
 				if(getTipoFromDir(dv03)=='b'){/* Imprime boolean */
 					boolean operando = mem.getBooleanVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03));
 					System.out.println(operando);
+					temporal += temporal + operando + "\n"; //DEBUG
 				}				
 				break;
 			
@@ -721,10 +729,13 @@ public class VirtualMachine{
 				break;
 			
 			case 26:/*End*/
-				if(execPtr >= (cuadruplos.size() - 1))
+				if(execPtr >= (cuadruplos.size() - 1)){
 					System.out.println("Program execution ended properly.");
+					temporal += temporal + "Program execution ended properly." + "\n"; //DEBUG
+				}
 				else{
 					System.out.println(DroidError.error(1000));
+					temporal += temporal + DroidError.error(1000) + "\n"; //DEBUG
 					System.exit(0);
 				}
 				break;

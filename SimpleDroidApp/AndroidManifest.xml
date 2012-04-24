@@ -22,7 +22,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.android.notepad" >
 
-    <application android:icon="@drawable/app_notes"
+    <application android:name=".MyApp"
+        android:icon="@drawable/app_notes"
         android:label="@string/app_name" >
         <provider android:name="NotePadProvider"
             android:authorities="com.example.notepad.provider.NotePad" />
