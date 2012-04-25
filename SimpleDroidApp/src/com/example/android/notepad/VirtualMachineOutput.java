@@ -37,6 +37,7 @@ public class VirtualMachineOutput extends Activity {
 	
 	    // TODO Auto-generated method stub
 	    setContentView(R.layout.virtual_machine_output);
+	    
 	    // Set up click handlers for the text field and button
         mText = (TextView) this.findViewById(R.id.virtualMachineOutput);
         mText.setText(""); /* Reinicializamos texto. */
