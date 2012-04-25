@@ -14,6 +14,15 @@ public class MyApp extends Application {
 	  List<String> constantesChar;
 	  List<String> constantesString;
 	  List<Boolean> constantesBooleanas;
+	  String readMe;
+	  
+	  public void setReadMe(String readMe){
+		  this.readMe = readMe;
+	  }
+	  
+	  public String getReadMe(){
+		  return readMe;
+	  }
 	  
 	  private VirtualMachine vm;
 

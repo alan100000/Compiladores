@@ -132,7 +132,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name="VirtualMachineOutput"></activity>
+        <activity android:name="VirtualMachineOutput" android:screenOrientation="landscape"></activity>
 
     </application>
 

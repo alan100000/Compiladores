@@ -18,8 +18,11 @@ public class VirtualMachineOutput extends Activity {
 	private int procIndex, execPtr;
 	private int tamanos[];
 	private Submemoria memoriaLocal;
-
+	private MyApp appState;
 	private boolean arreglo;
+	
+	private boolean leyendo;
+	private int auxPtr;
 	
 	/**
      * The EditText field from our UI. Keep track of this so we can extract the
@@ -37,7 +40,7 @@ public class VirtualMachineOutput extends Activity {
 	    // Set up click handlers for the text field and button
         mText = (TextView) this.findViewById(R.id.virtualMachineOutput);
         mText.setText(""); /* Reinicializamos texto. */
-        MyApp appState = ((MyApp)getApplicationContext());
+        appState = ((MyApp)getApplicationContext());
         
         init(appState.getCuadruplos(), appState.getProcs(), appState.getTamanos(), appState.getCEnteras(), appState.getCFlotantes(), appState.getCChar(), appState.getCString(), appState.getCBooleanas());
         try {
@@ -52,6 +55,8 @@ public class VirtualMachineOutput extends Activity {
 	public void init(List<Cuadruplo> cuadruplos, List<Procs> procs, int[] tamanos, List<Integer> constantesEnteras, List<Float> constantesFlotantes, List<String> constantesChar, List<String> constantesString, List<Boolean> constantesBooleanas){
 		execPtr = 0;
 		procIndex = 0;
+		auxPtr = 0;
+		leyendo = false;
 		this.tamanos = tamanos;
 		this.cuadruplos = cuadruplos;
 		this.procs = procs;
@@ -86,10 +91,17 @@ public class VirtualMachineOutput extends Activity {
 	}
 /* Metodo que va recorriendo la lista de cuadruplos y manda interpretar cada uno.*/
 	public void run() throws IOException{
-		procIndex = procs.size() - 1; /* Incializamos el procIndex en el indice del Main. */
-		for(execPtr =0; execPtr<cuadruplos.size();execPtr++){
+		if(leyendo){
+			execPtr = auxPtr;
+		}
+		else{
+			procIndex = procs.size() - 1; /* Incializamos el procIndex en el indice del Main. */
+			execPtr = 0;
+		}
+		while(execPtr<cuadruplos.size()){
 			System.out.println("SIG A INTERPRETAR: "+cuadruplos.get(execPtr).debug());
 			interpretaCuadruplo(cuadruplos.get(execPtr));	
+			execPtr++;
 		}
 		System.out.println("+++++++++++++DEBUG+++++++++++++++");
 		mem.debug();
@@ -602,66 +614,102 @@ public class VirtualMachineOutput extends Activity {
 				break;
 			
 			case 16:/* Read */
-				BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-				if(getTipoFromDir(dv03)=='i'){/* Lectura enteros */
-					int valorI = 0;
-					try{
-						valorI = Integer.parseInt(stdIn.readLine());
-					}
-					catch(NumberFormatException e){
-						System.out.println(DroidError.error(999));
-						mText.setText(mText.getText().toString() + DroidError.error(999) + "\n");
-						execPtr = cuadruplos.size() + 5; /* Para salir del ciclo.*/
-					}
-					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), valorI);
+				
+				if(!leyendo){
+					appState.setReadMe("");
+					String tipo = "";
+					if(getTipoFromDir(dv03)=='i')
+						tipo = "(integer)";
+					else if(getTipoFromDir(dv03)=='d')
+						tipo = "(decimal)";
+					else if(getTipoFromDir(dv03)=='c')
+						tipo = "(char)";
+					else if(getTipoFromDir(dv03)=='s')
+						tipo = "(string)";
+					else if(getTipoFromDir(dv03)=='b')
+						tipo = "(boolean)";
+					
+					PromptDialog dlg = new PromptDialog(this, "Read: ", tipo) {
+						 @Override
+						 public boolean onOkClicked(String input) {
+						  // do something
+							 appState.setReadMe(input);
+							 try {
+								run();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						  return true; // true = close dialog
+						 }
+					};
+					dlg.show();
+					leyendo = true;
+					auxPtr = execPtr;
+					execPtr = cuadruplos.size() + 1;
 				}
-				else if(getTipoFromDir(dv03)=='f'){/* Lectura flotante */
-					float valorD = 0;
-					try{
-						valorD = Float.parseFloat(stdIn.readLine());
+				else{				
+					if(getTipoFromDir(dv03)=='i'){/* Lectura enteros */
+						int valorI = 0;
+						try{
+							valorI = Integer.parseInt(appState.getReadMe());
+						}
+						catch(NumberFormatException e){
+							System.out.println(DroidError.error(999));
+							mText.setText(mText.getText().toString() + DroidError.error(999) + "\n");
+							execPtr = cuadruplos.size() + 5; /* Para salir del ciclo.*/
+						}
+						mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), valorI);
 					}
-					catch(NumberFormatException e){
-						System.out.println(DroidError.error(999));
-						mText.setText(mText.getText().toString() + DroidError.error(999) + "\n");
-						execPtr = cuadruplos.size() + 5; /* Para salir del ciclo.*/
+					else if(getTipoFromDir(dv03)=='d'){/* Lectura flotante */
+						float valorD = 0;
+						try{
+							valorD = Float.parseFloat(appState.getReadMe());
+						}
+						catch(NumberFormatException e){
+							System.out.println(DroidError.error(999));
+							mText.setText(mText.getText().toString() + DroidError.error(999) + "\n");
+							execPtr = cuadruplos.size() + 5; /* Para salir del ciclo.*/
+						}
+						mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), valorD);
 					}
-					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), valorD);
-				}
-				else if(getTipoFromDir(dv03)=='c'){/* Lectura caracter */
-					char valorC = ' ';
-					try{
-						valorC = (char)stdIn.read();
+					else if(getTipoFromDir(dv03)=='c'){/* Lectura caracter */
+						char valorC = ' ';
+						try{
+							valorC = appState.getReadMe().charAt(0);
+						}
+						catch(NumberFormatException e){
+							System.out.println(DroidError.error(999));
+							mText.setText(mText.getText().toString() + DroidError.error(999) + "\n");
+							execPtr = cuadruplos.size() + 5; /* Para salir del ciclo.*/
+						}
+						mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), valorC);
 					}
-					catch(NumberFormatException e){
-						System.out.println(DroidError.error(999));
-						mText.setText(mText.getText().toString() + DroidError.error(999) + "\n");
-						execPtr = cuadruplos.size() + 5; /* Para salir del ciclo.*/
+					else if(getTipoFromDir(dv03)=='s'){/* Lectura string */
+						String valorS = "";
+						try{
+							valorS = appState.getReadMe();
+						}
+						catch(NumberFormatException e){
+							System.out.println(DroidError.error(999));
+							mText.setText(mText.getText().toString() + DroidError.error(999) + "\n");
+							execPtr = cuadruplos.size() + 5; /* Para salir del ciclo.*/
+						}
+						mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), valorS);
 					}
-					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), valorC);
-				}
-				else if(getTipoFromDir(dv03)=='s'){/* Lectura string */
-					String valorS = "";
-					try{
-						valorS = stdIn.readLine();
+					else if(getTipoFromDir(dv03)=='b'){/* Lectura booleana */
+						boolean valorB = false;
+						try{
+							valorB = Boolean.parseBoolean(appState.getReadMe());
+						}
+						catch(NumberFormatException e){
+							System.out.println(DroidError.error(999));
+							mText.setText(mText.getText().toString() + DroidError.error(999) + "\n");
+							execPtr = cuadruplos.size() + 5; /* Para salir del ciclo.*/
+						}
+						mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), valorB);
 					}
-					catch(NumberFormatException e){
-						System.out.println(DroidError.error(999));
-						mText.setText(mText.getText().toString() + DroidError.error(999) + "\n");
-						execPtr = cuadruplos.size() + 5; /* Para salir del ciclo.*/
-					}
-					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), valorS);
-				}
-				else if(getTipoFromDir(dv03)=='b'){/* Lectura booleana */
-					boolean valorB = false;
-					try{
-						valorB = Boolean.parseBoolean(stdIn.readLine());
-					}
-					catch(NumberFormatException e){
-						System.out.println(DroidError.error(999));
-						mText.setText(mText.getText().toString() + DroidError.error(999) + "\n");
-						execPtr = cuadruplos.size() + 5; /* Para salir del ciclo.*/
-					}
-					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), valorB);
+					leyendo = false;
 				}
 				break;
 			
