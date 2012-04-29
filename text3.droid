@@ -1,0 +1,12 @@
+function int fibo(int x){
+	if(x <= 2){
+		return 1;
+	}
+	return invoke fibo(x-1) + invoke fibo(x-2);
+}
+
+function execute(){
+	int k = 3;
+	read(k);
+	write("FIBO DE "+k+" es: " + invoke fibo(k));	
+}

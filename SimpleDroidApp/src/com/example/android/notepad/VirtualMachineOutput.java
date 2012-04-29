@@ -755,7 +755,7 @@ public class VirtualMachineOutput extends Activity {
 			case 23:/*ERA*/
 				Era registro = new Era(procIndex, mem.local, execPtr);
 				eras.push(registro);
-				memoriaLocal = new Submemoria(tamanos[5], tamanos[6], tamanos[7], tamanos[8], tamanos[9]);
+				memoriaLocal = new Submemoria(tamanos[5]+1, tamanos[6]+1, tamanos[7]+1, tamanos[8]+1, tamanos[9]+1);
 				for(int i = 0; i<procs.size(); i++){
 					if(procs.get(i).getNombre().equals(dv03)){
 						procIndex = i;

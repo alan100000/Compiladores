@@ -470,6 +470,8 @@ tokens {
 		if(extraerTipoNumFromDir(toReturn) == getTipoNum(listaProcs.get(procIndice).getTipo())){
 			Cuadruplo ret = new Cuadruplo(27, toReturn);
 			listaCuadruplos.add(ret);
+			ret = new Cuadruplo(22); /* Para que no siga ejecutando el proc despues de un return. */
+			listaCuadruplos.add(ret);
 		}
 		else{
 			System.out.println(DroidError.error(77, numLinea));
@@ -1046,15 +1048,16 @@ llamadaPasoCinco: {	if(!primeraPasada){
 				if(!listaProcs.get(procIndiceParams).getTipo().equals("nothing")){
 					String resultado = listaProcs.get(procIndiceParams).getReturnVar();
 					Cuadruplo guardaRet = new Cuadruplo(13, resultado);
-					String temp = "t:"+resultado.charAt(2)+":"+dv[(10 + getTipoNum(resultado.substring(2,3)))]; /* El 10 debido al offset para el segmento de temporales */
-					dv[(10 + getTipoNum(resultado.substring(2,3)))]++;
+					String temp = "l:"+resultado.charAt(2)+":"+dv[(5 + getTipoNum(resultado.substring(2,3)))]; /* El 5 debido al offset para el segmento de temporales */
+					dv[(5 + getTipoNum(resultado.substring(2,3)))]++;
 					guardaRet.setDv03(temp);
 					if(!pilaOperadores.empty())
 						pilaOperadores.pop(); /* Sacamos fondo falso. */
 					pilaOperandos.push(temp); /* Metemos el resultado a la pila de operandos*/
 					listaCuadruplos.add(guardaRet);
 				}
-			}};
+			}
+		};
 
 paramsDos : expresion llamadaPasoTres paramsDosPrima 
 	| ;
