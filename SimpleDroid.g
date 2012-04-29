@@ -72,6 +72,7 @@ tokens {
     /* Banderas especiales  */
     static boolean compError = false; 		/* Bandera para impedir que se repitan multiples veces algunas indicaciones de error. */
     static boolean primeraPasada = true; 	/* Bandera para indicar que se esta en la primer pasada del codigo. */
+    static boolean hayUnNot = false;		/* Bandera para indicar que la expresion se va a negar con el token NOT. */
     static int negativa = 1; 			/* Bandera para detectar que se esta usando una variable negativa y no una resta. */
     /*                      */
 
@@ -918,9 +919,31 @@ arrPasoDosA: {
 
 arrPasoTresA: { if(!primeraPasada){asignacionArreglo = true; arregloTres();}};
 
-expresion : expresionPrima exp comparador;
+expresion : expresionPrima exp checaNot comparador;
 
-expresionPrima : NOT
+checaNot: { 	if(!primeraPasada){
+			if(hayUnNot){
+				String resultado = pilaOperandos.pop();
+				String permiso = cuboVars.verificaCubo(2, extraerTipoNumFromDir(resultado));
+				System.out.println("EL PERMISO ES: "+permiso);
+				if(permiso.equals("boolean")){
+					Cuadruplo negacion = new Cuadruplo(14, resultado);
+					String temp = "t:"+resultado.charAt(2)+":"+dv[(10 + getTipoNum(resultado.substring(2,3)))]; /* El 10 debido al offset para el segmento de temporales */
+					dv[(10 + getTipoNum(resultado.substring(2,3)))]++;
+					negacion.setDv03(temp);
+					pilaOperandos.push(temp);
+					listaCuadruplos.add(negacion);
+				}
+				else{
+					compError = true;
+					System.out.println(DroidError.error(641, numLinea));
+					salida += DroidError.error(641, numLinea);
+				}
+				hayUnNot = false;
+			}
+		}};
+
+expresionPrima : NOT {if(!primeraPasada){ hayUnNot = true; }}
 	| ;
 
 comparador : comparadorPrima logico { if(!pilaOperadores.empty()){

@@ -107,6 +107,8 @@ public class CuboVars{
 		return "errorDos";
 	if(i == 1)
 		return this.matriz[0][j];
+	if(i == 2)
+		return this.matriz[1][j];
 			
         return this.matriz[i-13][j];       
     }
