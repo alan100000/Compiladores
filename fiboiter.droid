@@ -1,0 +1,22 @@
+function execute(){
+	int n;
+	int f2=0;
+	int f1=1;
+ 	int fib=0;
+	int i;
+
+	write("Que numero de la serie fibonacci quieres?");
+	read(n);
+	
+	if(n<=1){
+		write(n);
+	}
+	else{
+		for(i=2;i<=n;i= i+1){
+			fib=f1+f2;
+			f2=f1;
+			f1=fib;
+		}
+		write(fib);
+	}
+}
