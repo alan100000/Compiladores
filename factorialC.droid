@@ -1,0 +1,10 @@
+function execute(){
+	int n;
+	int i;
+	int acumulador = 1;
+	read(n);
+	for(i =n; i>0; i=i-1){
+		acumulador = acumulador * i;
+	}
+	write("El factorial de " + n + " es: " + acumulador);
+}

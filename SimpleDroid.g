@@ -244,7 +244,10 @@ tokens {
     public int extraerTipoNumFromDir(String direccion){
 	try{
 		String subDir[] = direccion.split(":");
-		return getTipoNum(subDir[1]);
+		if(direccion.charAt(0) != '&')
+			return getTipoNum(subDir[1]);
+		else
+			return getTipoNum(subDir[4]);
 	}
 	catch(ArrayIndexOutOfBoundsException e){
 		return -1;
@@ -486,16 +489,34 @@ tokens {
 	if(!primeraPasada){
 		if(!pilaOperandos.empty()){
 			String direccion = getDireccion(id);
-			Cuadruplo asignacion = new Cuadruplo(listaOps.getOpCode("="), pilaOperandos.pop());
+			String asigname = pilaOperandos.pop();
+			Cuadruplo asignacion = new Cuadruplo(listaOps.getOpCode("="), asigname);
 			if(direccion.equals(""))
 				asignacion.setDv03(id);
 			else if(asignacionArreglo){
-				if(!pilaOperandos.empty())
-					asignacion.setDv03(pilaOperandos.pop());
+				if(!pilaOperandos.empty()){
+					direccion = pilaOperandos.pop();
+					String res = cuboVars.verificaCubo(listaOps.getOpCode("="), extraerTipoNumFromDir(asigname), extraerTipoNumFromDir(direccion));
+					if(!res.equals("error"))
+						asignacion.setDv03(direccion);
+					else{
+						compError = true;
+						System.out.println(DroidError.error(641, numLinea));
+						salida += DroidError.error(641, numLinea);
+					}
+				}
 				asignacionArreglo = false;
 			}
-			else
-				asignacion.setDv03(direccion);
+			else{
+				String res = cuboVars.verificaCubo(listaOps.getOpCode("="), extraerTipoNumFromDir(asigname), extraerTipoNumFromDir(direccion));
+				if(!res.equals("error"))
+					asignacion.setDv03(direccion);
+				else{
+					compError = true;
+					System.out.println(DroidError.error(641, numLinea));
+					salida += DroidError.error(641, numLinea);
+				}
+			}
 			listaCuadruplos.add(asignacion);
 		}
 	}
@@ -505,7 +526,14 @@ tokens {
     public void rellenaCuadruplos(String id, String direccion){
 	for(int i = 0; i<listaCuadruplos.size(); i++){
 		if(listaCuadruplos.get(i).getDv03().equals(id)){
-			listaCuadruplos.get(i).setDv03(direccion);
+			String res = cuboVars.verificaCubo(listaOps.getOpCode("="), extraerTipoNumFromDir(listaCuadruplos.get(i).getDv01()), extraerTipoNumFromDir(direccion));
+			if(!res.equals("error"))
+				listaCuadruplos.get(i).setDv03(direccion);
+			else{
+				compError = true;
+				System.out.println(DroidError.error(641, numLinea));
+				salida += DroidError.error(641, numLinea);
+			}
 		}
 	}
     }
@@ -665,22 +693,14 @@ tokens {
 		if(exp.charAt(2)=='i' || exp.charAt(3)=='i'){
 			Cuadruplo ver = new Cuadruplo(25, exp, ""+lsuperior);
 			listaCuadruplos.add(ver);		
-
 			String resultado = cuboVars.verificaCubo(0, extraerTipoNumFromDir(arregloDir), extraerTipoNumFromDir(exp));
-			if(resultado.equals("int")){
-				String temp = "&t:"+resultado.charAt(0)+":"+dv[(10 + getTipoNum(resultado))]; /* El 10 debido al offset para el segmento de temporales */
-				dv[(10 + getTipoNum(resultado))]++;
-				String dirOrig[] = arregloDir.split(":");
-				temp = temp + ":" + arregloDir.charAt(0)+":"+dirOrig[1];
-				pilaOperandos.push(temp); /* Metemos el resultado a la pila de operandos*/
-				Cuadruplo accArr = new Cuadruplo(0, "*"+arregloDir, exp, temp);
-				listaCuadruplos.add(accArr);
-			}
-			else{
-				compError = true;
-				System.out.println(DroidError.error(641, numLinea));
-				salida += DroidError.error(641, numLinea);
-			}
+			String temp = "&t:i:"+dv[10]; /* El 10 debido al offset para el segmento de temporales */
+			dv[10]++;
+			String dirOrig[] = arregloDir.split(":");
+			temp = temp + ":" + arregloDir.charAt(0)+":"+dirOrig[1];
+			pilaOperandos.push(temp); /* Metemos el resultado a la pila de operandos*/
+			Cuadruplo accArr = new Cuadruplo(0, "*"+arregloDir, exp, temp);
+			listaCuadruplos.add(accArr);
 			arregloDir = "";
 			lsuperior = 0;
 			return true;
@@ -762,15 +782,15 @@ fragment UPPERCASE : 'A'..'Z' ;
 programa : inicializacion vars agregaSalto funciones main {	
 		if(!primeraPasada){
 			if(DroidError.finalError){
-				System.out.println("Hubo errores en la compilacion.");
-				salida+="Hubo errores en la compilacion.";
+				System.out.println("There were compilation errors.");
+				salida+="There were compilation errors.";
 			}
 			else{
 				Cuadruplo endP = new Cuadruplo(26);
 				listaCuadruplos.add(endP); /* Agregar cuadruplo de terminacion. */
 				debugCuadruplos();
-				System.out.println("La compilacion ha sido exitosa. Bienvenido al futuro.");
-				salida += "La compilacion ha sido exitosa. Bienvenido al futuro.";
+				System.out.println("Successful Compilation!");
+				salida += "Successful Compilation!";
 			}
 			compError = DroidError.finalError;
 			if(!DroidError.finalError){

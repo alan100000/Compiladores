@@ -6,12 +6,7 @@ function int fibo(int x){
 }
 
 function execute(){
-	int k = 3;
-	boolean permiso;
-	write("PROSEGUIR INVERSO? true/false");
-	read(permiso);
-	if(NOT permiso){
-		read(k);
-		write("FIBO DE "+k+" es: " + invoke fibo(k));	
-	}
+	int k;
+	read(k);
+	write("Fibonacci de "+k+" es: " + invoke fibo(k));	
 }

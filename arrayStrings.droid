@@ -1,0 +1,11 @@
+function execute(){
+	string hilos[10];
+	string halos[10];
+	string suma;
+	boolean pedote;
+	hilos[0] = "pan";
+	halos[0] = "vino";
+	suma = hilos[0] + " y " + halos[0];
+	write(suma);
+	pedote = 3;
+}

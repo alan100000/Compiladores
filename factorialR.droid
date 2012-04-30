@@ -1,0 +1,15 @@
+function int factorial(int x){
+	if(x>=2){
+		return x * invoke factorial(x-1);
+	}
+	else{
+		return 1;
+	}
+}
+
+function execute(){
+	int n, resultado;
+	read(n);
+	resultado = invoke factorial(n);
+	write("El factorial de " + n + " es: " + resultado);
+}

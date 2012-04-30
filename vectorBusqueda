@@ -1,0 +1,23 @@
+function execute(){
+	int arreglo[5];
+	int n,i;
+	int posicion = -1;
+	write("Dame los valores de los arreglos: ");
+	for(i=0; i<5; i= i+1){
+		read(n);
+		arreglo[i] = n;
+	}
+	write("Que valor debo buscar: ");
+	read(n);
+	for(i=0; i<5; i= i+1){
+		if(arreglo[i] == n){
+			posicion = i;
+		}
+	}
+	if(posicion == -1){
+		write("Ese valor no esta en el arreglo");
+	}
+	else{
+		write("El valor esta en la posicion " + posicion);
+	}	
+}

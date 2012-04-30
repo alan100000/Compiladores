@@ -1,0 +1,17 @@
+function execute(){
+	decimal alfa[10];
+	decimal beta[10];
+	int i;
+	decimal suma;
+	alfa[0] = 1;
+	beta[0] = 1;
+	for(i = 0; i < 10; i = i + 1){
+		alfa[i] = i + 0.5;
+		beta [i] = 9.5 - i;
+	}
+	write("La suma arroja...");
+	for(i = 0; i < 10; i = i + 1){
+		suma = alfa[i] + beta[i];
+		write("La suma de alfa["+i+"] + beta["+i+"] es: "+ suma);
+	}
+}

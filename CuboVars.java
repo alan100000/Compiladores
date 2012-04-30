@@ -89,8 +89,8 @@ public class CuboVars{
                    {"error","error","error","error","error"},
                    {"error","error","error","error","boolean"}},
                   
-                  {{"int","error","error","error","error"}, //=
-                   {"decimal","decimal","error","error","error"},
+                  {{"int","decimal","error","error","error"}, //=
+                   {"error","decimal","error","error","error"},
                    {"error","error","char","error","error"},
                    {"error","error","string","string","error"},
                    {"error","error","error","error","boolean"}}};

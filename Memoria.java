@@ -140,6 +140,8 @@ public class Memoria{
 
     		case 'c':
     			return constantes.getDecimal(index);
+		case '*':
+			return index;
     	}
     	
     	return -1;
