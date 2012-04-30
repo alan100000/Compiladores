@@ -1,4 +1,3 @@
-package com.example.android.notepad;
 import java.util.Stack;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +13,6 @@ public class VirtualMachine{
 	Submemoria memoriaLocal;
 
 	boolean arreglo;
-	
-	public String temporal; /* Para propositos de testing. */
 
 	public VirtualMachine(List<Cuadruplo> cuadruplos, List<Procs> procs, int[] tamanos, List<Integer> constantesEnteras, List<Float> constantesFlotantes, List<String> constantesChar, List<String> constantesString, List<Boolean> constantesBooleanas){
 		execPtr = 0;
@@ -55,10 +52,9 @@ public class VirtualMachine{
 	}
 /* Metodo que va recorriendo la lista de cuadruplos y manda interpretar cada uno.*/
 	public void run() throws IOException{
-		temporal = "";
 		procIndex = procs.size() - 1; /* Incializamos el procIndex en el indice del Main. */
 		for(execPtr =0; execPtr<cuadruplos.size();execPtr++){
-			System.out.println("SIG A INTERPRETAR: "+cuadruplos.get(execPtr).debug());
+			//System.out.println("SIG A INTERPRETAR: "+cuadruplos.get(execPtr).debug());
 			interpretaCuadruplo(cuadruplos.get(execPtr));	
 		}
 		System.out.println("+++++++++++++DEBUG+++++++++++++++");
@@ -95,6 +91,14 @@ public class VirtualMachine{
 		}
 		if(arreglo)
 			arreglo = false;
+
+
+		/* Las direcciones son numeros enteros a fin de cuentas. */
+		if(!dv01.equals("") && dv01.charAt(0) == '*')
+			dv01 = dv01.substring(0,3) +"i" + dv01.substring(4);
+
+		if(!dv02.equals("") && dv02.charAt(0) == '*')
+			dv02 = dv02.substring(0,3) +"i" + dv01.substring(4);
 		
 		switch(cuad.getCodigoOp()){
 			case 0: /*Suma + */
@@ -104,19 +108,19 @@ public class VirtualMachine{
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1+operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='f'){ /*Entero + Flotante*/
+				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='d'){ /*Entero + Flotante*/
 					int operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1+operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='i'){ /* Flotante + Entero*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='i'){ /* Flotante + Entero*/
 					int operando2 = mem.getIntVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1+operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='f'){ /* Flotante + Flotante*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='d'){ /* Flotante + Flotante*/
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1+operando2);
@@ -158,13 +162,13 @@ public class VirtualMachine{
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1+operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='s'){ /*Flotante + String*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='s'){ /*Flotante + String*/
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					String operando2 = mem.getStringVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1+operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='s'&&getTipoFromDir(dv02)=='f'){ /*String + Flotante*/
+				else if(getTipoFromDir(dv01)=='s'&&getTipoFromDir(dv02)=='d'){ /*String + Flotante*/
 					String operando1 = mem.getStringVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1+operando2);
@@ -178,19 +182,19 @@ public class VirtualMachine{
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1-operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='f'){ /*Entero - Flotante*/
+				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='d'){ /*Entero - Flotante*/
 					int operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1-operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='i'){ /* Flotante - Entero*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='i'){ /* Flotante - Entero*/
 					int operando2 = mem.getIntVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1-operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='f'){ /* Flotante - Flotante*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='d'){ /* Flotante - Flotante*/
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1-operando2);
@@ -204,19 +208,19 @@ public class VirtualMachine{
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1*operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='f'){ /*Entero * Flotante*/
+				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='d'){ /*Entero * Flotante*/
 					int operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1*operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='i'){ /* Flotante * Entero*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='i'){ /* Flotante * Entero*/
 					int operando2 = mem.getIntVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1*operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='f'){ /* Flotante * Flotante*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='d'){ /* Flotante * Flotante*/
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1*operando2);
@@ -227,25 +231,25 @@ public class VirtualMachine{
 				if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='i'){ /*Entero / Entero*/
 					float operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getIntVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
-					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1+operando2);
+					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1/operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='f'){ /*Entero / Flotante*/
+				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='d'){ /*Entero / Flotante*/
 					float operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
-					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1+operando2);
+					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1/operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='i'){ /* Flotante / Entero*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='i'){ /* Flotante / Entero*/
 					float operando2 = mem.getIntVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
-					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1+operando2);
+					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1/operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='f'){ /* Flotante * Flotante*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='d'){ /* Flotante * Flotante*/
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
-					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1+operando2);
+					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1/operando2);
 				}
 				break;
 			
@@ -264,19 +268,19 @@ public class VirtualMachine{
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1>operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='f'){ /*Entero > Flotante*/
+				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='d'){ /*Entero > Flotante*/
 					int operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1>operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='i'){ /* Flotante > Entero*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='i'){ /* Flotante > Entero*/
 					int operando2 = mem.getIntVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1>operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='f'){ /* Flotante > Flotante*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='d'){ /* Flotante > Flotante*/
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1>operando2);
@@ -290,19 +294,19 @@ public class VirtualMachine{
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1<operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='f'){ /*Entero < Flotante*/
+				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='d'){ /*Entero < Flotante*/
 					int operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1<operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='i'){ /* Flotante < Entero*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='i'){ /* Flotante < Entero*/
 					int operando2 = mem.getIntVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1<operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='f'){ /* Flotante < Flotante*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='d'){ /* Flotante < Flotante*/
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1<operando2);
@@ -316,19 +320,19 @@ public class VirtualMachine{
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1>=operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='f'){ /*Entero >= Flotante*/
+				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='d'){ /*Entero >= Flotante*/
 					int operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1>=operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='i'){ /* Flotante >= Entero*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='i'){ /* Flotante >= Entero*/
 					int operando2 = mem.getIntVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1>=operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='f'){ /* Flotante >= Flotante*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='d'){ /* Flotante >= Flotante*/
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1>=operando2);
@@ -342,19 +346,19 @@ public class VirtualMachine{
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1<=operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='f'){ /*Entero < Flotante*/
+				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='d'){ /*Entero < Flotante*/
 					int operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1<=operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='i'){ /* Flotante < Entero*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='i'){ /* Flotante < Entero*/
 					int operando2 = mem.getIntVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1<=operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='f'){ /* Flotante < Flotante*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='d'){ /* Flotante < Flotante*/
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1<=operando2);
@@ -368,19 +372,19 @@ public class VirtualMachine{
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1==operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='f'){ /*Entero == Flotante*/
+				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='d'){ /*Entero == Flotante*/
 					int operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1==operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='i'){ /* Flotante == Entero*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='i'){ /* Flotante == Entero*/
 					int operando2 = mem.getIntVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1==operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='f'){ /* Flotante == Flotante*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='d'){ /* Flotante == Flotante*/
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1==operando2);
@@ -424,19 +428,19 @@ public class VirtualMachine{
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1!=operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='f'){ /*Entero != Flotante*/
+				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv02)=='d'){ /*Entero != Flotante*/
 					int operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1!=operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='i'){ /* Flotante != Entero*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='i'){ /* Flotante != Entero*/
 					int operando2 = mem.getIntVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1!=operando2);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv02)=='f'){ /* Flotante != Flotante*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv02)=='d'){ /* Flotante != Flotante*/
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					float operando2 = mem.getDecimalVar(getSubmemFromDir(dv02), getTipoFromDir(dv02), getIndexFromDir(dv02));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1!=operando2);
@@ -495,12 +499,12 @@ public class VirtualMachine{
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1);
 				}
 				
-				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv03)=='f'){ /*Flotante = Entero*/
-					int operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv03)=='d'){ /*Flotante = Entero*/
+					float operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv03)=='f'){ /* Flotante = Flotante*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv03)=='d'){ /* Flotante = Flotante*/
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1);
 				}
@@ -511,7 +515,7 @@ public class VirtualMachine{
 				}
 				
 				else if(getTipoFromDir(dv01)=='c'&&getTipoFromDir(dv03)=='s'){ /* String = Char*/
-					char operando1 = mem.getCharVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
+					String operando1 = ""+mem.getCharVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1);
 				}
 				
@@ -537,19 +541,16 @@ public class VirtualMachine{
 				if(getTipoFromDir(dv03)=='i'){/*Imprime entero*/
 					int operando = mem.getIntVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03));
 					System.out.println(operando);
-					temporal += temporal + operando + "\n"; //DEBUG
 				}
 
 				if(getTipoFromDir(dv03)=='d'){/* Imprime decimal */
 					float operando = mem.getDecimalVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03));
 					System.out.println(operando);
-					temporal += temporal + operando + "\n"; //DEBUG
 				}
 
 				if(getTipoFromDir(dv03)=='c'){/* Imprime caracter */
 					char operando = mem.getCharVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03));
 					System.out.println(operando);
-					temporal += temporal + operando + "\n"; //DEBUG
 				}
 
 				if(getTipoFromDir(dv03)=='s'){/* Imprime string */
@@ -561,13 +562,11 @@ public class VirtualMachine{
 						operando = operando + escape[i];
 					}
 					System.out.println(operando);
-					temporal += temporal + operando + "\n"; //DEBUG
 				}
 
 				if(getTipoFromDir(dv03)=='b'){/* Imprime boolean */
 					boolean operando = mem.getBooleanVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03));
 					System.out.println(operando);
-					temporal += temporal + operando + "\n"; //DEBUG
 				}				
 				break;
 			
@@ -584,7 +583,7 @@ public class VirtualMachine{
 					}
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), valorI);
 				}
-				else if(getTipoFromDir(dv03)=='f'){/* Lectura flotante */
+				else if(getTipoFromDir(dv03)=='d'){/* Lectura flotante */
 					float valorD = 0;
 					try{
 						valorD = Float.parseFloat(stdIn.readLine());
@@ -671,7 +670,7 @@ public class VirtualMachine{
 			case 23:/*ERA*/
 				Era registro = new Era(procIndex, mem.local, execPtr);
 				eras.push(registro);
-				memoriaLocal = new Submemoria(tamanos[5], tamanos[6], tamanos[7], tamanos[8], tamanos[9]);
+				memoriaLocal = new Submemoria(tamanos[5]+1, tamanos[6]+1, tamanos[7]+1, tamanos[8]+1, tamanos[9]+1);
 				for(int i = 0; i<procs.size(); i++){
 					if(procs.get(i).getNombre().equals(dv03)){
 						procIndex = i;
@@ -687,12 +686,12 @@ public class VirtualMachine{
 					memoriaLocal.addInt(getIndexFromDir(dv03), operando1);
 				}
 				
-				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv03)=='f'){ /*Flotante = Entero*/
+				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv03)=='d'){ /*Flotante = Entero*/
 					int operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					memoriaLocal.addDecimal(getIndexFromDir(dv03), operando1);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv03)=='f'){ /* Flotante = Flotante*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv03)=='d'){ /* Flotante = Flotante*/
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					memoriaLocal.addDecimal(getIndexFromDir(dv03), operando1);
 				}
@@ -729,13 +728,10 @@ public class VirtualMachine{
 				break;
 			
 			case 26:/*End*/
-				if(execPtr >= (cuadruplos.size() - 1)){
+				if(execPtr >= (cuadruplos.size() - 1))
 					System.out.println("Program execution ended properly.");
-					temporal += temporal + "Program execution ended properly." + "\n"; //DEBUG
-				}
 				else{
 					System.out.println(DroidError.error(1000));
-					temporal += temporal + DroidError.error(1000) + "\n"; //DEBUG
 					System.exit(0);
 				}
 				break;
@@ -747,12 +743,12 @@ public class VirtualMachine{
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1);
 				}
 				
-				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv03)=='f'){ /*Flotante = Entero*/
+				else if(getTipoFromDir(dv01)=='i'&&getTipoFromDir(dv03)=='d'){ /*Flotante = Entero*/
 					int operando1 = mem.getIntVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1);
 				}
 				
-				else if(getTipoFromDir(dv01)=='f'&&getTipoFromDir(dv03)=='f'){ /* Flotante = Flotante*/
+				else if(getTipoFromDir(dv01)=='d'&&getTipoFromDir(dv03)=='d'){ /* Flotante = Flotante*/
 					float operando1 = mem.getDecimalVar(getSubmemFromDir(dv01), getTipoFromDir(dv01), getIndexFromDir(dv01));
 					mem.addVar(getSubmemFromDir(dv03), getTipoFromDir(dv03), getIndexFromDir(dv03), operando1);
 				}

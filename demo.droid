@@ -1,0 +1,103 @@
+function string holaMundo(string nombre){
+	return "Bienvenido "+nombre+", hola mundo!";
+}
+
+function int suma(int a, int b){
+	return a + b;
+}
+
+function int resta(int a, int b){
+	return a - b;
+}
+
+function int multi(int a, int b){
+	return a * b;
+}
+
+function decimal divi(int a, int b){
+	return a / b;
+}
+
+function int mod(int a, int b){
+	return a % b;
+}
+
+function int potencia(int a, int b){
+	int i = 0;
+	int base;
+	base = a;
+	if(b == 0){
+		return 1;
+	}
+	for(i=1; i<b; i=i+1){
+		a = base * a;
+	}
+	return a;
+}
+
+function execute(){
+	string nombre;
+	int a, b, menu;
+	boolean dale = true;
+	write("Hola. Cual es tu nombre, humano?");
+	read(nombre);
+	write(invoke holaMundo(nombre));
+	write("******************BIENVENIDOS A LA CALCULADORA 1975******************");
+	while(dale){
+		write("Elige una opcion. Cualquier numero fuera del rango para salir.");
+		write("1 - Suma");
+		write("2 - Resta");
+		write("3 - Multiplicacion");
+		write("4 - Division");
+		write("5 - Mod");
+		write("6 - Potencia");
+		read(menu);
+		if((menu <= 0) OR (menu >= 7)){
+			dale = false;
+		}
+		if(menu == 1){
+			write("Primer numero:");
+			read(a);
+			write("Segundo numero:");
+			read(b);
+			write("Resultado: "+invoke suma(a,b));
+		}
+		if(menu == 2){
+			write("Primer numero:");
+			read(a);
+			write("Segundo numero:");
+			read(b);
+			write("Resultado: "+invoke resta(a,b));
+		}
+		if(menu == 3){
+			write("Primer numero:");
+			read(a);
+			write("Segundo numero:");
+			read(b);
+			write("Resultado: "+invoke multi(a,b));
+		}
+		if(menu == 4){
+			write("Primer numero:");
+			read(a);
+			write("Segundo numero:");
+			read(b);
+			write("Resultado: "+invoke divi(a,b));
+		}
+		if(menu == 5){
+			write("Primer numero:");
+			read(a);
+			write("Segundo numero:");
+			read(b);
+			write("Resultado: "+invoke mod(a,b));
+		}
+		if(menu == 6){
+			write("Numero:");
+			read(a);
+			write("Potencia:");
+			read(b);
+			write("Resultado: "+invoke potencia(a,b));
+		}
+		write("");
+		write("");
+	}
+}
